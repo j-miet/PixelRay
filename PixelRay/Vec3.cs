@@ -1,61 +1,29 @@
-global using Point3 = PixelRay.Vec3; // alias for Vec3; useful when referring to a point instead of a vector
-
 namespace PixelRay
 {
     /// <summary>
-    /// Class for 3D vectors
+    /// Class for 3D vectors. Can also be used for any 3D metric such as colors, points in space etc.
     /// </summary>
     public class Vec3
     {
-        private (double x, double y, double z) e;
-
         public Vec3()
         {
-            e = (0, 0, 0);
+            Data = (0, 0, 0);
         }
 
-        public Vec3(double e0, double e1, double e2)
+        public Vec3(double x, double y, double z)
         {
-            e = (e0, e1, e2);
+            Data = (x, y, z);
         }
 
-        public (double x, double y, double z) Get
-        {
-            get => e;
-        }
+        public (double, double, double) Data { get; }
 
-        public double X
-        {
-            get => e.x;
-            set => e.x = value;
-        }
-
-        public double Y
-        {
-            get => e.y;
-            set => e.y = value;
-        }
-
-        public double Z
-        {
-            get => e.z;
-            set => e.z = value;
-        }
-
-        public double GetValue(int index)
-        {
-            return index switch
-            {
-                0 => e.x,
-                1 => e.y,
-                2 => e.z,
-                _ => throw new ArgumentException("Invalid index"),
-            };
-        }
+        public double X { get => Data.Item1; }
+        public double Y { get => Data.Item2; }
+        public double Z { get => Data.Item3; }
 
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", e.x, e.y, e.z);
+            return string.Format("({0}, {1}, {2})", Data.Item1, Data.Item2, Data.Item3);
         }
 
         public double Length()
@@ -65,76 +33,141 @@ namespace PixelRay
 
         public double LengthSquared()
         {
-            return e.x * e.x + e.y * e.y + e.z * e.z;
+            return Data.Item1 * Data.Item1 + Data.Item2 * Data.Item2 + Data.Item3 * Data.Item3;
         }
 
-        // index operator overload. Then: Vec3 v = new() -> v[0] has value v.X, v[1] has v.Y and v[2] has v.Z
+        /// <summary>
+        /// Index operator overload; access vector coordinates by corresponding index: 0 for x , 1 for y, 2 for z 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns>Index position coordinate</returns>
         public double this[int index]
         {
             get => GetValue(index);
         }
 
         // arithmetic operation overloading requires use of 'static' in C#
-        // inverse
+
+        /// <summary>
+        /// Vector inverse; use it with syntax -v
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns>Vector -v</returns>
         public static Vec3 operator -(Vec3 v)
         {
-            return new Vec3(-v[0], -v[1], -v[2]);
+            return new Vec3(-v.X, -v.Y, -v.Z);
         }
 
-        // subtract
+        /// <summary>
+        /// Subtracts vector w from v
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns>Vector v - w</returns>
         public static Vec3 operator -(Vec3 v, Vec3 w)
         {
-            return new Vec3(v[0] - w[0], v[1] - w[1], v[2] - w[2]);
+            return new Vec3(v.X - w.X, v.Y - w.Y, v.Z - w.Z);
         }
 
-        // sum
+        /// <summary>
+        /// Sum of vectors
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns>Vector v + w</returns>
         public static Vec3 operator +(Vec3 v, Vec3 w)
         {
-            return new Vec3(v[0] + w[0], v[1] + w[1], v[2] + w[2]);
+            return new Vec3(v.X + w.X, v.Y + w.Y, v.Z + w.Z);
         }
 
-        // left scalar product
+        /// <summary>
+        /// Left scalar product
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="v"></param>
+        /// <returns>t * v</returns>
         public static Vec3 operator *(double t, Vec3 v)
         {
-            return new Vec3(t * v[0], t * v[1], t * v[2]);
+            return new Vec3(t * v.X, t * v.Y, t * v.Z);
         }
 
-        // right scalar product
+        /// <summary>
+        /// Right scalar product
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="t"></param>
+        /// <returns>t * v</returns>
         public static Vec3 operator *(Vec3 v, double t)
         {
             return t * v;
         }
 
-        //scalar division
+        /// <summary>
+        /// Scalar division
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="t"></param>
+        /// <returns>(1/t) * v</returns>
         public static Vec3 operator /(Vec3 v, double t)
         {
             return 1 / t * v;
         }
 
         //element-wise multiplication
+        /// <summary>
+        /// Element-wise multiplication
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns>Element-wise product vector</returns>
         public static Vec3 operator *(Vec3 v, Vec3 w)
         {
-            return new Vec3(v[0] * w[0], v[1] * w[1], v[2] * w[2]);
+            return new Vec3(v.X * w.X, v.Y * w.Y, v.Z * w.Z);
         }
 
-        // dot product
+        /// <summary>
+        /// Dot product
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns>Dot product of v and w</returns>
         public static double Dot(Vec3 v, Vec3 w)
         {
-            return v[0] * w[0] + v[1] * w[1] + v[2] * w[2];
+            return v.X * w.X + v.Y * w.Y + v.Z * w.Z;
         }
 
-        // cross product
+        /// <summary>
+        /// Cross product
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns>Cross product v x w</returns>
         public static Vec3 Cross(Vec3 v, Vec3 w)
         {
-            return new Vec3(v[1] * w[2] - v[2] * w[1],
-                            v[2] * w[0] - v[0] * w[2],
-                            v[0] * w[1] - v[1] * w[0]);
+            return new Vec3(v.Y * w.Z - v.Z * w.Y,
+                            v.Z * w.X - v.X * w.Z,
+                            v.X * w.Y - v.Y * w.X);
         }
 
-        // unit vector
+        /// <summary>
+        /// Unit vector
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns>Unit vector of v</returns>
         public static Vec3 Unit(Vec3 v)
         {
             return v / v.Length();
+        }
+
+        private double GetValue(int index)
+        {
+            return index switch
+            {
+                0 => Data.Item1,
+                1 => Data.Item2,
+                2 => Data.Item3,
+                _ => throw new ArgumentException("Invalid index"),
+            };
         }
     }
 }

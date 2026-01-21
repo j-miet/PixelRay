@@ -1,0 +1,9 @@
+{
+  "projects": [
+    "PixelRay",
+    "UnitTests"
+  ],
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  }
+}

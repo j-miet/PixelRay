@@ -110,6 +110,10 @@ namespace PixelRay
         /// <returns>(1/t) * v</returns>
         public static Vec3 operator /(Vec3 v, double t)
         {
+            if (t == 0)
+            {
+                throw new DivideByZeroException("Cannot divide a vector by zero!");
+            }
             return 1 / t * v;
         }
 
@@ -156,6 +160,11 @@ namespace PixelRay
         /// <returns>Unit vector of v</returns>
         public static Vec3 Unit(Vec3 v)
         {
+            double len = v.Length();
+            if (len == 0)
+            {
+                throw new DivideByZeroException("Zero vector has no unit vector!");
+            }
             return v / v.Length();
         }
 

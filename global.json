@@ -1,7 +1,7 @@
 {
   "projects": [
     "PixelRay",
-    "UnitTests"
+    "tests"
   ],
   "test": {
     "runner": "Microsoft.Testing.Platform"

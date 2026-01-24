@@ -28,7 +28,7 @@ namespace PixelRay.Tests
         public void TestVec3Get()
         {
             Vec3 v = new(1, 2, 3);
-            Assert.True(v.X == 1 && v.Y == 2 && v.Z == 3);
+            Assert.True(v.X == 1);
             Assert.True(v.Y == 2);
             Assert.True(v.Z == 3);
         }

@@ -23,4 +23,4 @@ jobs:
     - name: Install .Net SDK Templates for xUnit
       run: dotnet new install xunit.v3.templates
     - name: Run tests
-      run: dotnet test --project tests --no-build --verbosity normal
+      run: dotnet test --project tests --verbosity normal

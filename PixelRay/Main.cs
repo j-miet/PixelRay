@@ -1,15 +1,13 @@
-﻿namespace PixelRay
+﻿using PixelRay;
+
+static class CreateRayTracer
 {
-    static class CreatePixelRay
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            // TODO add command line interface access & scripting support here
-            PixelRay raytracer = new();
-            raytracer.Render();
-        }
-
+        // TODO add command line interface access & scripting support here
+        RayTracer raytracer = new();
+        raytracer.Render();
     }
-}
 
+}
 

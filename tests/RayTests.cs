@@ -8,8 +8,8 @@ namespace PixelRay.Tests
         [Fact]
         public void TestRay()
         {
-            Vec3 origin = new Vec3(1, 2, 3);
-            Vec3 direction = new Vec3(0, 0, 1);
+            Vec3 origin = new(1, 2, 3);
+            Vec3 direction = new(0, 0, 1);
 
             Ray r = new(origin, direction);
             Assert.True(r.Origin == origin);

@@ -8,6 +8,4 @@ static class CreateRayTracer
         RayTracer raytracer = new();
         raytracer.Render();
     }
-
 }
-

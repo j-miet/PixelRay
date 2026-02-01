@@ -2,7 +2,7 @@ namespace PixelRay;
 
 static class Color
 {
-    public static void WriteColor(List<string> image, rgbColor color)
+    public static void AddColor(List<string> image, RGBColor color)
     {
         double r = color[0];
         double g = color[1];

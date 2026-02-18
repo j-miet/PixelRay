@@ -1,10 +1,24 @@
-namespace PixelRay.Vec3;
+namespace PixelRay.Mathematics;
 
-public readonly struct Vec3(float x, float y, float z)
+public readonly struct Vec3
 {
-    public readonly float X = x;
-    public readonly float Y = y;
-    public readonly float Z = z;
+    public readonly double X;
+    public readonly double Y;
+    public readonly double Z;
+
+    public Vec3()
+    {
+        X = 0;
+        Y = 0;
+        Z = 0;
+    }
+
+    public Vec3(double x, double y, double z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
 
     /// <summary>
     /// Display Vec3 object in (x, y, z) format
@@ -16,10 +30,20 @@ public readonly struct Vec3(float x, float y, float z)
     }
 
     /// <summary>
+    /// Index operator overload; access vector coordinates by corresponding index: v[0] = X , v[1] = Y, v[2] = Z 
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns>Index position coordinate</returns>
+    public double this[int index]
+    {
+        get => GetValue(index);
+    }
+
+    /// <summary>
     /// Norm/length squared
     /// </summary>
     /// <returns></returns>
-    public float LengthSquared()
+    public double LengthSquared()
     {
         return X * X + Y * Y + Z * Z;
     }
@@ -28,9 +52,9 @@ public readonly struct Vec3(float x, float y, float z)
     /// Norm/Length of a vector
     /// </summary>
     /// <returns></returns>
-    public float Norm()
+    public double Norm()
     {
-        return (float)Math.Sqrt((double)LengthSquared());
+        return System.Math.Sqrt(LengthSquared());
     }
 
     /// <summary>
@@ -69,8 +93,8 @@ public readonly struct Vec3(float x, float y, float z)
     /// </summary>
     /// <param name="t"></param>
     /// <param name="v"></param>
-    /// <returns></returns>
-    public static Vec3 operator *(float t, Vec3 v)
+    /// <returns>Vector t*v</returns>
+    public static Vec3 operator *(double t, Vec3 v)
     {
         return new Vec3(t * v.X, t * v.Y, t * v.Z);
     }
@@ -80,10 +104,20 @@ public readonly struct Vec3(float x, float y, float z)
     /// </summary>
     /// <param name="v"></param>
     /// <param name="t"></param>
-    /// <returns></returns>
-    public static Vec3 operator *(Vec3 v, float t)
+    /// <returns>Vector t*v</returns>
+    public static Vec3 operator *(Vec3 v, double t)
     {
         return t * v;
+    }
+
+    /// <summary>
+    /// Vector inverse
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns>Vector -v</returns>
+    public static Vec3 operator -(Vec3 v)
+    {
+        return (-1) * v;
     }
 
     /// <summary>
@@ -93,7 +127,7 @@ public readonly struct Vec3(float x, float y, float z)
     /// <param name="t"></param>
     /// <returns></returns>
     /// <exception cref="DivideByZeroException">if t = 0</exception>
-    public static Vec3 operator /(Vec3 v, float t)
+    public static Vec3 operator /(Vec3 v, double t)
     {
         if (t == 0)
         {
@@ -122,7 +156,7 @@ public readonly struct Vec3(float x, float y, float z)
     /// <param name="v"></param>
     /// <param name="u"></param>
     /// <returns></returns>
-    public static float Dot(Vec3 v, Vec3 u)
+    public static double Dot(Vec3 v, Vec3 u)
     {
         return v.X * u.X + v.Y * u.Y + v.Z * u.Z;
     }
@@ -141,9 +175,9 @@ public readonly struct Vec3(float x, float y, float z)
     }
 
     /// <summary>
-    /// Reflection of vector v against a surface with normal n
+    /// Reflection of vector v against a surface normal n
     /// </summary>
-    /// <param name="v">Vector pointing at surface with normal n</param>
+    /// <param name="v">Vector pointing at surface normal n</param>
     /// <param name="n">Surface normal vector</param>
     /// <returns>Reflection vector</returns>
     public static Vec3 Reflect(Vec3 v, Vec3 n)
@@ -151,4 +185,14 @@ public readonly struct Vec3(float x, float y, float z)
         return v - 2 * Dot(v, n) * n;
     }
 
+    private double GetValue(int index)
+    {
+        return index switch
+        {
+            0 => X,
+            1 => Y,
+            2 => Z,
+            _ => throw new ArgumentException("Invalid index"),
+        };
+    }
 }

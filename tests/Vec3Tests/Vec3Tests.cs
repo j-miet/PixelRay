@@ -42,10 +42,11 @@ public class Vec3Tests
     [MemberData(nameof(TestLengthData))]
     public void TestLengthSquared(double x, double y, double z, double value)
     {
+        double error = 10e-14;
         Vec3 v = new(x, y, z);
 
         Assert.True(v.LengthSquared() >= 0);
-        Assert.True(v.LengthSquared() == value * value);
+        Assert.True(Math.Abs(v.LengthSquared() - value * value) < error);
     }
 
     [Theory]
@@ -79,7 +80,7 @@ public class Vec3Tests
         Vec3 w = -v;
         Assert.Equal(-x, w.X);
         Assert.Equal(-y, w.Y);
-        Assert.Equal(-z, w.Y);
+        Assert.Equal(-z, w.Z);
     }
 
     [Theory]

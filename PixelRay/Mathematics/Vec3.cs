@@ -54,7 +54,7 @@ public readonly struct Vec3
     /// <returns></returns>
     public double Norm()
     {
-        return System.Math.Sqrt(LengthSquared());
+        return Math.Sqrt(LengthSquared());
     }
 
     /// <summary>

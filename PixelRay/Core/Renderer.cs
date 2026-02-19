@@ -67,7 +67,7 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
         if (IsInShadow(closestHit, scene))
             return closestHit.Color * 0;
 
-        double light = Math.Max(0, Vec3.Dot(closestHit.Normal, -lightDirection)); // light intensity based on angle;
+        double light = Math.Max(0, Vec3.Dot(closestHit.Normal, -_lightDirection)); // light intensity based on angle;
         return (closestHit.Color * light).Quantize(_lightingBands);
     }
 

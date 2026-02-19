@@ -24,10 +24,7 @@ public readonly struct Vec3
     /// Display Vec3 object in (x, y, z) format
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
-        return string.Format("({0}, {1}, {2})", X, Y, Z);
-    }
+    public override string ToString() => string.Format("({0}, {1}, {2})", X, Y, Z);
 
     /// <summary>
     /// Index operator overload; access vector coordinates by corresponding index: v[0] = X , v[1] = Y, v[2] = Z 
@@ -43,39 +40,27 @@ public readonly struct Vec3
     /// Norm/length squared
     /// </summary>
     /// <returns></returns>
-    public double LengthSquared()
-    {
-        return X * X + Y * Y + Z * Z;
-    }
+    public double LengthSquared() => X * X + Y * Y + Z * Z;
 
     /// <summary>
     /// Norm/Length of a vector
     /// </summary>
     /// <returns></returns>
-    public double Norm()
-    {
-        return Math.Sqrt(LengthSquared());
-    }
+    public double Norm() => Math.Sqrt(LengthSquared());
 
     /// <summary>
     /// </summary>
     /// <param name="v"></param>
     /// <param name="u"></param>
     /// <returns>Vector v+u</returns>
-    public static Vec3 operator +(Vec3 v, Vec3 u)
-    {
-        return new Vec3(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
-    }
+    public static Vec3 operator +(Vec3 v, Vec3 u) => new(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
 
     /// <summary>
     /// </summary>
     /// <param name="v"></param>
     /// <param name="u"></param>
     /// <returns>Vector v-u</returns>
-    public static Vec3 operator -(Vec3 v, Vec3 u)
-    {
-        return new Vec3(v.X - u.X, v.Y - u.Y, v.Z - u.Z);
-    }
+    public static Vec3 operator -(Vec3 v, Vec3 u) => new(v.X - u.X, v.Y - u.Y, v.Z - u.Z);
 
     /// <summary>
     /// Element-wise vector product
@@ -83,10 +68,7 @@ public readonly struct Vec3
     /// <param name="v"></param>
     /// <param name="u"></param>
     /// <returns>Vector v * u</returns>
-    public static Vec3 operator *(Vec3 v, Vec3 u)
-    {
-        return new Vec3(v.X * u.X, v.Y * u.Y, v.Z * u.Z);
-    }
+    public static Vec3 operator *(Vec3 v, Vec3 u) => new(v.X * u.X, v.Y * u.Y, v.Z * u.Z);
 
     /// <summary>
     /// Scalar multiplication
@@ -94,10 +76,7 @@ public readonly struct Vec3
     /// <param name="t"></param>
     /// <param name="v"></param>
     /// <returns>Vector t*v</returns>
-    public static Vec3 operator *(double t, Vec3 v)
-    {
-        return new Vec3(t * v.X, t * v.Y, t * v.Z);
-    }
+    public static Vec3 operator *(double t, Vec3 v) => new(t * v.X, t * v.Y, t * v.Z);
 
     /// <summary>
     /// Scalar multiplication
@@ -105,33 +84,26 @@ public readonly struct Vec3
     /// <param name="v"></param>
     /// <param name="t"></param>
     /// <returns>Vector t*v</returns>
-    public static Vec3 operator *(Vec3 v, double t)
-    {
-        return t * v;
-    }
+    public static Vec3 operator *(Vec3 v, double t) => t * v;
 
     /// <summary>
     /// Vector inverse
     /// </summary>
     /// <param name="v"></param>
     /// <returns>Vector -v</returns>
-    public static Vec3 operator -(Vec3 v)
-    {
-        return (-1) * v;
-    }
+    public static Vec3 operator -(Vec3 v) => (-1) * v;
 
     /// <summary>
     /// Scalar division
     /// </summary>
     /// <param name="v"></param>
     /// <param name="t"></param>
-    /// <returns></returns>
-    /// <exception cref="DivideByZeroException">if t = 0</exception>
+    /// <returns>1/t * v; if t = 0, the zero vector</returns>
     public static Vec3 operator /(Vec3 v, double t)
     {
         if (t == 0)
         {
-            throw new DivideByZeroException("Cannot divide a vector by scalar 0.");
+            return new();
         }
         return 1 / t * v;
     }
@@ -139,13 +111,12 @@ public readonly struct Vec3
     /// <summary>
     /// Unit vector of this Vec3 object
     /// </summary>
-    /// <returns>This vector with norm = 1</returns>
-    /// <exception cref="DivideByZeroException">If origin vector (0, 0, 0) is used</exception>
+    /// <returns>This vector with norm = 1, except for zero vector itself</returns>
     public Vec3 Unit()
     {
         if ((X, Y, Z).Equals((0, 0, 0)))
         {
-            throw new DivideByZeroException("Origin vector has no unit.");
+            return new();
         }
         return new Vec3(X, Y, Z) / Norm();
     }
@@ -156,10 +127,7 @@ public readonly struct Vec3
     /// <param name="v"></param>
     /// <param name="u"></param>
     /// <returns></returns>
-    public static double Dot(Vec3 v, Vec3 u)
-    {
-        return v.X * u.X + v.Y * u.Y + v.Z * u.Z;
-    }
+    public static double Dot(Vec3 v, Vec3 u) => v.X * u.X + v.Y * u.Y + v.Z * u.Z;
 
     /// <summary>
     /// Cross product
@@ -180,10 +148,7 @@ public readonly struct Vec3
     /// <param name="v">Vector pointing at surface normal n</param>
     /// <param name="n">Surface normal vector</param>
     /// <returns>Reflection vector</returns>
-    public static Vec3 Reflect(Vec3 v, Vec3 n)
-    {
-        return v - 2 * Dot(v, n) * n;
-    }
+    public static Vec3 Reflect(Vec3 v, Vec3 n) => v - 2 * Dot(v, n) * n;
 
     private double GetValue(int index)
     {

@@ -88,9 +88,9 @@ public class Vec3Tests
     public void TestVectorSubtract(Vec3 v, Vec3 w)
     {
         Vec3 sub = v - w;
-        Assert.Equal(sub.X, v.X - w.X);
-        Assert.Equal(sub.Y, v.Y - w.Y);
-        Assert.Equal(sub.Z, v.Z - w.Z);
+        Assert.Equal(v.X - w.X, sub.X);
+        Assert.Equal(v.Y - w.Y, sub.Y);
+        Assert.Equal(v.Z - w.Z, sub.Z);
     }
 
     [Theory]
@@ -98,9 +98,9 @@ public class Vec3Tests
     public void TestVectorSum(Vec3 v, Vec3 w)
     {
         Vec3 sum = v + w;
-        Assert.Equal(sum.X, v.X + w.X);
-        Assert.Equal(sum.Y, v.Y + w.Y);
-        Assert.Equal(sum.Z, v.Z + w.Z);
+        Assert.Equal(v.X + w.X, sum.X);
+        Assert.Equal(v.Y + w.Y, sum.Y);
+        Assert.Equal(v.Z + w.Z, sum.Z);
     }
 
     [Theory]
@@ -108,9 +108,9 @@ public class Vec3Tests
     public void TestVectorLeftScalarProduct(double t, Vec3 v)
     {
         Vec3 leftProd = t * v;
-        Assert.Equal(leftProd.X, t * v.X);
-        Assert.Equal(leftProd.Y, t * v.Y);
-        Assert.Equal(leftProd.Z, t * v.Z);
+        Assert.Equal(t * v.X, leftProd.X);
+        Assert.Equal(t * v.Y, leftProd.Y);
+        Assert.Equal(t * v.Z, leftProd.Z);
     }
 
     [Theory]
@@ -118,25 +118,27 @@ public class Vec3Tests
     public void TestVectorRightScalarProduct(double t, Vec3 v)
     {
         Vec3 rightProd = v * t;
-        Assert.Equal(rightProd.X, t * v.X);
-        Assert.Equal(rightProd.Y, t * v.Y);
-        Assert.Equal(rightProd.Z, t * v.Z);
+        Assert.Equal(t * v.X, rightProd.X);
+        Assert.Equal(t * v.Y, rightProd.Y);
+        Assert.Equal(t * v.Z, rightProd.Z);
     }
 
     [Theory]
     [MemberData(nameof(TestScalarAndVectorOperationsData))]
     public void TestVectorScalarDivision(double t, Vec3 v)
     {
+        Vec3 div = v / t;
         if (t == 0)
         {
-            Assert.Throws<DivideByZeroException>(() => v / t);
+            Assert.Equal(0, div.X);
+            Assert.Equal(0, div.Y);
+            Assert.Equal(0, div.Z);
         }
         else
         {
-            Vec3 div = v / t;
-            Assert.Equal(div.X, 1 / t * v.X);
-            Assert.Equal(div.Y, 1 / t * v.Y);
-            Assert.Equal(div.Z, 1 / t * v.Z);
+            Assert.Equal(1 / t * v.X, div.X);
+            Assert.Equal(1 / t * v.Y, div.Y);
+            Assert.Equal(1 / t * v.Z, div.Z);
         }
     }
 
@@ -145,9 +147,9 @@ public class Vec3Tests
     public void TestVectorProduct(Vec3 v, Vec3 w)
     {
         Vec3 u = v * w;
-        Assert.Equal(u.X, v.X * w.X);
-        Assert.Equal(u.Y, v.Y * w.Y);
-        Assert.Equal(u.Z, v.Z * w.Z);
+        Assert.Equal(v.X * w.X, u.X);
+        Assert.Equal(v.Y * w.Y, u.Y);
+        Assert.Equal(v.Z * w.Z, u.Z);
     }
 
     [Theory]
@@ -155,7 +157,7 @@ public class Vec3Tests
     public void TestVectorDotProduct(Vec3 v, Vec3 w)
     {
         double dot = Vec3.Dot(v, w);
-        Assert.Equal(dot, v.X * w.X + v.Y * w.Y + v.Z * w.Z);
+        Assert.Equal(v.X * w.X + v.Y * w.Y + v.Z * w.Z, dot);
     }
 
     [Theory]
@@ -163,9 +165,9 @@ public class Vec3Tests
     public void TestVectorCrossProduct(Vec3 v, Vec3 w)
     {
         Vec3 u = Vec3.Cross(v, w);
-        Assert.Equal(u.X, v.Y * w.Z - v.Z * w.Y);
-        Assert.Equal(u.Y, v.Z * w.X - v.X * w.Z);
-        Assert.Equal(u.Z, v.X * w.Y - v.Y * w.X);
+        Assert.Equal(v.Y * w.Z - v.Z * w.Y, u.X);
+        Assert.Equal(v.Z * w.X - v.X * w.Z, u.Y);
+        Assert.Equal(v.X * w.Y - v.Y * w.X, u.Z);
     }
 
     [Theory]
@@ -173,17 +175,10 @@ public class Vec3Tests
     public void TestVectorUnit(Vec3 v, Vec3 result)
     {
         double len = v.Norm();
-        if (len == 0)
-        {
-            Assert.Throws<DivideByZeroException>(() => v / len);
-        }
-        else
-        {
-            Vec3 unit = v / len;
-            Assert.Equal(result.X, unit.X);
-            Assert.Equal(result.Y, unit.Y);
-            Assert.Equal(result.Z, unit.Z);
-        }
+        Vec3 unit = v / len;
+        Assert.Equal(result.X, unit.X);
+        Assert.Equal(result.Y, unit.Y);
+        Assert.Equal(result.Z, unit.Z);
     }
 
     // MemberData iterators
@@ -201,6 +196,9 @@ public class Vec3Tests
     public static IEnumerable<object[]> TestVectorAndVectorOperationsData() // data for (vector, vector) operations
     {
         yield return new object[] { new Vec3(0, 0, 0), new Vec3(1, 2, 3) };
+        yield return new object[] { new Vec3(0, -1, 0), new Vec3(0, 1, 0) };
+        yield return new object[] { new Vec3(0, 0, 0), new Vec3(0, 0, 0) };
+        yield return new object[] { new Vec3(2, 2, 2), new Vec3(1, 1, 1) };
     }
 
     public static IEnumerable<object[]> TestScalarAndVectorOperationsData() // data for (scalar, vector) operations

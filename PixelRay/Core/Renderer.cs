@@ -16,16 +16,22 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
     /// </summary>
     /// <param name="scene"></param>
     /// <param name="camera"></param>
+    /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
     /// <returns></returns>
-    public FrameBuffer Render(Scene scene, Camera camera)
+    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1)
     {
-        FrameBuffer buffer = new(_width, _height);
+        int scaledW = upScale * _width;
+        int scaledH = upScale * _height;
+        FrameBuffer buffer = new(scaledW, scaledH);
 
-        for (int y = 0; y < _height; y++)
+        for (int y = 0; y < scaledH; y++)
         {
-            for (int x = 0; x < _width; x++)
+            for (int x = 0; x < scaledW; x++)
             {
-                Ray ray = camera.GetRay(x, y);
+                int baseX = (int)Math.Floor(x / (double)upScale);
+                int baseY = (int)Math.Floor(y / (double)upScale);
+
+                Ray ray = camera.GetRay(baseX, baseY);
                 ColorRGB color = Trace(ray, scene);
                 buffer.SetPixel(x, y, color.Clamp());
             }
@@ -37,7 +43,9 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
     private readonly int _width = width;
     private readonly int _height = height;
     private readonly int _lightingBands = lightingBands;
+
     private readonly Vec3 _lightDirection = lightDirection.Unit();
+    private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
 
     /// <summary>
     /// Trace a ray and return its corresponding viewport pixel color.
@@ -49,7 +57,7 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
     {
         double closest = double.MaxValue;
         bool hitAnything = false;
-        HitRecord closestHit = default; // give default state without initializing
+        HitRecord closestHit = default;
 
         foreach (IHittable obj in scene.Objects)
         {
@@ -62,13 +70,13 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
         }
 
         if (!hitAnything)
-            return new ColorRGB(0.1, 0.1, 0.15);
+            return _backGroundColor;
 
         if (IsInShadow(closestHit, scene))
-            return closestHit.Color * 0;
+            return 0 * closestHit.Color;
 
         double light = Math.Max(0, Vec3.Dot(closestHit.Normal, -_lightDirection)); // light intensity based on angle;
-        return (closestHit.Color * light).Quantize(_lightingBands);
+        return (light * closestHit.Color).Quantize(_lightingBands);
     }
 
     /// <summary>

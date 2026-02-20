@@ -1,16 +1,18 @@
 using PixelRay.Lighting;
 using PixelRay.Mathematics;
+using PixelRay.Rendering;
 using PixelRay.SceneObjects;
 
 namespace PixelRay.Core;
 
 /// <summary>
+/// For rendering images
 /// </summary>
 /// <param name="width">Resolution width</param>
-/// <param name="height"Resolution height></param>
-/// <param name="lightingBands">Amount of lighting quantization levels</param>
-/// <param name="lightDirection">Fixed lighting direction</param>
-public class Renderer(int width, int height, int lightingBands)
+/// <param name="height">Resolution height></param>
+/// <param name="palette">Used color palette. If you wish to use no palette, pass 'new Palette([])' instead</param>
+/// <param name="lightingBands">Amount of lighting quantization levels. Default value is 1</param>
+public class Renderer(int width, int height, Palette palette, int lightingBands = 1)
 {
     /// <summary>
     /// Render a scene through a camera and load image into a buffer.
@@ -43,6 +45,7 @@ public class Renderer(int width, int height, int lightingBands)
 
     private readonly int _width = width;
     private readonly int _height = height;
+    private readonly Palette _palette = palette;
     private readonly int _lightingBands = lightingBands;
 
     private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
@@ -91,7 +94,9 @@ public class Renderer(int width, int height, int lightingBands)
             }
         }
 
-        return finalColor;
+        if (_palette.Colors.Length == 0)
+            return finalColor;
+        return _palette.Map(finalColor);
     }
 
     /// <summary>
@@ -100,7 +105,7 @@ public class Renderer(int width, int height, int lightingBands)
     /// <param name="hit"></param>
     /// <param name="scene"></param>
     /// <returns></returns>
-    private bool IsInShadow(HitRecord hit, Scene scene, DirectionalLight light)
+    private static bool IsInShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
         Vec3 origin = hit.Point + hit.Normal * 0.001; // slightly nudge the normal to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);

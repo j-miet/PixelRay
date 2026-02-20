@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace PixelRay.Mathematics;
 
 public readonly struct ColorRGB(double red, double green, double blue)
@@ -43,5 +45,15 @@ public readonly struct ColorRGB(double red, double green, double blue)
     public static ColorRGB operator *(ColorRGB color, double scalar)
     {
         return scalar * color;
+    }
+
+    public static ColorRGB operator +(ColorRGB color1, ColorRGB color2)
+    {
+        return new ColorRGB(color1.R + color2.R, color1.G + color2.G, color1.B + color2.B);
+    }
+
+    public static ColorRGB operator *(ColorRGB color1, ColorRGB color2)
+    {
+        return new ColorRGB(color1.R * color2.R, color1.G * color2.G, color1.B * color2.B);
     }
 }

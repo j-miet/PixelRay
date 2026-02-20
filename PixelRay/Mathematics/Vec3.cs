@@ -37,6 +37,24 @@ public readonly struct Vec3
     }
 
     /// <summary>
+    /// Access coordinate by index. This method itself is not very useful and is more so a helper function to allow
+    /// bracket syntax i.e. v[0] = v.X, v[1] = v.Y, v[2] = v.Z
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public double GetValue(int index)
+    {
+        return index switch
+        {
+            0 => X,
+            1 => Y,
+            2 => Z,
+            _ => throw new ArgumentException("Invalid index"),
+        };
+    }
+
+    /// <summary>
     /// Norm/length squared
     /// </summary>
     /// <returns></returns>
@@ -150,14 +168,4 @@ public readonly struct Vec3
     /// <returns>Reflection vector</returns>
     public static Vec3 Reflect(Vec3 v, Vec3 n) => v - 2 * Dot(v, n) * n;
 
-    private double GetValue(int index)
-    {
-        return index switch
-        {
-            0 => X,
-            1 => Y,
-            2 => Z,
-            _ => throw new ArgumentException("Invalid index"),
-        };
-    }
 }

@@ -1,3 +1,4 @@
+using PixelRay.Lighting;
 using PixelRay.Mathematics;
 using PixelRay.SceneObjects;
 
@@ -9,7 +10,7 @@ namespace PixelRay.Core;
 /// <param name="height"Resolution height></param>
 /// <param name="lightingBands">Amount of lighting quantization levels</param>
 /// <param name="lightDirection">Fixed lighting direction</param>
-public class Renderer(int width, int height, int lightingBands, Vec3 lightDirection)
+public class Renderer(int width, int height, int lightingBands)
 {
     /// <summary>
     /// Render a scene through a camera and load image into a buffer.
@@ -44,7 +45,6 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
     private readonly int _height = height;
     private readonly int _lightingBands = lightingBands;
 
-    private readonly Vec3 _lightDirection = lightDirection.Unit();
     private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
 
     /// <summary>
@@ -72,11 +72,26 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
         if (!hitAnything)
             return _backGroundColor;
 
-        if (IsInShadow(closestHit, scene))
-            return 0 * closestHit.Color;
+        ColorRGB finalColor = new(0, 0, 0);
 
-        double light = Math.Max(0, Vec3.Dot(closestHit.Normal, -_lightDirection)); // light intensity based on angle;
-        return (light * closestHit.Color).Quantize(_lightingBands);
+        foreach (Light light in scene.Lights)
+        {
+            if (light is DirectionalLight directionalLight)
+            {
+                if (!IsInShadow(closestHit, scene, directionalLight))
+                {
+                    double lightAngle = Math.Max(0, Vec3.Dot(closestHit.Normal, -directionalLight.Direction));
+                    ColorRGB quantized = (lightAngle * closestHit.Color).Quantize(_lightingBands);
+                    ColorRGB contribution = quantized * directionalLight.Color;
+
+                    finalColor += contribution;
+                    // you can add separate parameter for sum quantizing i.e. instead of individual quantize, skip this
+                    // step here and call Quantize before returning value
+                }
+            }
+        }
+
+        return finalColor;
     }
 
     /// <summary>
@@ -85,10 +100,10 @@ public class Renderer(int width, int height, int lightingBands, Vec3 lightDirect
     /// <param name="hit"></param>
     /// <param name="scene"></param>
     /// <returns></returns>
-    private bool IsInShadow(HitRecord hit, Scene scene)
+    private bool IsInShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
         Vec3 origin = hit.Point + hit.Normal * 0.001; // slightly nudge the normal to avoid surface self-collision
-        Ray shadowRay = new(origin, -_lightDirection);
+        Ray shadowRay = new(origin, -light.Direction);
 
         foreach (IHittable obj in scene.Objects)
         {

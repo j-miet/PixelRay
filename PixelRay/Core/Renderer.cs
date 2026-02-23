@@ -6,7 +6,7 @@ using PixelRay.SceneObjects;
 namespace PixelRay.Core;
 
 /// <summary>
-/// For rendering images
+/// Image rendering class
 /// </summary>
 /// <param name="width">Resolution width</param>
 /// <param name="height">Resolution height></param>
@@ -17,10 +17,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// <summary>
     /// Render a scene through a camera and load image into a buffer.
     /// </summary>
-    /// <param name="scene"></param>
-    /// <param name="camera"></param>
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
-    /// <returns></returns>
     public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1)
     {
         int scaledW = upScale * _width;
@@ -53,9 +50,6 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// <summary>
     /// Trace a ray and return its corresponding viewport pixel color.
     /// </summary>
-    /// <param name="ray"></param>
-    /// <param name="scene"></param>
-    /// <returns></returns>
     private ColorRGB Trace(Ray ray, Scene scene)
     {
         double closest = double.MaxValue;
@@ -102,9 +96,6 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// <summary>
     /// Check if space between traced pixel and light source is blocked by any scene object.
     /// </summary>
-    /// <param name="hit"></param>
-    /// <param name="scene"></param>
-    /// <returns></returns>
     private static bool IsInShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
         Vec3 origin = hit.Point + hit.Normal * 0.001; // slightly nudge the normal to avoid surface self-collision

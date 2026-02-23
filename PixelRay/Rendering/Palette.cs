@@ -2,6 +2,9 @@ using PixelRay.Mathematics;
 
 namespace PixelRay.Rendering;
 
+/// <summary>
+/// Simple color palette generator
+/// </summary>
 public class Palette(ColorRGB[] colors)
 {
     public ColorRGB[] Colors { get; } = colors;

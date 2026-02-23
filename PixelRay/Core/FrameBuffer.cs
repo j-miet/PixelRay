@@ -2,6 +2,9 @@ using PixelRay.Mathematics;
 
 namespace PixelRay.Core;
 
+/// <summary>
+/// Data class for storing and accessing stored pixels
+/// </summary>
 public class FrameBuffer(int width, int height)
 {
     public int Width { get; } = width;

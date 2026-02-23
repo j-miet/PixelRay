@@ -1,7 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Mathematics;
 
-namespace PixelRay.Ouput
+namespace PixelRay.Output
 {
     /// <summary>
     /// Writes data from FrameBuffer into a file
@@ -12,7 +12,7 @@ namespace PixelRay.Ouput
         /// Write buffer data into PPM file
         /// </summary>
         /// <param name="path">Image save path</param>
-        /// <param name="buffer"></param>
+        /// <param name="buffer">Pixel buffer</param>
         public static void WritePPM(string path, FrameBuffer buffer)
         {
             using StreamWriter writer = new(path);

@@ -4,10 +4,10 @@ using Silk.NET.Windowing;
 using PixelRay.Core;
 using PixelRay.Mathematics;
 
-namespace PixelRay.Ouput;
+namespace PixelRay.Output;
 
 /// <summary>
-/// For rendering saved PPM images progressively using SILK.NET library
+/// For rendering saved PPM images in a new window using SILK.NET library
 /// </summary>
 public class ImageDisplay
 {
@@ -34,7 +34,8 @@ public class ImageDisplay
     /// <param name="width">Image width</param>
     /// <param name="height">Image height</param>
     /// <param name="buffer">PPM image data</param>
-    /// <param name="renderSpeed">How fast it takes to render a single pixel, in milliseconds. Default value 1.</param>
+    /// <param name="renderSpeed">How fast it takes to render a single pixel, in milliseconds. Default value 1.
+    /// Use higher values if you'd like to see the image generated progressively or use 0 for max speed.</param>
     public ImageDisplay(int width, int height, FrameBuffer buffer, int renderSpeed = 1)
     {
         _width = width;
@@ -77,7 +78,7 @@ public class ImageDisplay
 
         _gl = GL.GetApi(_window);
 
-        // Texture
+        // Base texture
         _texture = _gl.GenTexture();
         _gl.BindTexture(TextureTarget.Texture2D, _texture);
         _gl.TexImage2D(
@@ -94,7 +95,12 @@ public class ImageDisplay
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
-        // --- Fullscreen Quad ---
+        // a square screen can be represented with 2 triangles
+        // position coordinates range from -1 to 1 whereas OpenGL texture coordinates are from 0 to 1
+        // texture coordinates start from bottom-left (0, 0)
+        // so in order to map two triangles to form a square, we can do
+        // 1. (0, 0) -> (1, 0) -> (1, 1) then connect (1, 1) -> (0, 0) but this doesn't need to be explicitly stated
+        // 2. (0, 0) -> (1, 0) -> (0, 1) then connect (0, 1) -> (0, 0), same as above
         float[] vertices =
         [
             // positions   // texcoords
@@ -120,7 +126,7 @@ public class ImageDisplay
 
         _shaderProgram = CreateShader();
 
-        // start a separate thread to read data into buffer
+        // start a separate thread which reads data into render buffer
         new Thread(RenderLoop).Start();
     }
 
@@ -131,6 +137,7 @@ public class ImageDisplay
 
         if (_dirty)
         {
+            // Rendered texture
             _gl.BindTexture(TextureTarget.Texture2D, _texture);
             _gl.TexSubImage2D(
                 TextureTarget.Texture2D,
@@ -179,7 +186,8 @@ public class ImageDisplay
             gl_Position = vec4(aPos, 0.0, 1.0);
         }";
 
-        // here texture coordinates y-axis must be inverted because OpenGL coordinates start from bottom-left
+        // here texture coordinates y-coordinate is set to 1-y so image gets rendered from top-left; otherwise final
+        // image is upside-down
         string fragmentShaderSource = @"
         #version 330 core
         out vec4 FragColor;

@@ -7,9 +7,6 @@ namespace PixelRay.Geometry;
 /// <summary>
 /// Sphere primitive
 /// </summary>
-/// <param name="center"></param>
-/// <param name="radius"></param>
-/// <param name="color"></param>
 public class Sphere(Vec3 center, double radius, ColorRGB color) : IHittable
 {
     public Vec3 Center = center;

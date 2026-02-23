@@ -2,11 +2,14 @@ using PixelRay.Mathematics;
 
 namespace PixelRay.Core;
 
+/// <summary>
+/// Creates a camera i.e. a collection of rays from center to viewport pixels
+/// </summary>
 public class Camera
 {
-    public Camera(Vec3 position, double width, double height)
+    public Camera(Vec3 center, double width, double height)
     {
-        _cameraCenter = position;
+        _cameraCenter = center;
 
         double aspectRatio = width / height;
         double viewportHeight = 2;
@@ -19,7 +22,7 @@ public class Camera
         _horizontalDelta = horizontal / width;
         _verticalDelta = vertical / height;
 
-        // screen center coordinate is center - (0, 0, focalLength)
+        // screen center and camera vectors must be perpendicular -> center coordinate = center - (0, 0, focalLength)
         Vec3 viewportTopLeft = _cameraCenter - new Vec3(0, 0, focalLength) - horizontal / 2 - vertical / 2;
         _topLeft = viewportTopLeft + 0.5 * (_horizontalDelta - _verticalDelta);
     }

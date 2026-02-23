@@ -1,5 +1,8 @@
 namespace PixelRay.Mathematics;
 
+/// <summary>
+/// 3D vector
+/// </summary>
 public readonly struct Vec3
 {
     public readonly double X;
@@ -40,8 +43,6 @@ public readonly struct Vec3
     /// Access coordinate by index. This method itself is not very useful and is more so a helper function to allow
     /// bracket syntax i.e. v[0] = v.X, v[1] = v.Y, v[2] = v.Z
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public double GetValue(int index)
     {
@@ -54,105 +55,29 @@ public readonly struct Vec3
         };
     }
 
-    /// <summary>
-    /// Norm/length squared
-    /// </summary>
-    /// <returns></returns>
     public double LengthSquared() => X * X + Y * Y + Z * Z;
 
-    /// <summary>
-    /// Norm/Length of a vector
-    /// </summary>
-    /// <returns></returns>
     public double Norm() => Math.Sqrt(LengthSquared());
 
     /// <summary>
+    /// This vector normalized, except for zero vector return itself
     /// </summary>
-    /// <param name="v"></param>
-    /// <param name="u"></param>
-    /// <returns>Vector v+u</returns>
-    public static Vec3 operator +(Vec3 v, Vec3 u) => new(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
-
-    /// <summary>
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="u"></param>
-    /// <returns>Vector v-u</returns>
-    public static Vec3 operator -(Vec3 v, Vec3 u) => new(v.X - u.X, v.Y - u.Y, v.Z - u.Z);
-
-    /// <summary>
-    /// Element-wise vector product
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="u"></param>
-    /// <returns>Vector v * u</returns>
-    public static Vec3 operator *(Vec3 v, Vec3 u) => new(v.X * u.X, v.Y * u.Y, v.Z * u.Z);
-
-    /// <summary>
-    /// Scalar multiplication
-    /// </summary>
-    /// <param name="t"></param>
-    /// <param name="v"></param>
-    /// <returns>Vector t*v</returns>
-    public static Vec3 operator *(double t, Vec3 v) => new(t * v.X, t * v.Y, t * v.Z);
-
-    /// <summary>
-    /// Scalar multiplication
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="t"></param>
-    /// <returns>Vector t*v</returns>
-    public static Vec3 operator *(Vec3 v, double t) => t * v;
-
-    /// <summary>
-    /// Vector inverse
-    /// </summary>
-    /// <param name="v"></param>
-    /// <returns>Vector -v</returns>
-    public static Vec3 operator -(Vec3 v) => (-1) * v;
-
-    /// <summary>
-    /// Scalar division
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="t"></param>
-    /// <returns>1/t * v; if t = 0, the zero vector</returns>
-    public static Vec3 operator /(Vec3 v, double t)
-    {
-        if (t == 0)
-        {
-            return new();
-        }
-        return 1 / t * v;
-    }
-
-    /// <summary>
-    /// Unit vector of this Vec3 object
-    /// </summary>
-    /// <returns>This vector with norm = 1, except for zero vector itself</returns>
     public Vec3 Unit()
     {
         if ((X, Y, Z).Equals((0, 0, 0)))
-        {
             return new();
-        }
+
         return new Vec3(X, Y, Z) / Norm();
     }
 
     /// <summary>
     /// Dot product
     /// </summary>
-    /// <param name="v"></param>
-    /// <param name="u"></param>
-    /// <returns></returns>
     public static double Dot(Vec3 v, Vec3 u) => v.X * u.X + v.Y * u.Y + v.Z * u.Z;
 
     /// <summary>
-    /// Cross product
+    /// Cross product v x u
     /// </summary>
-    /// <param name="v">Left vector</param>
-    /// <param name="u">Right vector</param>
-    /// <returns>Cross product vector v x u</returns>
     public static Vec3 Cross(Vec3 v, Vec3 u)
     {
         return new Vec3(v.Y * u.Z - v.Z * u.Y,
@@ -163,9 +88,31 @@ public readonly struct Vec3
     /// <summary>
     /// Reflection of vector v against a surface normal n
     /// </summary>
-    /// <param name="v">Vector pointing at surface normal n</param>
-    /// <param name="n">Surface normal vector</param>
+    /// <param name="v">Vector pointing at normal n</param>
+    /// <param name="n">Outward surface normal</param>
     /// <returns>Reflection vector</returns>
     public static Vec3 Reflect(Vec3 v, Vec3 n) => v - 2 * Dot(v, n) * n;
 
+    public static Vec3 operator +(Vec3 v, Vec3 u) => new(v.X + u.X, v.Y + u.Y, v.Z + u.Z);
+
+    public static Vec3 operator -(Vec3 v, Vec3 u) => new(v.X - u.X, v.Y - u.Y, v.Z - u.Z);
+
+    public static Vec3 operator *(Vec3 v, Vec3 u) => new(v.X * u.X, v.Y * u.Y, v.Z * u.Z);
+
+    public static Vec3 operator *(double t, Vec3 v) => new(t * v.X, t * v.Y, t * v.Z);
+
+    public static Vec3 operator *(Vec3 v, double t) => t * v;
+
+    public static Vec3 operator -(Vec3 v) => (-1) * v;
+
+    /// <summary>
+    /// Scalar division 1/t * v; if t = 0, the zero vector
+    /// </summary>
+    public static Vec3 operator /(Vec3 v, double t)
+    {
+        if (t == 0)
+            return new();
+
+        return 1 / t * v;
+    }
 }

@@ -7,9 +7,6 @@ namespace PixelRay.Geometry;
 /// <summary>
 /// A plane in 3d space
 /// </summary>
-/// <param name="point"></param>
-/// <param name="normal"></param>
-/// <param name="color"></param>
 public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
 {
     public Vec3 Point = point;
@@ -25,7 +22,7 @@ public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
         // Dot(Point - O, n) / Dot(n, D)
         // Thus denominator of this term is Dot(n, d), which also tells the angle between ray and plane.
         double denominator = Vec3.Dot(Normal, ray.Direction);
-        if (Math.Abs(denominator) < 0.0001) // normal and direction are perpendicular
+        if (Math.Abs(denominator) < 0.0001) // check if normal and direction are perpendicular
             return false;
 
         double root = Vec3.Dot(Point - ray.Origin, Normal) / denominator;

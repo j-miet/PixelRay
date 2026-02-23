@@ -1,7 +1,8 @@
-using System.Drawing;
-
 namespace PixelRay.Mathematics;
 
+/// <summary>
+/// RGB color
+/// </summary>
 public readonly struct ColorRGB(double red, double green, double blue)
 {
     public readonly double R = red;

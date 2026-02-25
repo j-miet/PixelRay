@@ -28,18 +28,18 @@ public class Sphere(Vec3 center, double radius, ColorRGB color) : IHittable
             return false;
 
         double sqrtDiscriminant = Math.Sqrt(discriminant);
-        double root = (-b - sqrtDiscriminant) / (2 * a);
+        double t = (-b - sqrtDiscriminant) / (2 * a);
 
-        if (root <= tMin || root >= tMax)
+        if (t <= tMin || t >= tMax)
         {
-            root = (-b + sqrtDiscriminant) / (2 * a);
-            if (root <= tMin || root >= tMax)
+            t = (-b + sqrtDiscriminant) / (2 * a);
+            if (t <= tMin || t >= tMax)
                 return false;
         }
 
-        hit.Point = ray.At(root);
+        hit.Point = ray.At(t);
         hit.Normal = (hit.Point - Center).Unit();
-        hit.T = root;
+        hit.T = t;
         hit.Color = Color;
 
         return true;

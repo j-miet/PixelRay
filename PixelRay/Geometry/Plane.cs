@@ -25,14 +25,14 @@ public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
         if (Math.Abs(denominator) < 0.0001) // check if normal and direction are perpendicular
             return false;
 
-        double root = Vec3.Dot(Point - ray.Origin, Normal) / denominator;
+        double t = Vec3.Dot(Point - ray.Origin, Normal) / denominator;
 
-        if (root <= tMin || root >= tMax)
+        if (t <= tMin || t >= tMax)
             return false;
 
-        hit.Point = ray.At(root);
+        hit.Point = ray.At(t);
         hit.Normal = Normal;
-        hit.T = root;
+        hit.T = t;
         hit.Color = Color;
 
         return true;

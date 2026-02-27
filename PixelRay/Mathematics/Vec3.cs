@@ -55,9 +55,13 @@ public readonly struct Vec3
         };
     }
 
-    public double LengthSquared() => X * X + Y * Y + Z * Z;
+    public double NormSquared() => X * X + Y * Y + Z * Z;
 
-    public double Norm() => Math.Sqrt(LengthSquared());
+    public double Norm() => Math.Sqrt(NormSquared());
+
+    // aliases for norm functions
+    public double Length() => Norm();
+    public double LengthSquared() => NormSquared();
 
     /// <summary>
     /// This vector normalized, except for zero vector return itself

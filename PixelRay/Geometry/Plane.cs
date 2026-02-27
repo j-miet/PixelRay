@@ -31,7 +31,7 @@ public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
             return false;
 
         hit.Point = ray.At(t);
-        hit.Normal = Normal;
+        hit.Normal = Normal.Unit();
         hit.T = t;
         hit.Color = Color;
 

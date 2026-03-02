@@ -5,7 +5,7 @@ using PixelRay.SceneObjects;
 namespace PixelRay.Geometry;
 
 /// <summary>
-/// Sphere primitive
+/// A sphere defined by center and radius.
 /// </summary>
 public class Sphere(Vec3 center, double radius, ColorRGB color) : IHittable
 {
@@ -17,11 +17,11 @@ public class Sphere(Vec3 center, double radius, ColorRGB color) : IHittable
     {
         hit = default;
 
-        Vec3 oc = Center - ray.Origin;
+        Vec3 co = ray.Origin - Center;
         // coefficients of a quadratic equation produced by ray intersecting the sphere surface
         double a = Vec3.Dot(ray.Direction, ray.Direction);
-        double b = -2 * Vec3.Dot(ray.Direction, oc);
-        double c = Vec3.Dot(oc, oc) - Radius * Radius;
+        double b = 2 * Vec3.Dot(ray.Direction, co);
+        double c = Vec3.Dot(co, co) - Radius * Radius;
 
         double discriminant = b * b - 4 * a * c;
         if (discriminant < 0)

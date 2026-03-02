@@ -5,7 +5,7 @@ using PixelRay.SceneObjects;
 namespace PixelRay.Geometry;
 
 /// <summary>
-/// A plane in 3d space
+/// Plane defined by a point and a normal.
 /// </summary>
 public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
 {
@@ -16,22 +16,23 @@ public class Plane(Vec3 point, Vec3 normal, ColorRGB color) : IHittable
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
+        double epsilon = 1e-4;
 
         // plane is defined by all points x such that Dot(n, x - Point) = 0
         // Substituting ray R(t) into x yields Dot(n, O + t*D - Point) = 0 which can be simplified into
-        // Dot(Point - O, n) / Dot(n, D)
-        // Thus denominator of this term is Dot(n, d), which also tells the angle between ray and plane.
-        double denominator = Vec3.Dot(Normal, ray.Direction);
-        if (Math.Abs(denominator) < 0.0001) // check if normal and direction are perpendicular
+        // Dot(n, Point - O) / Dot(n, D)
+        // denominator term Dot(n, d) also tells the angle between ray and plane.
+        double NDotR = Vec3.Dot(Normal, ray.Direction);
+        if (Math.Abs(NDotR) < epsilon) // check if normal and direction are perpendicular
             return false;
 
-        double t = Vec3.Dot(Point - ray.Origin, Normal) / denominator;
+        double t = Vec3.Dot(Normal, Point - ray.Origin) / NDotR;
 
         if (t <= tMin || t >= tMax)
             return false;
 
         hit.Point = ray.At(t);
-        hit.Normal = Normal.Unit();
+        hit.Normal = Vec3.Dot(ray.Direction, Normal) > 0 ? -Normal : Normal;
         hit.T = t;
         hit.Color = Color;
 

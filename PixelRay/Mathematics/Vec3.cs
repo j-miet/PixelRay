@@ -56,12 +56,11 @@ public readonly struct Vec3
     }
 
     public double NormSquared() => X * X + Y * Y + Z * Z;
-
     public double Norm() => Math.Sqrt(NormSquared());
 
     // aliases for norm functions
-    public double Length() => Norm();
     public double LengthSquared() => NormSquared();
+    public double Length() => Norm();
 
     /// <summary>
     /// This vector normalized, except for zero vector return itself
@@ -87,6 +86,24 @@ public readonly struct Vec3
         return new Vec3(v.Y * u.Z - v.Z * u.Y,
                         v.Z * u.X - v.X * u.Z,
                         v.X * u.Y - v.Y * u.X);
+    }
+
+    /// <summary>
+    /// Vector projection of v on u i.e. proj_u v
+    /// Vector u is normalized automatically, no need to pass u.Unit()
+    /// </summary>
+    public static Vec3 Proj(Vec3 v, Vec3 u)
+    {
+        Vec3 uNormalized = u.Unit();
+        return Dot(v, uNormalized) * uNormalized;
+    }
+
+    /// <summary>
+    /// Orthogonal vector projection of v on u i.e. oproj_u v
+    /// </summary>
+    public static Vec3 Oproj(Vec3 v, Vec3 u)
+    {
+        return v - Proj(v, u);
     }
 
     /// <summary>

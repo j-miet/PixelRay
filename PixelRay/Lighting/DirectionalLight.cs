@@ -3,9 +3,10 @@ using PixelRay.Mathematics;
 namespace PixelRay.Lighting;
 
 /// <summary>
-/// Object resembling a directional light beam
+/// A directional light ray
 /// </summary>
 public class DirectionalLight(Vec3 direction, ColorRGB color) : Light(color)
 {
+    // Light direction (so -1*Direction gives direction TO light source )
     public Vec3 Direction { get; } = direction.Unit();
 }

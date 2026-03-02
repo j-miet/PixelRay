@@ -7,7 +7,7 @@ namespace PixelRay.Core;
 /// </summary>
 public class Camera
 {
-    public Camera(Vec3 center, double width, double height)
+    public Camera(Vec3 center, int width, int height)
     {
         _cameraCenter = center;
 
@@ -24,7 +24,7 @@ public class Camera
 
         // screen center and camera vectors must be perpendicular -> center coordinate = center - (0, 0, focalLength)
         Vec3 viewportTopLeft = _cameraCenter - new Vec3(0, 0, focalLength) - horizontal / 2 - vertical / 2;
-        _topLeft = viewportTopLeft + 0.5 * (_horizontalDelta - _verticalDelta);
+        _topLeft = viewportTopLeft + 0.5 * (_horizontalDelta + _verticalDelta);
     }
 
     public Ray GetRay(int x, int y)

@@ -6,14 +6,16 @@ using PixelRay.SceneObjects;
 namespace PixelRay.Debug;
 
 /// <summary>
-/// Simple tracing debugger for detecting shadow pixels
+/// Simple tracing debugger for detecting blocked shadow pixels i.e. pixels which are both hit by a light ray AND 
+/// blocked by another object.
+/// Pixels blocked by some object show as red, anything else as green.
 /// </summary>
-public static class TraceDebug
+public static class BlockedShadows
 {
     private static readonly double _epsilon = 1e-4;
     private static readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
 
-    public static ColorRGB RunTraceDebug(Ray ray, Scene scene)
+    public static ColorRGB TraceDebug(Ray ray, Scene scene)
     {
         double closest = double.MaxValue;
         HitRecord closestHit = default;
@@ -59,6 +61,6 @@ public static class TraceDebug
             }
         }
 
-        return new ColorRGB(0.2, 0.2, 0.2); // ambient fallback
+        return new ColorRGB(0.2, 0.2, 0.2); // default ambient color
     }
 }

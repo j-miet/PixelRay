@@ -12,8 +12,9 @@ namespace PixelRay.Core;
 /// <param name="width">Resolution width</param>
 /// <param name="height">Resolution height></param>
 /// <param name="palette">Used color palette. If you wish to use no palette, pass 'new Palette([])' instead</param>
-/// <param name="lightingBands">Amount of lighting quantization levels. Default value is 1</param>
-public class Renderer(int width, int height, Palette palette, int lightingBands = 1)
+/// <param name="lightingBands">Amount of lighting quantization levels. Default is 1</param>
+/// <param name="ambientFactor">Base amount of lighting in environment, takes scalar values [0, 1]. Default is 0</param>
+public class Renderer(int width, int height, Palette palette, int lightingBands = 1, double ambientFactor = 0)
 {
     /// <summary>
     /// Render a scene through a camera and load image into a buffer.
@@ -36,7 +37,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
                 ColorRGB color;
                 if (debugMode)
                 {
-                    color = TraceDebug.RunTraceDebug(ray, scene);
+                    color = BlockedShadows.TraceDebug(ray, scene);
                 }
                 else
                 {
@@ -52,7 +53,8 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     private readonly int _width = width;
     private readonly int _height = height;
     private readonly Palette _palette = palette;
-    private readonly int _lightingBands = lightingBands;
+    private readonly int _lightingBands = (lightingBands >= 0) ? lightingBands : 0;
+    private readonly double _ambient = (ambientFactor >= 0 && ambientFactor <= 1) ? ambientFactor : 0;
 
     private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
     private const double _epsilon = 1e-4;
@@ -89,12 +91,13 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
                 if (!CheckShadow(closestHit, scene, directionalLight))
                 {
                     double lightAngle = Math.Max(0, Vec3.Dot(closestHit.Normal, -directionalLight.Direction));
-                    ColorRGB quantized = (lightAngle * closestHit.Color).Quantize(_lightingBands);
+                    double diffused = _ambient + (1 - _ambient) * lightAngle;
+                    ColorRGB quantized = (diffused * closestHit.Color).Quantize(_lightingBands);
                     ColorRGB contribution = quantized * directionalLight.Color;
 
-                    finalColor += contribution;
-                    // you can add separate parameter for sum quantizing i.e. instead of individual quantize, skip this
-                    // step here and call Quantize before returning value
+                    finalColor += contribution + closestHit.Color * _ambient;
+                    // TODO add optional quantizing + mode of quantizing: individually for each light source or only
+                    // after summing all lights
                 }
             }
         }

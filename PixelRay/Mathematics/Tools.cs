@@ -9,8 +9,10 @@ public static class Tools
 {
     const double quarticEpsilon = 1e-6;
 
-    // solves a quartic (4. degree) equation ax^4 + bx^3 + cx^2 + dx + e = 0 using Durand-Kerner method and returns
-    // only its real-valued roots
+    /// <summary>
+    /// solves a quartic (4. degree) equation ax^4 + bx^3 + cx^2 + dx + e = 0 using Durand-Kerner method and returns
+    /// only its real-valued roots
+    /// </summary>
     public static double[] SolveQuartic(double a, double b, double c, double d, double e)
     {
         // normalize by the highest power term to use form x^4 + b/a*x^3 + c/a*x^2 + d/a*x + e/a*x under iterations

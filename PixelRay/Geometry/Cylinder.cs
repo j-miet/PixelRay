@@ -6,9 +6,9 @@ namespace PixelRay.Geometry;
 
 /// <summary>
 /// Finite length cylinder with bottom and top disc/cap included.
-/// Defined by bottom disc center point, radius, axis normal and height/distance to top disc. 
+/// Defined by bottom disc center point, axis normal, radius and height/distance to top disc. 
 /// </summary>
-public class Cylinder(Vec3 baseCenter, double radius, Vec3 axis, double height, ColorRGB color) : IHittable
+public class Cylinder(Vec3 baseCenter, Vec3 axis, double radius, double height, ColorRGB color) : IHittable
 {
     public Vec3 Center = baseCenter;
     public double Radius = radius;
@@ -19,7 +19,7 @@ public class Cylinder(Vec3 baseCenter, double radius, Vec3 axis, double height, 
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
-        double epsilon = 1e-4;
+        double epsilon = 1e-8;
 
         Vec3 finalPoint = new();
         Vec3 finalNormal = new();
@@ -60,7 +60,7 @@ public class Cylinder(Vec3 baseCenter, double radius, Vec3 axis, double height, 
                 double sqrtD = Math.Sqrt(discriminant);
                 foreach (double t in new double[] { (-b - sqrtD) / (2 * a), (-b + sqrtD) / (2 * a) })
                 {
-                    if (t < tMin || t > tMax) continue;
+                    if (t <= tMin || t >= tMax) continue;
 
                     Vec3 rayPoint = ray.At(t);
                     Vec3 centerToRay = rayPoint - Center;
@@ -78,7 +78,7 @@ public class Cylinder(Vec3 baseCenter, double radius, Vec3 axis, double height, 
             }
         }
 
-        if (Math.Abs(Vec3.Dot(-Axis, ray.Direction)) >= epsilon) // bottom disc/cap
+        if (Vec3.Dot(Axis, ray.Direction) >= epsilon) // bottom disc
         {
             Vec3 bottomNormal = -Axis;
             Vec3 bottomCenter = Center;
@@ -97,7 +97,7 @@ public class Cylinder(Vec3 baseCenter, double radius, Vec3 axis, double height, 
             }
         }
 
-        if (Math.Abs(Vec3.Dot(Axis, ray.Direction)) >= epsilon) // top disc/cap
+        if (Vec3.Dot(Axis, ray.Direction) <= -epsilon) // top disc
         {
             Vec3 topNormal = Axis;
             Vec3 topCenter = Center + Height * topNormal;

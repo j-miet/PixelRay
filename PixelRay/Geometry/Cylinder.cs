@@ -23,7 +23,7 @@ public class Cylinder(Vec3 baseCenter, Vec3 axis, double radius, double height, 
 
         Vec3 finalPoint = new();
         Vec3 finalNormal = new();
-        double finalT = double.MaxValue;
+        double finalT = double.PositiveInfinity;
         bool hitAnything = false;
 
         // TODO remove excessive comments and write a short summary of what algorithm does

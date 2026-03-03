@@ -25,7 +25,7 @@ public class Cone(Vec3 apexPoint, Vec3 axis, double baseRadius, double height, C
 
         Vec3 finalPoint = new();
         Vec3 finalNormal = new();
-        double finalT = double.MaxValue;
+        double finalT = double.PositiveInfinity;
         bool hitAnything = false;
 
         // Cone can be constructed by defining its head/apex point A, radius of base R and axis unit normal N.

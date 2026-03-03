@@ -7,7 +7,7 @@ namespace PixelRay.Geometry;
 /// <summary>
 /// Planar disc defined by its center point, radius and normal.
 /// </summary>
-public class Disc(Vec3 center, double radius, Vec3 normal, ColorRGB color) : IHittable
+public class Disc(Vec3 center, Vec3 normal, double radius, ColorRGB color) : IHittable
 {
     public Vec3 Center = center;
     public double Radius = radius;

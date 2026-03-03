@@ -11,8 +11,8 @@ public class Camera
     {
         _cameraCenter = center;
 
-        double aspectRatio = width / height;
-        double viewportHeight = 2;
+        double aspectRatio = width / (double)height;
+        double viewportHeight = 1;
         double viewportWidth = viewportHeight * aspectRatio;
         double focalLength = 1;
 

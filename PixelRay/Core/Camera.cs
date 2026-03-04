@@ -7,14 +7,18 @@ namespace PixelRay.Core;
 /// </summary>
 public class Camera
 {
-    public Camera(Vec3 center, int width, int height)
+    public Camera(
+        Vec3 center,
+        int width,
+        int height,
+        double viewportHeight = 2,
+        double focalLength = 1
+    )
     {
         _cameraCenter = center;
 
         double aspectRatio = width / (double)height;
-        double viewportHeight = 1;
         double viewportWidth = viewportHeight * aspectRatio;
-        double focalLength = 1;
 
         Vec3 horizontal = new(viewportWidth, 0, 0);
         Vec3 vertical = new(0, -viewportHeight, 0);

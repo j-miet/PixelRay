@@ -1,8 +1,8 @@
 using PixelRay.Core;
-using PixelRay.Mathematics;
-using PixelRay.SceneObjects;
+using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Hittable;
 
-namespace PixelRay.Geometry;
+namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Triangle defined by its vertices v1, v2 and v3.

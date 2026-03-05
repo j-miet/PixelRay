@@ -1,14 +1,14 @@
 using PixelRay.Core;
-using PixelRay.Mathematics;
-using PixelRay.SceneObjects;
+using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Hittable;
 
-namespace PixelRay.Geometry;
+namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// General quadric primitive Ax^2 + By^2 + Cz^2 + Dxy + Exz + Fyz + Gx + Hy + Iz + J = 0
 /// Can describe same objects as some of the existing primitive classes e.g. unit sphere would be generated with
 /// A=B=C=1, J = -r*r, set rest to 0.
-/// Doesn't implemented cutting => objects can expand indefinitely.
+/// Does not implement cutting => objects can expand indefinitely.
 /// </summary>
 public class Quadric(
     double a, double b, double c,
@@ -79,8 +79,9 @@ public class Quadric(
         Vec3 normal = new Vec3(
             2 * A * p.X + D * p.Y + E * p.Z + G,
             2 * B * p.Y + D * p.X + F * p.Z + H,
-            2 * C * p.Z + E * p.X + F * p.Y + I)
-            .Unit();
+            2 * C * p.Z + E * p.X + F * p.Y + I
+        )
+        .Unit();
 
         hit.Point = p;
         hit.Normal = Vec3.Dot(normal, ray.Direction) > 0 ? -normal : normal;

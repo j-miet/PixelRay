@@ -1,6 +1,6 @@
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
-namespace PixelRay.Lighting;
+namespace PixelRay.SceneView.Lighting;
 
 /// <summary>
 /// A directional light ray

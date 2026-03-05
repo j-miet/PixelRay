@@ -1,6 +1,6 @@
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
-namespace PixelRay.Lighting;
+namespace PixelRay.SceneView.Lighting;
 
 /// <summary>
 /// Abstraction of light objects

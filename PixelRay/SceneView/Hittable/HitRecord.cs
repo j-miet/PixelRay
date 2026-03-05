@@ -1,6 +1,6 @@
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
-namespace PixelRay.SceneObjects;
+namespace PixelRay.SceneView.Hittable;
 
 /// <summary>
 /// Record data of ray intersecting a hittable object.

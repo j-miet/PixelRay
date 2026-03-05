@@ -1,6 +1,7 @@
-using PixelRay.Lighting;
+using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Lighting;
 
-namespace PixelRay.SceneObjects;
+namespace PixelRay.SceneView.Scene;
 
 /// <summary>
 /// Collection of all traceable objects: hittables, lights

@@ -1,6 +1,6 @@
 using PixelRay.Core;
 
-namespace PixelRay.SceneObjects;
+namespace PixelRay.SceneView.Hittable;
 
 /// <summary>
 /// Interface for hittable object on scene

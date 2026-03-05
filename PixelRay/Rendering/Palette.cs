@@ -1,4 +1,4 @@
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Rendering;
 

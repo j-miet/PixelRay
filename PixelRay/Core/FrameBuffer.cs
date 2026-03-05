@@ -1,9 +1,9 @@
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Core;
 
 /// <summary>
-/// Data class for storing and accessing stored pixels
+/// Data class for storing and accessing pixel colors
 /// </summary>
 public class FrameBuffer(int width, int height)
 {

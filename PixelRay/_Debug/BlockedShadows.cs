@@ -1,7 +1,8 @@
 using PixelRay.Core;
-using PixelRay.Lighting;
-using PixelRay.Mathematics;
-using PixelRay.SceneObjects;
+using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Lighting;
+using PixelRay.SceneView.Scene;
 
 namespace PixelRay.Debug;
 

@@ -2,7 +2,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
 using PixelRay.Core;
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Output;
 

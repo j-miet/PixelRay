@@ -1,5 +1,5 @@
 using PixelRay.Core;
-using PixelRay.Mathematics;
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Output
 {

@@ -1,8 +1,10 @@
-using PixelRay.Lighting;
-using PixelRay.Mathematics;
-using PixelRay.Rendering;
-using PixelRay.SceneObjects;
+using PixelRay.Core.Mathematics;
 using PixelRay.Debug;
+using PixelRay.Rendering;
+using PixelRay.SceneView.Camera;
+using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Lighting;
+using PixelRay.SceneView.Scene;
 
 namespace PixelRay.Core;
 

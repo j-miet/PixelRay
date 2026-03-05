@@ -1,9 +1,9 @@
 using Complex = System.Numerics.Complex;
 
-namespace PixelRay.Mathematics;
+namespace PixelRay.Core.Mathematics;
 
 /// <summary>
-/// Various math tools
+/// Various math utilities
 /// </summary>
 public static class Tools
 {

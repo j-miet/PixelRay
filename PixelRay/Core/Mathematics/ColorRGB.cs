@@ -1,4 +1,4 @@
-namespace PixelRay.Mathematics;
+namespace PixelRay.Core.Mathematics;
 
 /// <summary>
 /// RGB color

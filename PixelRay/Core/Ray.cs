@@ -3,7 +3,7 @@ using PixelRay.Core.Mathematics;
 namespace PixelRay.Core;
 
 /// <summary>
-/// Ray function
+/// Ray function R(t) = O + t*D. D is automatically normalized.
 /// </summary>
 public readonly struct Ray(Vec3 origin, Vec3 direction)
 {
@@ -11,7 +11,7 @@ public readonly struct Ray(Vec3 origin, Vec3 direction)
     public readonly Vec3 Direction = direction.Unit();
 
     /// <summary>
-    /// Returns a ray position R(t) = O + t*d
+    /// Returns a ray position R(t) = O + t*D
     /// </summary>
     public Vec3 At(double t)
     {

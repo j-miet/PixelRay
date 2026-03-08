@@ -5,42 +5,47 @@ using PixelRay.SceneView.Hittable;
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
-/// A sphere defined by center and radius.
+/// Origin-centered unit sphere.
 /// </summary>
-public class Sphere(Vec3 center, double radius, ColorRGB color) : IHittable
+public class Sphere(ColorRGB color) : IHittable
 {
-    public Vec3 Center = center;
-    public double Radius = radius;
     public ColorRGB Color = color;
 
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
 
-        Vec3 co = ray.Origin - Center;
-        // coefficients of a quadratic equation produced by ray intersecting the sphere surface.
-        // normally double a = Vec3.Dot(ray.Direction, ray.Direction), but ray.D is normalized so it's always 1.
-        double b = 2 * Vec3.Dot(ray.Direction, co);
-        double c = Vec3.Dot(co, co) - Radius * Radius;
+        double a = Vec3.Dot(ray.Direction, ray.Direction);
+        double b = 2 * Vec3.Dot(ray.Direction, ray.Origin);
+        double c = ray.Origin.NormSquared() - 1;
 
-        double discriminant = b * b - 4 * c; // remove a from here (and also from root calculations)
-        if (discriminant < 0)
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant < -Const.HitDiscriminant)
             return false;
 
-        double sqrtDiscriminant = Math.Sqrt(discriminant);
-        double t = (-b - sqrtDiscriminant) / 2;
+        double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
 
-        if (t <= tMin || t >= tMax)
-        {
-            t = (-b + sqrtDiscriminant) / 2;
-            if (t <= tMin || t >= tMax)
-                return false;
-        }
+        double t1 = (-b - sqrtD) / (2 * a);
+        double t2 = (-b + sqrtD) / (2 * a);
+
+        double t = double.PositiveInfinity;
+
+        if (t1 >= tMin && t1 <= tMax)
+            t = t1;
+
+        if (t2 >= tMin && t2 <= tMax && t2 < t)
+            t = t2;
+
+        if (t == double.PositiveInfinity)
+            return false;
 
         hit.Point = ray.At(t);
-        hit.Normal = (hit.Point - Center).Unit();
+        Vec3 normal = hit.Point.Unit();
+        hit.SetFaceNormal(ray, normal);
+
         hit.T = t;
         hit.Color = Color;
+        hit.Object = this;
 
         return true;
     }

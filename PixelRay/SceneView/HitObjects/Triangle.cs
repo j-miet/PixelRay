@@ -17,7 +17,6 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
-        double epsilon = 1e-4;
 
         // triangle intersection with ray without requiring the triangle plane using Möller-Trumbore algorithm:
         // point P on a triangle can be represented as convex combination
@@ -46,7 +45,7 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
         Vec3 rayCrossE2 = Vec3.Cross(ray.Direction, e2); // system matrix determinant
         double determinant = Vec3.Dot(e1, rayCrossE2);
 
-        if (Math.Abs(determinant) < epsilon) // if ray and normal are parallel
+        if (Math.Abs(determinant) < Const.ParallelEpsilon) // if ray and normal are parallel
             return false;
 
         // to solve linear system using Cramer's Rule, subdeterminants are required. These are calculated by replacing
@@ -62,25 +61,26 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
 
         // det(A_2) = Dot(-D, Cross(O-V1, e2)) = Dot(O-V1, Cross(D, e2))
         double b = Vec3.Dot(v1ToOrigin, rayCrossE2) / determinant;
-        if (b < 0 || b > 1) // check convex combination requirements
+        if (b < -Const.HitEpsilon || b > 1 + Const.HitEpsilon) // check convex combination requirements
             return false;
 
         // det(A_3) = Dot(-D, Cross(e1, O-V1)) = Dot(D, Cross(O-V1, e1))
         Vec3 v1oCrossE1 = Vec3.Cross(v1ToOrigin, e1);
         double c = Vec3.Dot(ray.Direction, v1oCrossE1) / determinant;
-        if (c < 0 || b + c > 1) // check convex combination reqs
+        if (c < -Const.HitEpsilon || b + c > 1 + Const.HitEpsilon) // check convex combination
             return false;
 
         // det(A_1) = Dot(O-V1, Cross(e1, e2)) = -Dot(e2, Cross(e1, O-V1)) = Dot(e2, Cross(O-V1, e1)).
         double t = Vec3.Dot(e2, v1oCrossE1) / determinant;
-        if (t <= tMin || t >= tMax)
+        if (t < tMin || t > tMax)
             return false;
 
         hit.Point = ray.At(t);
         Vec3 normal = Vec3.Cross(e1, e2).Unit();
-        hit.Normal = Vec3.Dot(ray.Direction, normal) > 0 ? -normal : normal;
+        hit.SetFaceNormal(ray, normal);
         hit.T = t;
         hit.Color = Color;
+        hit.Object = this;
 
         return true;
     }

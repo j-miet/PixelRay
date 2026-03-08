@@ -11,30 +11,31 @@ namespace PixelRay.SceneView.HitObjects;
 /// Does not implement cutting => objects can expand indefinitely.
 /// </summary>
 public class Quadric(
+    ColorRGB color,
     double a, double b, double c,
     double d, double e, double f,
     double g, double h, double i,
     double j,
-    Vec3 position,
-    ColorRGB color
+    double xmin = -0.5,
+    double xmax = 0.5,
+    double ymin = -0.5,
+    double ymax = 0.5,
+    double zmin = -0.5,
+    double zmax = 0.5
 ) : IHittable
 {
+    public ColorRGB Color = color;
     public double A = a, B = b, C = c; // square terms
     public double D = d, E = e, F = f; // product terms
     public double H = h, G = g, I = i; // linear terms
     public double J = j; // constant
-    public Vec3 Position = position;
-    public ColorRGB Color = color;
+    public double Xmin = xmin, Xmax = xmax, Ymin = ymin, Ymax = ymax, Zmin = zmin, Zmax = zmax;
 
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
 
-        Vec3 O = ray.Origin - Position; // local origin
-        Vec3 Dir = ray.Direction;
-        Ray localRay = new(O, Dir); // ray in local coordinates
-
-        // quadric in Euclidean space can be written as P^T M P where M is a 4x4 matrix
+        // a quadric in Euclidean space can be written as P^T M P where M is a 4x4 matrix
         // M = [  A  D/2 E/2 G/2 ]
         //     | D/2  B  F/2 H/2 |
         //     | E/2 F/2  C  I/2 |
@@ -46,10 +47,11 @@ public class Quadric(
         // Now substituting P = O + t*Q (Q ray direction as D already used) yields a quadratic with following 
         // coefficients:
         // a = Q^T W Q, b = 2*O^T W Q + L^T Q, c = O^T W O + L^T O + J
-        double Ox = O.X, Oy = O.Y, Oz = O.Z;
-        double Dx = Dir.X, Dy = Dir.Y, Dz = Dir.Z;
 
-        // calculate coefficients by simplifying matrix forms
+        double Ox = ray.Origin.X, Oy = ray.Origin.Y, Oz = ray.Origin.Z;
+        double Dx = ray.Direction.X, Dy = ray.Direction.Y, Dz = ray.Direction.Z;
+
+        // calculate coefficients from matrix forms
         double a = A * Dx * Dx + B * Dy * Dy + C * Dz * Dz + D * Dx * Dy + E * Dx * Dz + F * Dy * Dz;
         double b = 2 * A * Ox * Dx + 2 * B * Oy * Dy + 2 * C * Oz * Dz +
             D * (Ox * Dy + Oy * Dx) + E * (Ox * Dz + Oz * Dx) + F * (Oy * Dz + Oz * Dy) +
@@ -58,23 +60,40 @@ public class Quadric(
             D * Ox * Oy + E * Ox * Oz + F * Oy * Oz +
             G * Ox + H * Oy + I * Oz + J;
 
-        double discriminant = b * b - 4 * a * c;
-        if (discriminant < 0)
+        if (Math.Abs(a) < Const.HitEpsilon)
             return false;
 
-        double sqrtD = Math.Sqrt(discriminant);
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant < -Const.HitDiscriminant)
+            return false;
+
+        double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
         double t1 = (-b - sqrtD) / (2 * a);
         double t2 = (-b + sqrtD) / (2 * a);
-        double t = double.PositiveInfinity;
 
-        if (t1 > tMin && t1 < tMax)
-            t = t1;
-        if (t2 > tMin && t2 < tMax && t2 < t)
-            t = t2;
+        double t = double.PositiveInfinity;
+        List<double> roots = [];
+        Vec3 p;
+
+        if (t1 >= tMin && t1 <= tMax) roots.Add(t1);
+        if (t2 >= tMin && t2 <= tMax) roots.Add(t2);
+
+        foreach (double candidate in roots)
+        {
+            p = ray.At(candidate);
+            if (p.X >= Xmin && p.X <= Xmax && // check bounding conditions
+                p.Y >= Ymin && p.Y <= Ymax &&
+                p.Z >= Zmin && p.Z <= Zmax)
+            {
+                t = candidate;
+                break;
+            }
+        }
+
         if (t == double.PositiveInfinity)
             return false;
 
-        Vec3 p = localRay.At(t);
+        p = ray.At(t);
         // normal(x,y,z) = grad(x,y,z) = <2*A*x + D*y + E*z + G, 2*B*y + D*x + F*z + H, 2*C*z + E*x + F*y + I>
         Vec3 normal = new Vec3(
             2 * A * p.X + D * p.Y + E * p.Z + G,
@@ -84,9 +103,10 @@ public class Quadric(
         .Unit();
 
         hit.Point = p;
-        hit.Normal = Vec3.Dot(normal, ray.Direction) > 0 ? -normal : normal;
+        hit.SetFaceNormal(ray, normal);
         hit.T = t;
         hit.Color = Color;
+        hit.Object = this;
 
         return true;
     }

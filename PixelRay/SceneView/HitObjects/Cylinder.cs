@@ -5,121 +5,93 @@ using PixelRay.SceneView.Hittable;
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
-/// Finite length cylinder with bottom and top disc/cap included.
-/// Defined by bottom disc center point, axis normal, radius and height/distance to top disc. 
+/// Cylinder with bottom cap center at origin, normal (0, 1, 0) and radius 1 i.e. bottom cap is unit circle
+/// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top caps/discs are included.
 /// </summary>
-public class Cylinder(Vec3 baseCenter, Vec3 axis, double radius, double height, ColorRGB color) : IHittable
+public class Cylinder(ColorRGB color) : IHittable
 {
-    public Vec3 Center = baseCenter;
-    public double Radius = radius;
-    public Vec3 Axis = axis.Unit();
-    public double Height = height;
     public ColorRGB Color = color;
+    public Vec3 Axis = new(0, 1, 0);
 
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
-        double epsilon = 1e-8;
 
         Vec3 finalPoint = new();
         Vec3 finalNormal = new();
         double finalT = double.PositiveInfinity;
         bool hitAnything = false;
 
-        // TODO remove excessive comments and write a short summary of what algorithm does
+        Vec3 O = ray.Origin;
+        Vec3 D = ray.Direction;
 
-        // define any point P and a cylinder by its center C, radius R and normal N
-        // then cylinder can be constructed by setting a line ray with origin C and direction N and taking all points
-        // which have exact distance R to the closest point on the line i.e. point projected onto axis
-        // To find general intersection equation for point and cylinder, the idea is as follows:
-        // 1. calculate vector V := P-C 
-        // 2. use vector projection proj_N (V) to project point P on the a line perpendicular to N. 
-        // 3. calculate orthogonal projection oproj_N (V)= V - proj_N (V): because projection is done with 
-        // respect to N, this result vector preserves the cylinder direction and thus the radial distance of P to 
-        // closest axis point
-        // 4. then just check if orthogonal projection lies on the R radius circle. |oproj_N (V)| = R
-        // |oproj_N (V)|^2 = | V - proj_N (V)|^2 = | V - ((Dot(V, N)/|N|^2) * V^2 | ^2
-        // because N is normalized the condition to check is | V- Dot(V, N)*V |^2 = R^2
-        // Now substituing the ray R(t) = O + t*D in place of P results into a lot of algebra and eventually a 
-        // quadratic equation
-        // however using the fact that N is normalized will simplify this a lot. Define co = O - C. 
-        // End results for quadratic terms a, b and c thus become
-        // a = |oproj_N (D)|^2, b = 2*Dot(oproj_N (co), oproj_N (D)), c = |oproj_N (co)|^2 - R^2
-        Vec3 co = ray.Origin - Center;
-        Vec3 oprojDonAxis = Vec3.Oproj(ray.Direction, Axis);
-        Vec3 oprojCOonAxis = Vec3.Oproj(co, Axis);
-        double a = oprojDonAxis.NormSquared();
-        double b = 2 * Vec3.Dot(oprojCOonAxis, oprojDonAxis);
-        double c = oprojCOonAxis.NormSquared() - Radius * Radius;
+        double a = D.X * D.X + D.Z * D.Z;
+        double b = 2 * (O.X * D.X + O.Z * D.Z);
+        double c = O.X * O.X + O.Z * O.Z - 1;
 
-        if (a > epsilon) // sides
+        if (Math.Abs(a) > Const.HitEpsilon) // cone sides
         {
             double discriminant = b * b - 4 * a * c;
-            if (discriminant >= 0)
+            if (discriminant >= -Const.HitDiscriminant)
             {
-                double sqrtD = Math.Sqrt(discriminant);
+                double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
                 foreach (double t in new double[] { (-b - sqrtD) / (2 * a), (-b + sqrtD) / (2 * a) })
                 {
-                    if (t <= tMin || t >= tMax) continue;
+                    if (t < tMin || t > tMax)
+                        continue;
 
                     Vec3 rayPoint = ray.At(t);
-                    Vec3 centerToRay = rayPoint - Center;
-                    double h = Vec3.Dot(centerToRay, Axis);
-                    if (h < 0 || h > Height) continue; // generate only finite cylinders
+                    double h = rayPoint.Y;
+                    if (h < -Const.HitEpsilon || h > 1 + Const.HitEpsilon)
+                        continue;
 
-                    if (t < finalT) // important for picking only the closest ray hit amongst side + caps
+                    if (t < finalT)
                     {
+                        hitAnything = true;
                         finalT = t;
                         finalPoint = rayPoint;
-                        finalNormal = (centerToRay - Axis * h).Unit(); // same as Vec3.Oproj(centerToRay, Axis).Unit();
-                        hitAnything = true;
+                        finalNormal = (2 * new Vec3(rayPoint.X, 0, rayPoint.Z)).Unit();
                     }
                 }
             }
         }
 
-        if (Vec3.Dot(Axis, ray.Direction) >= epsilon) // bottom disc
+        if (ray.Direction.Y > Const.HitEpsilon) // bottom unit disc with center is (0, 0, 0)
         {
             Vec3 bottomNormal = -Axis;
-            Vec3 bottomCenter = Center;
-            double t = Vec3.Dot(bottomNormal, bottomCenter - ray.Origin) / Vec3.Dot(bottomNormal, ray.Direction);
+            double t = -ray.Origin.Y / ray.Direction.Y;
             Vec3 rayPoint = ray.At(t);
 
-            if (t >= tMin && t <= tMax && (rayPoint - bottomCenter).Norm() <= Radius)
+            if (t >= tMin && t <= tMax && rayPoint.Norm() <= 1 + Const.HitEpsilon && t < finalT)
             {
-                if (t < finalT)
-                {
-                    hitAnything = true;
-                    finalT = t;
-                    finalPoint = rayPoint;
-                    finalNormal = bottomNormal;
-                }
+                hitAnything = true;
+                finalT = t;
+                finalPoint = rayPoint;
+                finalNormal = bottomNormal;
             }
         }
 
-        if (Vec3.Dot(Axis, ray.Direction) <= -epsilon) // top disc
+        if (ray.Direction.Y < -Const.HitEpsilon) // top cap unit disc with center at (0, 1, 0)
         {
-            Vec3 topNormal = Axis;
-            Vec3 topCenter = Center + Height * topNormal;
-            double t = Vec3.Dot(topNormal, topCenter - ray.Origin) / Vec3.Dot(topNormal, ray.Direction);
+            Vec3 baseNormal = Axis;
+            Vec3 baseCenter = Axis;
+            double t = ray.Origin.Y / ray.Direction.Y;
             Vec3 rayPoint = ray.At(t);
 
-            if (t >= tMin && t <= tMax && (rayPoint - topCenter).Norm() <= Radius)
+            if (t >= tMin && t <= tMax && (rayPoint - baseCenter).Norm() <= 1 + Const.HitEpsilon && t < finalT)
             {
-                if (t < finalT)
-                {
-                    hitAnything = true;
-                    finalT = t;
-                    finalPoint = rayPoint;
-                    finalNormal = topNormal;
-                }
+                hitAnything = true;
+                finalT = t;
+                finalPoint = rayPoint;
+                finalNormal = baseNormal;
             }
         }
 
         hit.Point = finalPoint;
-        hit.Normal = finalNormal;
+        hit.SetFaceNormal(ray, finalNormal);
         hit.T = finalT;
         hit.Color = Color;
+        hit.Object = this;
 
         return hitAnything;
     }

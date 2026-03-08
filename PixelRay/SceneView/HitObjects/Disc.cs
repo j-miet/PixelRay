@@ -5,40 +5,34 @@ using PixelRay.SceneView.Hittable;
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
-/// Planar disc defined by its center point, radius and normal.
+/// Unit origin-centered disc on plane y=0 with normal (0, 1, 0)
 /// </summary>
-public class Disc(Vec3 center, Vec3 normal, double radius, ColorRGB color) : IHittable
+public class Disc(ColorRGB color) : IHittable
 {
-    public Vec3 Center = center;
-    public double Radius = radius;
-    public Vec3 Normal = normal.Unit();
     public ColorRGB Color = color;
+    public Vec3 Normal = new(0, 1, 0);
 
     public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
     {
         hit = default;
-        double epsilon = 1e-4;
 
-        // same math can be used here as with planes
-        // first check perpendicularity, then calculate plane intersection. Finally check if distance between center
-        // and plane intersection point is <= radius
-        double NDotR = Vec3.Dot(Normal, ray.Direction);
-        if (Math.Abs(NDotR) < epsilon) // check if normal and direction are perpendicular
+        if (Math.Abs(ray.Direction.Y) < Const.ParallelEpsilon)
             return false;
 
-        double t = Vec3.Dot(Normal, Center - ray.Origin) / NDotR; // intersection with disc plane
+        double t = -ray.Origin.Y / ray.Direction.Y;
 
-        if (t <= tMin || t >= tMax)
+        if (t < tMin || t > tMax)
             return false;
 
         Vec3 point = ray.At(t);
-        if ((point - Center).Norm() > Radius)
+        if (point.Norm() > 1 + Const.HitEpsilon)
             return false;
 
         hit.Point = point;
-        hit.Normal = Vec3.Dot(ray.Direction, Normal) > 0 ? -Normal : Normal;
+        hit.SetFaceNormal(ray, Normal);
         hit.T = t;
         hit.Color = Color;
+        hit.Object = this;
 
         return true;
     }

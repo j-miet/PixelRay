@@ -10,12 +10,14 @@ public static class Const
 
     // Rendering
     public const double ClosestHitEpsilon = 1e-5;
-    public const double RayIntersectOffset = 1e-4; // shadow ray normal offset
-    public enum RenderMode
+    public const double ShadowRayIntersectOffset = 1e-4; // shadow ray normal offset
+    public enum DebugMode
     {
-        Default,
-        DebugShadows,
-        DebugNormals
+        None,
+        BlockedShadows,     // blocked shadow pixel detection
+        Normals,            // visualize surface normals
+        DepthHeat,          // visualize distance along ray
+        ObjectID            // visualize which object was hit
     }
 
     // IHittable

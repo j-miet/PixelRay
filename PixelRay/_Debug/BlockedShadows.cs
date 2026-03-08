@@ -13,22 +13,24 @@ namespace PixelRay.Debug;
 /// </summary>
 public static class BlockedShadows
 {
-    private static readonly double _epsilon = 1e-4;
     private static readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
 
     public static ColorRGB TraceDebug(Ray ray, Scene scene)
     {
-        double closest = double.MaxValue;
+        double closestT = double.MaxValue;
         HitRecord closestHit = default;
         bool hitAnything = false;
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, _epsilon, closest, out HitRecord hit))
+            if (obj.Hit(ray, Const.HitMin, closestT, out HitRecord hit))
             {
-                closest = hit.T;
-                hitAnything = true;
-                closestHit = hit;
+                if (hit.T + Const.ClosestHitEpsilon < closestT)
+                {
+                    hitAnything = true;
+                    closestT = hit.T;
+                    closestHit = hit;
+                }
             }
         }
 
@@ -39,13 +41,13 @@ public static class BlockedShadows
         {
             if (light is DirectionalLight dirLight)
             {
-                Vec3 origin = closestHit.Point + closestHit.Normal * _epsilon;
+                Vec3 origin = closestHit.Point + closestHit.Normal * Const.ShadowRayIntersectOffset;
                 Ray shadowRay = new(origin, -dirLight.Direction);
 
                 bool blocked = false;
                 foreach (var obj in scene.Objects)
                 {
-                    if (obj.Hit(shadowRay, _epsilon, double.MaxValue, out _))
+                    if (obj.Hit(shadowRay, Const.HitMin, double.MaxValue, out _))
                     {
                         blocked = true;
                     }

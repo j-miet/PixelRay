@@ -73,6 +73,8 @@ public readonly struct Vec3
         return new Vec3(X, Y, Z) / Norm();
     }
 
+    public Vec3 Normalize() => Unit(); // alias for obtaining unit vectors
+
     /// <summary>
     /// Dot product
     /// </summary>

@@ -5,10 +5,8 @@ namespace PixelRay.Core.Mathematics;
 /// <summary>
 /// Various math utilities
 /// </summary>
-public static class Tools
+public static class Utils
 {
-    const double quarticEpsilon = 1e-6;
-
     /// <summary>
     /// solves a quartic (4. degree) equation ax^4 + bx^3 + cx^2 + dx + e = 0 using Durand-Kerner method and returns
     /// only its real-valued roots
@@ -44,7 +42,7 @@ public static class Tools
 
         foreach (Complex root in roots)
         {
-            if (Math.Abs(root.Imaginary) < quarticEpsilon) // if imaginary part falls under error
+            if (Math.Abs(root.Imaginary) < Const.QuarticEpsilon) // if imaginary part falls under error
                 realRoots.Add(root.Real);
         }
 
@@ -68,5 +66,17 @@ public static class Tools
         // update x and z references; cross product creates orthogonal vector
         xAxisRef = Vec3.Cross(helper, yAxis).Unit();
         zAxisRef = Vec3.Cross(yAxis, xAxisRef); // both vectors already normalized means cross product is too
+    }
+
+    /// <summary>
+    /// Check if ray hits a origin-centered sphere with radius r. Ray direction must be normalized!
+    /// </summary>
+    public static bool HitBoundingSphere(Ray ray, double r)
+    {
+        // because ray D is assumed to be normalized, discriminant can be simplified
+        double b = Vec3.Dot(ray.Origin, ray.Direction);
+        double c = Vec3.Dot(ray.Origin, ray.Origin) - r * r;
+        double discriminant = b * b - c;
+        return discriminant >= -Const.HitDiscriminant;
     }
 }

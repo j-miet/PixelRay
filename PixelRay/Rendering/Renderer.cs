@@ -25,7 +25,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
     /// <param name="debugMode">What debug mode is used. Default = 0 means nothing, 1 is for shadows, 2 is for normals</
     /// param>
-    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, RenderMode mode = RenderMode.Default)
+    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, DebugMode mode = DebugMode.None)
     {
         int scaledW = upScale * _width;
         int scaledH = upScale * _height;
@@ -40,17 +40,19 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
 
                 Ray ray = camera.GetRay(baseX, baseY);
                 ColorRGB color;
-                if (mode == RenderMode.DebugShadows)
+                switch (mode)
                 {
-                    color = BlockedShadows.TraceDebug(ray, scene);
-                }
-                else if (mode == RenderMode.DebugNormals)
-                {
-                    color = Trace(ray, scene, true);
-                }
-                else
-                {
-                    color = Trace(ray, scene, false);
+                    case DebugMode.None:
+                        color = Trace(ray, scene);
+                        break;
+
+                    case DebugMode.BlockedShadows:
+                        color = BlockedShadows.TraceDebug(ray, scene);
+                        break;
+
+                    default:
+                        color = DebugRender.Debug(ray, scene, mode);
+                        break;
                 }
                 buffer.SetPixel(x, y, color.Clamp());
             }
@@ -70,7 +72,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// <summary>
     /// Trace a ray and return its corresponding viewport pixel color.
     /// </summary>
-    private ColorRGB Trace(Ray ray, Scene scene, bool debugNormals = false)
+    private ColorRGB Trace(Ray ray, Scene scene)
     {
         double closestT = double.MaxValue;
         bool hitAnything = false;
@@ -92,8 +94,6 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
 
         if (!hitAnything)
             return _backGroundColor;
-        if (debugNormals)
-            return DebugNormal.TraceDebugNormal(closestHit);
 
         ColorRGB finalColor = new(0, 0, 0);
 
@@ -126,7 +126,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// </summary>
     private static bool CheckShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
-        Vec3 origin = hit.Point + hit.Normal * RayIntersectOffset; // slight nudge to avoid surface self-collision
+        Vec3 origin = hit.Point + hit.Normal * ShadowRayIntersectOffset; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);
 
         foreach (IHittable obj in scene.Objects)

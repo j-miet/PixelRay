@@ -5,6 +5,7 @@ using PixelRay.SceneView.Camera;
 using PixelRay.SceneView.Hittable;
 using PixelRay.SceneView.Lighting;
 using PixelRay.SceneView.Scene;
+using static PixelRay.Core.Mathematics.Const;
 
 namespace PixelRay.Core;
 
@@ -22,7 +23,9 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// Render a scene through a camera and load image into a buffer.
     /// </summary>
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
-    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, bool debugMode = false)
+    /// <param name="debugMode">What debug mode is used. Default = 0 means nothing, 1 is for shadows, 2 is for normals</
+    /// param>
+    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, RenderMode mode = RenderMode.Default)
     {
         int scaledW = upScale * _width;
         int scaledH = upScale * _height;
@@ -37,13 +40,17 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
 
                 Ray ray = camera.GetRay(baseX, baseY);
                 ColorRGB color;
-                if (debugMode)
+                if (mode == RenderMode.DebugShadows)
                 {
                     color = BlockedShadows.TraceDebug(ray, scene);
                 }
+                else if (mode == RenderMode.DebugNormals)
+                {
+                    color = Trace(ray, scene, true);
+                }
                 else
                 {
-                    color = Trace(ray, scene);
+                    color = Trace(ray, scene, false);
                 }
                 buffer.SetPixel(x, y, color.Clamp());
             }
@@ -59,30 +66,34 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     private readonly double _ambient = (ambientFactor >= 0 && ambientFactor <= 1) ? ambientFactor : 0;
 
     private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
-    private const double _epsilon = 1e-4;
-    private const double _tMin = 1e-4;
 
     /// <summary>
     /// Trace a ray and return its corresponding viewport pixel color.
     /// </summary>
-    private ColorRGB Trace(Ray ray, Scene scene)
+    private ColorRGB Trace(Ray ray, Scene scene, bool debugNormals = false)
     {
-        double closest = double.MaxValue;
+        double closestT = double.MaxValue;
         bool hitAnything = false;
         HitRecord closestHit = default;
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, _tMin, closest, out HitRecord hit))
+            if (obj.Hit(ray, HitMin, closestT, out HitRecord hit))
             {
-                closest = hit.T;
-                hitAnything = true;
-                closestHit = hit;
+                // Only accept hits slightly closer than the current closest
+                if (hit.T + ClosestHitEpsilon < closestT)
+                {
+                    hitAnything = true;
+                    closestT = hit.T;
+                    closestHit = hit;
+                }
             }
         }
 
         if (!hitAnything)
             return _backGroundColor;
+        if (debugNormals)
+            return DebugNormal.TraceDebugNormal(closestHit);
 
         ColorRGB finalColor = new(0, 0, 0);
 
@@ -97,12 +108,13 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
                     ColorRGB quantized = (diffused * closestHit.Color).Quantize(_lightingBands);
                     ColorRGB contribution = quantized * directionalLight.Color;
 
-                    finalColor += contribution + closestHit.Color * _ambient;
+                    finalColor += contribution;
                     // TODO add optional quantizing + mode of quantizing: individually for each light source or only
                     // after summing all lights
                 }
             }
         }
+        finalColor += closestHit.Color * _ambient;
 
         if (_palette.Colors.Length == 0)
             return finalColor;
@@ -114,13 +126,16 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     /// </summary>
     private static bool CheckShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
-        Vec3 origin = hit.Point + hit.Normal * _epsilon; // slightly nudge the normal to avoid surface self-collision
+        Vec3 origin = hit.Point + hit.Normal * RayIntersectOffset; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(shadowRay, _tMin, double.MaxValue, out _))
-                return true;
+            if (!ReferenceEquals(obj, hit.Object) && obj.Hit(shadowRay, HitMin, double.MaxValue, out HitRecord shadow))
+            {
+                if (shadow.T > 1e-3)
+                    return true;
+            }
         }
 
         return false;

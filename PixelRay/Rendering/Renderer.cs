@@ -17,8 +17,16 @@ namespace PixelRay.Core;
 /// <param name="palette">Used color palette. If you wish to use no palette, pass 'new Palette([])' instead</param>
 /// <param name="lightingBands">Amount of lighting quantization levels. Default is 1</param>
 /// <param name="ambientFactor">Base amount of lighting in environment, takes scalar values [0, 1]. Default is 0</param>
-public class Renderer(int width, int height, Palette palette, int lightingBands = 1, double ambientFactor = 0)
+public class Renderer(
+    int width,
+    int height,
+    Palette palette,
+    int lightingBands = 1,
+    double ambientFactor = 0
+)
 {
+    public ColorRGB BackGroundColor = new(0.1, 0.1, 0.1);
+
     /// <summary>
     /// Render a scene through a camera and load image into a buffer.
     /// </summary>
@@ -39,21 +47,12 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
                 int baseY = (int)Math.Floor(y / (double)upScale);
 
                 Ray ray = camera.GetRay(baseX, baseY);
-                ColorRGB color;
-                switch (mode)
+                ColorRGB color = mode switch
                 {
-                    case DebugMode.None:
-                        color = Trace(ray, scene);
-                        break;
-
-                    case DebugMode.BlockedShadows:
-                        color = BlockedShadows.TraceDebug(ray, scene);
-                        break;
-
-                    default:
-                        color = DebugRender.Debug(ray, scene, mode);
-                        break;
-                }
+                    DebugMode.None => Trace(ray, scene),
+                    DebugMode.BlockedShadows => BlockedShadows.TraceDebug(ray, scene),
+                    _ => DebugRender.Debug(ray, scene, mode),
+                };
                 buffer.SetPixel(x, y, color.Clamp());
             }
         }
@@ -66,8 +65,6 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
     private readonly Palette _palette = palette;
     private readonly int _lightingBands = (lightingBands >= 0) ? lightingBands : 0;
     private readonly double _ambient = (ambientFactor >= 0 && ambientFactor <= 1) ? ambientFactor : 0;
-
-    private readonly ColorRGB _backGroundColor = new(0.1, 0.1, 0.1);
 
     /// <summary>
     /// Trace a ray and return its corresponding viewport pixel color.
@@ -93,7 +90,7 @@ public class Renderer(int width, int height, Palette palette, int lightingBands 
         }
 
         if (!hitAnything)
-            return _backGroundColor;
+            return BackGroundColor;
 
         ColorRGB finalColor = new(0, 0, 0);
 

@@ -9,7 +9,7 @@ public static class Const
     public const double QuarticEpsilon = 1e-6; // for picking real roots in quartic equations
 
     // Rendering
-    public const double ClosestHitEpsilon = 1e-5;
+    public const double ClosestHitEpsilon = 1e-5; // when iterating over hittable objects e.g. during pixel tracing
     public const double ShadowRayIntersectOffset = 1e-4; // shadow ray normal offset
     public enum DebugMode
     {

@@ -82,7 +82,7 @@ public class QuadricT(
 
         foreach (double candidate in roots)
         {
-            p = ray.At(candidate);
+            p = localRay.At(candidate);
             if (p.X >= Xmin && p.X <= Xmax && // check bounding conditions
                 p.Y >= Ymin && p.Y <= Ymax &&
                 p.Z >= Zmin && p.Z <= Zmax)
@@ -95,7 +95,8 @@ public class QuadricT(
         if (t == double.PositiveInfinity)
             return false;
 
-        p = localRay.At(t);
+        p = localRay.At(t); // if ray.At(t) is used here, gradient would need to be calculated with respect to transform
+        // instead for standard origin-centered quadrics it's simply: 
         // normal(x,y,z) = grad(x,y,z) = <2*A*x + D*y + E*z + G, 2*B*y + D*x + F*z + H, 2*C*z + E*x + F*y + I>
         Vec3 normal = new Vec3(
             2 * A * p.X + D * p.Y + E * p.Z + G,
@@ -104,7 +105,7 @@ public class QuadricT(
         )
         .Unit();
 
-        hit.Point = p;
+        hit.Point = ray.At(t);
         hit.SetFaceNormal(ray, normal);
         hit.T = t;
         hit.Color = Color;

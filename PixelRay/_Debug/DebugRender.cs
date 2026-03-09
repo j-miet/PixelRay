@@ -53,12 +53,11 @@ public static class DebugRender
         switch (mode)
         {
             case DebugMode.Normals:
-                // remap [-1,1] -> [0,1] for color
                 Vec3 n = closestHit.Normal;
+                // remap range [-1,1] to [0,1] for color
                 return new ColorRGB(0.5 * (n.X + 1), 0.5 * (n.Y + 1), 0.5 * (n.Z + 1));
 
             case DebugMode.DepthHeat:
-                // exponential decay for contrast
                 double shade = Math.Exp(-0.5 * closestHit.T);
                 return new ColorRGB(shade, shade, shade);
 
@@ -71,7 +70,7 @@ public static class DebugRender
                     double b = ((id >> 16) & 255) / 255.0;
                     return new ColorRGB(r, g, b);
                 }
-                return new ColorRGB(1, 1, 1);
+                return closestHit.Color;
 
             default:
                 return closestHit.Color;

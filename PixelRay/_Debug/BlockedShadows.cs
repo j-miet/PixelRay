@@ -23,9 +23,9 @@ public static class BlockedShadows
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, Const.HitMin, closestT, out HitRecord hit))
+            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
             {
-                if (hit.T + Const.ClosestHitEpsilon < closestT)
+                if (hit.T + MathConst.RayEpsilon < closestT)
                 {
                     hitAnything = true;
                     closestT = hit.T;
@@ -41,13 +41,13 @@ public static class BlockedShadows
         {
             if (light is DirectionalLight dirLight)
             {
-                Vec3 origin = closestHit.Point + closestHit.Normal * Const.ShadowRayIntersectOffset;
+                Vec3 origin = closestHit.Point + closestHit.Normal * MathConst.RayEpsilon;
                 Ray shadowRay = new(origin, -dirLight.Direction);
 
                 bool blocked = false;
                 foreach (var obj in scene.Objects)
                 {
-                    if (obj.Hit(shadowRay, Const.HitMin, double.MaxValue, out _))
+                    if (obj.Hit(shadowRay, MathConst.RayEpsilon, double.MaxValue, out _))
                     {
                         blocked = true;
                     }

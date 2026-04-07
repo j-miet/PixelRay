@@ -5,7 +5,7 @@ using PixelRay.SceneView.Camera;
 using PixelRay.SceneView.Hittable;
 using PixelRay.SceneView.Lighting;
 using PixelRay.SceneView.Scene;
-using static PixelRay.Core.Mathematics.Const;
+using static PixelRay.Const;
 
 namespace PixelRay.Core;
 
@@ -28,10 +28,11 @@ public class Renderer(
     public ColorRGB BackGroundColor = new(0.1, 0.1, 0.1);
 
     /// <summary>
-    /// Render a scene through a camera and load image into a buffer.
+    /// Render a scene through camera and return pixel buffer of rendered image.
     /// </summary>
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
-    /// <param name="debugMode">What debug mode is used. Default = 0 means nothing, 1 is for shadows, 2 is for normals</
+    /// <param name="debugMode">What debug mode is used. Pass value as DebugMode enum, which are: None, BlockedShadows,
+    /// Normals, DepthHeat, ObjectId </
     /// param>
     public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, DebugMode mode = DebugMode.None)
     {
@@ -73,14 +74,14 @@ public class Renderer(
     {
         double closestT = double.MaxValue;
         bool hitAnything = false;
-        HitRecord closestHit = default;
+        HitRecord closestHit = default; // use object references to recycle data structs
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, HitMin, closestT, out HitRecord hit))
+            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
             {
                 // Only accept hits slightly closer than the current closest
-                if (hit.T + ClosestHitEpsilon < closestT)
+                if (hit.T + MathConst.RayEpsilon < closestT)
                 {
                     hitAnything = true;
                     closestT = hit.T;
@@ -92,6 +93,14 @@ public class Renderer(
         if (!hitAnything)
             return BackGroundColor;
 
+        return ApplyLighting(scene, ref closestHit);
+    }
+
+    /// <summary>
+    /// Apply lighting to traced pixel
+    /// </summary>
+    private ColorRGB ApplyLighting(Scene scene, ref HitRecord closestHit)
+    {
         ColorRGB finalColor = new(0, 0, 0);
 
         foreach (Light light in scene.Lights)
@@ -108,6 +117,7 @@ public class Renderer(
                     finalColor += contribution;
                     // TODO add optional quantizing + mode of quantizing: individually for each light source or only
                     // after summing all lights
+                    // TODO rewrite ambient lighting, it's currently implemented just for testing purposes
                 }
             }
         }
@@ -118,19 +128,21 @@ public class Renderer(
         return _palette.Map(finalColor);
     }
 
+
     /// <summary>
     /// Check if space between traced pixel and a directional light ray is blocked by any scene object.
     /// </summary>
     private static bool CheckShadow(HitRecord hit, Scene scene, DirectionalLight light)
     {
-        Vec3 origin = hit.Point + hit.Normal * ShadowRayIntersectOffset; // slight nudge to avoid surface self-collision
+        Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (!ReferenceEquals(obj, hit.Object) && obj.Hit(shadowRay, HitMin, double.MaxValue, out HitRecord shadow))
+            if (!ReferenceEquals(obj, hit.Object)
+                && obj.Hit(shadowRay, MathConst.RayEpsilon, double.MaxValue, out HitRecord shadow))
             {
-                if (shadow.T > 1e-3)
+                if (shadow.T > MathConst.RayEpsilon)
                     return true;
             }
         }

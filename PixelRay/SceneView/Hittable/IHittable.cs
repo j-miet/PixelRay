@@ -3,13 +3,14 @@ using PixelRay.Core;
 namespace PixelRay.SceneView.Hittable;
 
 /// <summary>
-/// Interface for a hittable object on scene. When implementing IHittable, the standard is to use closed intervals to
-/// include values: <br />
-/// 1. tMin LTOR t LTOR tMax <br />
-/// 2. value = 0 ==> AbsoluteVal(value) LTOR epsilon <br />
-/// 3. value LT 0 ==> value LT -epsilon --- value > 0 ==> value > epsilon <br />
-/// 4. value LTOR 0 ==> value LTOR epsilon --- value >= 0 ==> value > -epsilon
-/// (Here LT = less/greater than, LTOR = less than or equal; docstring doesn't allow 'less than' sign) <br />
+/// Interface for a hittable object on scene. When implementing IHittable, the standard for this codebase is to use 
+/// closed intervals when including boundary values: <br/>
+/// 1. tMin LTOR t LTOR tMax, or equally, t in [tMin, tMax] <br/>
+/// 2. value = 0 ==> AbsoluteVal(value) LTOR epsilon, or equally, value in [-eps, eps] <br />
+/// 3. value LT 0 ==> value LT -epsilon --- value > 0 ==> value > epsilon, or equally, value in (eps, inf) <br />
+/// 4. value LTOR 0 ==> value LTOR epsilon, or equally value in [epsilon, inf)<br/>
+/// OR value >= 0 ==> value > -epsilon, or equally, value in (-eps, inf)<br/><br/>
+/// --- Here LT = less/greater than, LTOR = less than or equal; docstring doesn't allow 'less than' sign <br/><br/>
 /// **It's important to stay consistent with this standard** so that excluding values is clear and won't cause bugs
 /// </summary>
 public interface IHittable

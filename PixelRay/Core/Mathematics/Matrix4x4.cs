@@ -1,7 +1,7 @@
 namespace PixelRay.Core.Mathematics;
 
 /// <summary>
-/// 4x4 matrix struct for creating linear transformation matrices
+/// 4x4 matrix struct for creating linear/affine transformation matrices
 /// </summary>
 public readonly struct Matrix4x4(
     double m00, double m01, double m02, double m03,
@@ -20,18 +20,10 @@ public readonly struct Matrix4x4(
     /// </summary>
     public Vec3 TransformPoint(Vec3 p)
     {
-        // vectors require use of translation vector Mx3
+        // apply also translation component Mx3
         double x = M00 * p.X + M01 * p.Y + M02 * p.Z + M03;
         double y = M10 * p.X + M11 * p.Y + M12 * p.Z + M13;
         double z = M20 * p.X + M21 * p.Y + M22 * p.Z + M23;
-        double w = M30 * p.X + M31 * p.Y + M32 * p.Z + M33;
-
-        if (w != 0.0) // if affine component not 0, normalize all coordinates by it's value
-        {
-            x /= w;
-            y /= w;
-            z /= w;
-        }
 
         return new(x, y, z);
     }
@@ -60,33 +52,38 @@ public readonly struct Matrix4x4(
     }
 
     /// <summary>
-    /// Matrix m inverse for affine transforms. These include translation, rotation, scaling (including non-uniform) 
-    /// and any combination of these.
+    /// Matrix m inverse for 3-dimensional affine transforms. These include translation, rotation, scaling (including 
+    /// non-uniform) and any combination of these.
     /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
     public Matrix4x4 InverseAffine()
     {
-        // affine transform matric have simple square form
-        // [ R     T ]
+        // Assume affine transform matrix with simple square form
+        // [ A     T ]
         // [ 0 0 0 1 ]
-        // where R is 3x3 rotation matrix (orthonormal) and T the translation vector [tx, ty, tz]^T
+        // where A is 3x3 matrix and T is a vector [tx, ty, tz]^T
         // Inverse of this is then simply
-        // [ R^-1 -(R^1)*T]
+        // [ A^-1 -(A^1)*T]
         // [ 0   0   0  1 ]
-        // Furthermore: because R is a rotation matrix thus orthonormal, its inverse is equal to transpose.
-        // However this version cannot be applied to scaling transforms because orthonormal condition breaks. Therefore
-        // orthonormal assumption cannot be used, but final inverse has same structure as stated above
-        double determinant = M00 * (M11 * M22 - M12 * M21) - M01 * (M10 * M22 - M12 * M20)
-                            + M02 * (M10 * M21 - M11 * M20);
+        // If A would be orthonormal, R^1 = R^T meaning inverse equals to transpose. Thus this version cannot be 
+        // applied to scaling transforms and inverse must be calculated manually, but final inverse has still the same 
+        // structure as stated above
 
-        if (Math.Abs(determinant) < 1e-12)
-            throw new InvalidOperationException("Matrix not invertible");
+        // determinant of rotation matrix
+        double _r00 = M11 * M22 - M12 * M21;
+        double _r01 = M10 * M22 - M12 * M20;
+        double _r02 = M10 * M21 - M11 * M20;
+        double det = M00 * _r00 - M01 * _r01 + M02 * _r02;
 
-        double invDet = 1.0 / determinant;
+        if (Utils.IsEqual(det, 0, MathConst.MatrixEpsilon))
+            throw new InvalidOperationException("Rotation matrix not invertible");
 
-        // A^-1 = (1 / det) * Adj(A) where Adj(A) is the adjugate matrix.
-        double r00 = (M11 * M22 - M12 * M21) * invDet;
-        double r01 = (M02 * M21 - M01 * M22) * invDet;
-        double r02 = (M01 * M12 - M02 * M11) * invDet;
+        double invDet = 1.0 / det;
+
+        // nxn matrix inverse can be calculated as A^-1 = (1 / det) * Adj(A) where Adj(A) is the adjugate matrix.
+        double r00 = _r00 * invDet;
+        double r01 = _r01 * invDet;
+        double r02 = _r02 * invDet;
 
         double r10 = (M12 * M20 - M10 * M22) * invDet;
         double r11 = (M00 * M22 - M02 * M20) * invDet;
@@ -96,7 +93,7 @@ public readonly struct Matrix4x4(
         double r21 = (M01 * M20 - M00 * M21) * invDet;
         double r22 = (M00 * M11 - M01 * M10) * invDet;
 
-        // -(A⁻¹ * t); this applies transform properly so coordinate x becomes x - a after applying transform vector a
+        // -(R⁻¹ * t); this applies transform properly so vector x is shifted to x - (R^-1)*t
         double t0 = -(r00 * M03 + r01 * M13 + r02 * M23);
         double t1 = -(r10 * M03 + r11 * M13 + r12 * M23);
         double t2 = -(r20 * M03 + r21 * M13 + r22 * M23);
@@ -110,7 +107,8 @@ public readonly struct Matrix4x4(
     }
 
     /// <summary>
-    /// Matrix inverse. For affine transformations always use the faster InverseAffine method.
+    /// Matrix inverse. For affine 3D transformations always use the faster InverseAffine method. Therefore this method 
+    /// is not really required
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public Matrix4x4 Inverse()
@@ -132,7 +130,7 @@ public readonly struct Matrix4x4(
             b00 * b11 - b01 * b10 + b02 * b09 +
             b03 * b08 - b04 * b07 + b05 * b06;
 
-        if (Math.Abs(det) < 1e-12)
+        if (Utils.IsEqual(det, 0, MathConst.MatrixEpsilon))
             throw new InvalidOperationException("Matrix not invertible");
 
         double invDet = 1.0 / det;
@@ -218,17 +216,15 @@ public readonly struct Matrix4x4(
         );
     }
 
+    // scaling alias
+    public static Matrix4x4 Scale(Vec3 v) => Scale(v.X, v.Y, v.Z);
+
     /// <summary>
     /// Uniform matrix scaling
     /// </summary>
     public static Matrix4x4 Scale(double t)
     {
-        return new Matrix4x4(
-            t, 0, 0, 0,
-            0, t, 0, 0,
-            0, 0, t, 0,
-            0, 0, 0, 1
-        );
+        return Scale(t, t, t);
     }
 
     /// <summary>

@@ -2,7 +2,7 @@ using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
 using PixelRay.SceneView.Scene;
-using static PixelRay.Core.Mathematics.Const;
+using static PixelRay.Const;
 
 namespace PixelRay.Debug;
 
@@ -28,9 +28,9 @@ public static class DebugRender
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, HitMin, closestT, out HitRecord hit))
+            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
             {
-                if (hit.T + ClosestHitEpsilon < closestT)
+                if (hit.T + MathConst.RayEpsilon < closestT)
                 {
                     hitAnything = true;
                     closestT = hit.T;

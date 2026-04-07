@@ -24,7 +24,7 @@ public readonly struct ColorRGB(double red, double green, double blue)
 
     /// <summary>
     /// Perform quantization to rgb color value
-    /// This process splits interval [0, 1] into evenly spaces ranges where each range maps into a single color.
+    /// This process splits colors into evenly spaced ranges where each range maps into a single color.
     /// End result makes output image have more limited color palette thus making images more pixelated.
     /// </summary>
     /// <param name="levels">Amount of levels</param>

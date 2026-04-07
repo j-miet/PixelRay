@@ -19,6 +19,6 @@ public struct HitRecord
     /// </summary>
     public void SetFaceNormal(Ray ray, Vec3 outwardNormal)
     {
-        Normal = Vec3.Dot(ray.Direction, outwardNormal) < -Const.HitEpsilon ? outwardNormal : -outwardNormal;
+        Normal = Utils.LessThan(Vec3.Dot(ray.Direction, outwardNormal), 0) ? outwardNormal : -outwardNormal;
     }
 }

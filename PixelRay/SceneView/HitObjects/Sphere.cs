@@ -20,7 +20,7 @@ public class Sphere(ColorRGB color) : IHittable
         double c = ray.Origin.NormSquared() - 1;
 
         double discriminant = b * b - 4 * a * c;
-        if (discriminant < -Const.HitDiscriminant)
+        if (Utils.LessThan(discriminant, 0))
             return false;
 
         double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));

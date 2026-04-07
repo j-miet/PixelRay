@@ -16,7 +16,7 @@ public class Disc(ColorRGB color) : IHittable
     {
         hit = default;
 
-        if (Math.Abs(ray.Direction.Y) < Const.ParallelEpsilon)
+        if (Utils.IsEqual(ray.Direction.Y, 0))
             return false;
 
         double t = -ray.Origin.Y / ray.Direction.Y;
@@ -25,7 +25,7 @@ public class Disc(ColorRGB color) : IHittable
             return false;
 
         Vec3 point = ray.At(t);
-        if (point.Norm() > 1 + Const.HitEpsilon)
+        if (Utils.GreaterThan(point.Norm(), 1))
             return false;
 
         hit.Point = point;

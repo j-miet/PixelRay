@@ -16,7 +16,7 @@ public class Plane(ColorRGB color) : IHittable
     {
         hit = default;
 
-        if (Math.Abs(ray.Direction.Y) < Const.ParallelEpsilon)
+        if (Utils.IsEqual(ray.Direction.Y, 0))
             return false;
 
         double t = -ray.Origin.Y / ray.Direction.Y;

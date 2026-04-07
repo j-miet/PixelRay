@@ -6,7 +6,7 @@ namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Cylinder with bottom cap center at origin, normal (0, 1, 0) and radius 1 i.e. bottom cap is unit circle
-/// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top caps/discs are included.
+/// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top discs are included.
 /// </summary>
 public class Cylinder(ColorRGB color) : IHittable
 {
@@ -29,10 +29,10 @@ public class Cylinder(ColorRGB color) : IHittable
         double b = 2 * (O.X * D.X + O.Z * D.Z);
         double c = O.X * O.X + O.Z * O.Z - 1;
 
-        if (Math.Abs(a) > Const.HitEpsilon) // cone sides
+        if (!Utils.IsEqual(a, 0)) // cone sides
         {
             double discriminant = b * b - 4 * a * c;
-            if (discriminant >= -Const.HitDiscriminant)
+            if (Utils.GreaterThanOrEqual(discriminant, 0))
             {
                 double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
                 foreach (double t in new double[] { (-b - sqrtD) / (2 * a), (-b + sqrtD) / (2 * a) })
@@ -42,7 +42,7 @@ public class Cylinder(ColorRGB color) : IHittable
 
                     Vec3 rayPoint = ray.At(t);
                     double h = rayPoint.Y;
-                    if (h < -Const.HitEpsilon || h > 1 + Const.HitEpsilon)
+                    if (Utils.LessThan(h, 0) || Utils.GreaterThan(h, 1))
                         continue;
 
                     if (t < finalT)
@@ -56,34 +56,40 @@ public class Cylinder(ColorRGB color) : IHittable
             }
         }
 
-        if (ray.Direction.Y > Const.HitEpsilon) // bottom unit disc with center is (0, 0, 0)
+        if (Utils.GreaterThan(ray.Direction.Y, 0)) // bottom unit disc with center is (0, 0, 0)
         {
-            Vec3 bottomNormal = -Axis;
             double t = -ray.Origin.Y / ray.Direction.Y;
-            Vec3 rayPoint = ray.At(t);
 
-            if (t >= tMin && t <= tMax && rayPoint.Norm() <= 1 + Const.HitEpsilon && t < finalT)
+            if (t >= tMin && t <= tMax)
             {
-                hitAnything = true;
-                finalT = t;
-                finalPoint = rayPoint;
-                finalNormal = bottomNormal;
+                Vec3 bottomNormal = -Axis;
+                Vec3 rayPoint = ray.At(t);
+                if (Utils.LessThanOrEqual(rayPoint.Norm(), 1) && t < finalT)
+                {
+                    hitAnything = true;
+                    finalT = t;
+                    finalPoint = rayPoint;
+                    finalNormal = bottomNormal;
+                }
             }
         }
 
-        if (ray.Direction.Y < -Const.HitEpsilon) // top cap unit disc with center at (0, 1, 0)
+        if (Utils.LessThanOrEqual(ray.Direction.Y, 0)) // top cap unit disc with center at (0, 1, 0)
         {
-            Vec3 baseNormal = Axis;
-            Vec3 baseCenter = Axis;
             double t = ray.Origin.Y / ray.Direction.Y;
-            Vec3 rayPoint = ray.At(t);
 
-            if (t >= tMin && t <= tMax && (rayPoint - baseCenter).Norm() <= 1 + Const.HitEpsilon && t < finalT)
+            if (t >= tMin && t <= tMax)
             {
-                hitAnything = true;
-                finalT = t;
-                finalPoint = rayPoint;
-                finalNormal = baseNormal;
+                Vec3 baseNormal = Axis;
+                Vec3 baseCenter = Axis;
+                Vec3 rayPoint = ray.At(t);
+                if (Utils.LessThanOrEqual((rayPoint - baseCenter).Norm(), 1) && t < finalT)
+                {
+                    hitAnything = true;
+                    finalT = t;
+                    finalPoint = rayPoint;
+                    finalNormal = baseNormal;
+                }
             }
         }
 

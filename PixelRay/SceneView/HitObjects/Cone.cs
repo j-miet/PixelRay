@@ -7,6 +7,8 @@ namespace PixelRay.SceneView.HitObjects;
 /// <summary>
 /// Cone with apex at origin, normal (0, 1, 0) and radius 1. Thus cone extends outward to positive y-axis from 
 /// (0, 0, 0) to unit circle with center (0, 1, 0). Base cap/disc is included.
+/// Cones with small radii might become pitch black due dot products of normal and lighting vanishing.
+/// Use higher lightingbands and/or ambient values to combat this OR just use a bit larger radius.
 /// </summary>
 public class Cone(ColorRGB color) : IHittable
 {
@@ -29,10 +31,10 @@ public class Cone(ColorRGB color) : IHittable
         double b = 2 * (O.X * D.X + O.Z * D.Z - O.Y * D.Y);
         double c = O.X * O.X + O.Z * O.Z - O.Y * O.Y;
 
-        if (Math.Abs(a) > Const.HitEpsilon) // cone sides
+        if (!Utils.IsEqual(a, 0)) // cone sides
         {
             double discriminant = b * b - 4 * a * c;
-            if (discriminant >= -Const.HitDiscriminant)
+            if (Utils.GreaterThanOrEqual(discriminant, 0))
             {
                 double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
                 foreach (double t in new double[] { (-b - sqrtD) / (2 * a), (-b + sqrtD) / (2 * a) })
@@ -42,7 +44,7 @@ public class Cone(ColorRGB color) : IHittable
 
                     Vec3 rayPoint = ray.At(t);
                     double h = rayPoint.Y;
-                    if (h < -Const.HitEpsilon || h > 1 + Const.HitEpsilon)
+                    if (Utils.LessThan(h, 0) || Utils.GreaterThan(h, 1))
                         continue;
 
                     if (t < finalT)
@@ -55,19 +57,22 @@ public class Cone(ColorRGB color) : IHittable
                 }
             }
         }
-        if (ray.Direction.Y < -Const.HitEpsilon) // cone unit disc
+        if (Utils.LessThan(ray.Direction.Y, 0)) // cone unit disc
         {
-            Vec3 baseNormal = Axis;
-            Vec3 baseCenter = Axis;
             double t = ray.Origin.Y / ray.Direction.Y;
-            Vec3 rayPoint = ray.At(t);
 
-            if (t >= tMin && t <= tMax && (rayPoint - baseCenter).Norm() <= 1 + Const.HitEpsilon && t < finalT)
+            if (t >= tMin && t <= tMax)
             {
-                hitAnything = true;
-                finalT = t;
-                finalPoint = rayPoint;
-                finalNormal = baseNormal;
+                Vec3 baseNormal = Axis;
+                Vec3 baseCenter = Axis;
+                Vec3 rayPoint = ray.At(t);
+                if (Utils.LessThanOrEqual((rayPoint - baseCenter).Norm(), 1) && t < finalT)
+                {
+                    hitAnything = true;
+                    finalT = t;
+                    finalPoint = rayPoint;
+                    finalNormal = baseNormal;
+                }
             }
         }
 

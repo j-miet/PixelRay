@@ -60,11 +60,11 @@ public class Quadric(
             D * Ox * Oy + E * Ox * Oz + F * Oy * Oz +
             G * Ox + H * Oy + I * Oz + J;
 
-        if (Math.Abs(a) < Const.HitEpsilon)
+        if (Utils.IsEqual(a, 0))
             return false;
 
         double discriminant = b * b - 4 * a * c;
-        if (discriminant < -Const.HitDiscriminant)
+        if (Utils.LessThan(discriminant, 0))
             return false;
 
         double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));

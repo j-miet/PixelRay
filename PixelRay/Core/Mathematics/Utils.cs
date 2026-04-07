@@ -11,7 +11,7 @@ public static class Utils
     /// solves a quartic (4. degree) equation ax^4 + bx^3 + cx^2 + dx + e = 0 using Durand-Kerner method and returns
     /// only its real-valued roots
     /// </summary>
-    public static double[] SolveQuartic(double a, double b, double c, double d, double e)
+    public static double[] SolveQuartic(double a, double b, double c, double d, double e, int iterations = 50)
     {
         // normalize by the highest power term to use form x^4 + b/a*x^3 + c/a*x^2 + d/a*x + e/a*x under iterations
         b /= a;
@@ -21,7 +21,7 @@ public static class Utils
 
         Complex[] roots = [new(1, 0), new(0, 1), new(-1, 0), new(0, -1)]; // initial complex roots candidates
 
-        for (int iter = 0; iter < 50; iter++)
+        for (int iter = 0; iter < iterations; iter++)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -42,7 +42,7 @@ public static class Utils
 
         foreach (Complex root in roots)
         {
-            if (Math.Abs(root.Imaginary) < Const.QuarticEpsilon) // if imaginary part falls under error
+            if (Math.Abs(root.Imaginary) < MathConst.QuarticEpsilon) // if imaginary part falls under error
                 realRoots.Add(root.Real);
         }
 
@@ -77,6 +77,37 @@ public static class Utils
         double b = Vec3.Dot(ray.Origin, ray.Direction);
         double c = Vec3.Dot(ray.Origin, ray.Origin) - r * r;
         double discriminant = b * b - c;
-        return discriminant >= -Const.HitDiscriminant;
+        return discriminant >= -MathConst.Epsilon;
+    }
+
+    /// <summary>
+    /// Checks if value equals to comparison value. All compare methods use closed interval epsilon precision for 0 
+    /// internally i.e. x = 0 iff x in [-epsilon, epsilon]. For example this method uses Abs(val-compare) = 0 which 
+    /// then translates to Abs(val-compare) LTOE epsilon (LTOE is less than or equal)
+    /// </summary>
+    /// <param name="val">First value</param>
+    /// <param name="compare">Comparison value</param>
+    /// <param name="epsilon">Required precision. Default is MathConst.Epsilon: comparison methods are most often used 
+    /// with hittable objects so this avoids repeating same constant everywhere </param>
+    /// <returns></returns>
+    public static bool IsEqual(double val, double compare, double epsilon = MathConst.Epsilon)
+    {
+        return Math.Abs(val - compare) <= epsilon;
+    }
+    public static bool GreaterThan(double left, double right, double epsilon = MathConst.Epsilon)
+    {
+        return left > right + epsilon;
+    }
+    public static bool GreaterThanOrEqual(double left, double right, double epsilon = MathConst.Epsilon)
+    {
+        return left >= right + epsilon;
+    }
+    public static bool LessThan(double left, double right, double epsilon = MathConst.Epsilon)
+    {
+        return left < right - epsilon;
+    }
+    public static bool LessThanOrEqual(double left, double right, double epsilon = MathConst.Epsilon)
+    {
+        return left <= right - epsilon;
     }
 }

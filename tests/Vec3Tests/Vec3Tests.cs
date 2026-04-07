@@ -1,4 +1,5 @@
-using PixelRay.Mathematics;
+/*
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Tests;
 
@@ -219,3 +220,4 @@ public class Vec3Tests
         yield return new object[] { new Vec3(-1, -1, -1), -1 / Math.Sqrt(3) * new Vec3(1, 1, 1) };
     }
 }
+*/

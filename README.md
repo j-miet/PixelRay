@@ -2,13 +2,13 @@
 
 ### Features
 
-- primites:
+- primitives:
     - Sphere
     - Disc
     - Plane
     - Triangle
-    - Cylinder (custom height, render bottom and top discs)
-    - Cone (custom height, renders base disc)
+    - Cylinder
+    - Cone
     - Torus
     - Quadric (general class)
 
@@ -20,31 +20,53 @@
 - lighting
     - directional light
 
-### TODO
+- camera
+    - camera origin/eye point
+    - width
+    - height
+    - viewport height
+    - focal length (= distance to viewport)
 
-- Maybe combine default HitObjects and Transformed ones. Just let user to modify public fields if they want to customize
-them.
-    - Pros: 
-        - easy to use build-in transform features so often no matrix transforms required
-        - always optional to use these features
-    - Cons
-        - default uses fixed position (origin), normal and parameter values; transformed object use custom positions,
-      normals and parameters which makes hit calculations more general and thus heavier even when using same default
-      parameters
-        - building new object to support pre-transforms is difficult/time consuming (of course could always just skip
-        this separation for new objects)
+- rendering
+    - width
+    - height
+    - color palette
+    - lighting bands
+    - ambient color factor
+    - rendering config
+        - image upscale factor
+        - debug mode
+
+### TODO (including random stuff that might or might now get implemented)
 
 - light: light source type, ambient lighting, reflections, refractions, global illumination
+- soft shadows (umbra, penumbra, antumbra)
 - camera: FOV setting
 - materials
-- clean up code: optimizing performance and code in general, updating comments (= remove excess ones)
-    - Bounding Volume Hierarchy (BHV) support (torus uses a lazy bounding sphere logic already)
-    - AABB (axis-aligned bounding boxes)
-    - clean up code: do the quadratic check require so much logic to handle both solutions. After all it's the left root
+- clean up code: 
+    - optimize performance
+        - Bounding Volume Hierarchy (BHV) support (torus uses a lazy bounding sphere logic already)
+        - AABB (axis-aligned bounding boxes)
+    - clean up codebase
+        - can split long code into subroutines
+        - clean up object implementations and ask if all the logic is required (e.g. quadratic checks when left root is the first to hit)
+        - naming conventions
+    - updating comments (= remove excess ones)
     that always connects first
-- superquadrics class
-- creating scenes from JSON files. Load camera/rendered setting too?
+- new primitives: 
+    - superquadrics class
+    - mobius strip
+    - quadrilaterals class
+    - paths/curves
+- more matrix transforms e.g. shear and maybe an example of nonlinear transform
+- creating scenes from JSON files. Add camera/renderer settings, too.
 - shaders and triangle meshes
 - turning camera -> moving camera?
-- ray marching
+    - also before moving camera, dynamic re-rendering e.g. modify scene, camera, renderer parameters -> retrace ->
+    render scene again. 
+    - Implementation: 
+        - run CLI command, read changes from a file
+        - modify tracer class attributes
+        - trace + render
+        - display new image
 - unit tests

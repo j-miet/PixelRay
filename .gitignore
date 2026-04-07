@@ -4,3 +4,6 @@
 # bin and obj
 **/bin
 **/obj
+
+# ppm files
+**/*.ppm

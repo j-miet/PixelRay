@@ -14,7 +14,7 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
     public Vec3 V3 = v3;
     public ColorRGB Color = color;
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -72,7 +72,7 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
 
         // det(A_1) = Dot(O-V1, Cross(e1, e2)) = -Dot(e2, Cross(e1, O-V1)) = Dot(e2, Cross(O-V1, e1)).
         double t = Vec3.Dot(e2, v1oCrossE1) / determinant;
-        if (t < tMin || t > tMax)
+        if (!rayT.InClosed(t))
             return false;
 
         hit.Point = ray.At(t);

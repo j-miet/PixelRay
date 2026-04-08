@@ -12,7 +12,7 @@ public class Plane(ColorRGB color) : IHittable
     public ColorRGB Color = color;
     public Vec3 Normal = new(0, 1, 0);
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -21,7 +21,7 @@ public class Plane(ColorRGB color) : IHittable
 
         double t = -ray.Origin.Y / ray.Direction.Y;
 
-        if (t < tMin || t > tMax)
+        if (!rayT.InClosed(t))
             return false;
 
         hit.Point = ray.At(t);

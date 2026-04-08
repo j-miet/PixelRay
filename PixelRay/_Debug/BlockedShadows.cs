@@ -23,7 +23,7 @@ public static class BlockedShadows
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
+            if (obj.Hit(ray, new Interval(MathConst.RayEpsilon, closestT), out HitRecord hit))
             {
                 if (hit.T + MathConst.RayEpsilon < closestT)
                 {
@@ -45,9 +45,10 @@ public static class BlockedShadows
                 Ray shadowRay = new(origin, -dirLight.Direction);
 
                 bool blocked = false;
+                Interval rayT = new(MathConst.RayEpsilon, double.MaxValue);
                 foreach (var obj in scene.Objects)
                 {
-                    if (obj.Hit(shadowRay, MathConst.RayEpsilon, double.MaxValue, out _))
+                    if (obj.Hit(shadowRay, rayT, out _))
                     {
                         blocked = true;
                     }

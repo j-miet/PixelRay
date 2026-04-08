@@ -1,4 +1,5 @@
 using PixelRay.Core;
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.SceneView.Hittable;
 
@@ -25,5 +26,5 @@ public interface IHittable
     /// only initialized by the hittable's own implementation.
     /// </param>
     /// <returns>Boolean value of whether ray intersects the hittable or not</returns>
-    bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit);
+    bool Hit(Ray ray, Interval rayT, out HitRecord hit);
 }

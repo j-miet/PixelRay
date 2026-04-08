@@ -11,7 +11,7 @@ public class Sphere(ColorRGB color) : IHittable
 {
     public ColorRGB Color = color;
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -30,10 +30,10 @@ public class Sphere(ColorRGB color) : IHittable
 
         double t = double.PositiveInfinity;
 
-        if (t1 >= tMin && t1 <= tMax)
+        if (rayT.InClosed(t1))
             t = t1;
 
-        if (t2 >= tMin && t2 <= tMax && t2 < t)
+        if (rayT.InClosed(t2) && t2 < t)
             t = t2;
 
         if (t == double.PositiveInfinity)

@@ -28,13 +28,14 @@ public class Transform : IHittable
         InverseTranspose = InverseMatrix.Transpose(); // for properly inverting normals; see comment below
     }
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         Ray localRay = InverseMatrix.TransformRay(ray);
+        Interval localRayT = new(MathConst.RayEpsilon, double.MaxValue);
 
         // don't use tMin/tMax here as those are from world space; instead check these conditions only after 
         // transforming is done locally and values are converted back to world space
-        if (!Obj.Hit(localRay, MathConst.RayEpsilon, double.MaxValue, out hit))
+        if (!Obj.Hit(localRay, localRayT, out hit))
             return false;
 
         Vec3 worldPoint = TransformMatrix.TransformPoint(hit.Point);
@@ -49,7 +50,7 @@ public class Transform : IHittable
 
         // projecting vector P-rayOrigin onto rayDirection and taking this length gives the distance in world space
         double worldT = Vec3.Dot(worldPoint - ray.Origin, ray.Direction);
-        if (worldT < tMin || worldT > tMax) // now check the range using global boundaries
+        if (!localRayT.InClosed(worldT)) // now check the range using global boundaries
             return false;
 
         hit.Point = worldPoint;

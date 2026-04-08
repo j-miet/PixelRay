@@ -78,7 +78,7 @@ public class Renderer(
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
+            if (obj.Hit(ray, new Interval(MathConst.RayEpsilon, closestT), out HitRecord hit))
             {
                 // Only accept hits slightly closer than the current closest
                 if (hit.T + MathConst.RayEpsilon < closestT)
@@ -136,14 +136,14 @@ public class Renderer(
     {
         Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);
+        Interval rayT = new(MathConst.RayEpsilon, double.MaxValue);
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (!ReferenceEquals(obj, hit.Object)
-                && obj.Hit(shadowRay, MathConst.RayEpsilon, double.MaxValue, out HitRecord shadow))
+            if (!ReferenceEquals(obj, hit.Object) && obj.Hit(shadowRay, rayT, out HitRecord shadow) &&
+                shadow.T > MathConst.RayEpsilon)
             {
-                if (shadow.T > MathConst.RayEpsilon)
-                    return true;
+                return true;
             }
         }
 

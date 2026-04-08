@@ -28,7 +28,7 @@ public static class DebugRender
 
         foreach (IHittable obj in scene.Objects)
         {
-            if (obj.Hit(ray, MathConst.RayEpsilon, closestT, out HitRecord hit))
+            if (obj.Hit(ray, new Interval(MathConst.RayEpsilon, closestT), out HitRecord hit))
             {
                 if (hit.T + MathConst.RayEpsilon < closestT)
                 {

@@ -15,7 +15,7 @@ public class Cone(ColorRGB color) : IHittable
     public ColorRGB Color = color;
     public Vec3 Axis = new(0, 1, 0);
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -39,7 +39,7 @@ public class Cone(ColorRGB color) : IHittable
                 double sqrtD = Math.Sqrt(Math.Max(discriminant, 0.0));
                 foreach (double t in new double[] { (-b - sqrtD) / (2 * a), (-b + sqrtD) / (2 * a) })
                 {
-                    if (t < tMin || t > tMax)
+                    if (!rayT.InClosed(t))
                         continue;
 
                     Vec3 rayPoint = ray.At(t);
@@ -61,7 +61,7 @@ public class Cone(ColorRGB color) : IHittable
         {
             double t = ray.Origin.Y / ray.Direction.Y;
 
-            if (t >= tMin && t <= tMax)
+            if (rayT.InClosed(t))
             {
                 Vec3 baseNormal = Axis;
                 Vec3 baseCenter = Axis;

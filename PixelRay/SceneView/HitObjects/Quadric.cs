@@ -31,7 +31,7 @@ public class Quadric(
     public double J = j; // constant
     public double Xmin = xmin, Xmax = xmax, Ymin = ymin, Ymax = ymax, Zmin = zmin, Zmax = zmax;
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -75,8 +75,8 @@ public class Quadric(
         List<double> roots = [];
         Vec3 p;
 
-        if (t1 >= tMin && t1 <= tMax) roots.Add(t1);
-        if (t2 >= tMin && t2 <= tMax) roots.Add(t2);
+        if (rayT.InClosed(t1)) roots.Add(t1);
+        if (rayT.InClosed(t2)) roots.Add(t2);
 
         foreach (double candidate in roots)
         {

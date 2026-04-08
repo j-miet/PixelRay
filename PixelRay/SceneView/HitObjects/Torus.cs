@@ -14,7 +14,7 @@ public class Torus(ColorRGB color, double majorRadius = 0.2, double minorRadius 
     public double MajorR = majorRadius;
     public double MinorR = minorRadius;
 
-    public bool Hit(Ray ray, double tMin, double tMax, out HitRecord hit)
+    public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
         hit = default;
 
@@ -39,7 +39,7 @@ public class Torus(ColorRGB color, double majorRadius = 0.2, double minorRadius 
 
         foreach (double t in roots)
         {
-            if (t >= tMin && t <= tMax && t < closest)
+            if (rayT.InClosed(t) && t < closest)
                 closest = t;
         }
 

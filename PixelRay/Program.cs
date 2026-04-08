@@ -8,7 +8,7 @@ using PixelRay.Output;
 using PixelRay.Rendering;
 using PixelRay.SceneView.Hittable;
 
-using Debug = PixelRay.Const.DebugMode;
+using DebugMode = PixelRay.Const.DebugMode;
 using M4 = PixelRay.Core.Mathematics.Matrix4x4;
 
 static class CreatePixelRay
@@ -17,11 +17,24 @@ static class CreatePixelRay
     {
         const int WIDTH = 249;
         const int HEIGHT = 140;
+        const string outputPPM = "output.ppm";
+
+        // renderer
+        Palette colorPalette = new([]);
+        const int lightingBands = 32;
+        const int ambientFactor = 0;
+
+        const DebugMode debugMode = DebugMode.None;
         const int upScaleFactor = 3;
 
-        int w = (WIDTH % 2 == 0) ? WIDTH * upScaleFactor : (WIDTH - 1) * upScaleFactor;
-        int h = (HEIGHT % 2 == 0) ? HEIGHT * upScaleFactor : (HEIGHT - 1) * upScaleFactor;
-
+        // scene: camera and scene objects
+        Camera camera = new(
+            new Vec3(0, 0, 0),
+            WIDTH,
+            HEIGHT,
+            2,
+            1
+        );
         Scene scene = new();
 
         scene.AddObject(new Transform(
@@ -91,17 +104,14 @@ static class CreatePixelRay
             new ColorRGB(1, 1, 1)
         ));
 
-        Camera camera = new(
-            new Vec3(0, 0, 0),
-            WIDTH,
-            HEIGHT,
-            2,
-            1
-        );
-        Renderer renderer = new(WIDTH, HEIGHT, new Palette([]), 32, 0);
-        FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor);
-        ImageWriter.WritePPM("output.ppm", buffer);
+        // render, save output image and display it
+        Renderer renderer = new(WIDTH, HEIGHT, colorPalette, lightingBands, ambientFactor);
+        FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor, debugMode);
+        ImageWriter.WritePPM(outputPPM, buffer);
 
+        // ensure upscaled resolution has even coordinates
+        int w = (WIDTH % 2 == 0) ? WIDTH * upScaleFactor : (WIDTH - 1) * upScaleFactor;
+        int h = (HEIGHT % 2 == 0) ? HEIGHT * upScaleFactor : (HEIGHT - 1) * upScaleFactor;
         ImageDisplay display = new(w, h, buffer, 0);
         display.Display();
     }

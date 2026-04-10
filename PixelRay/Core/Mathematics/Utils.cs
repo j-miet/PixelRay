@@ -42,11 +42,11 @@ public static class Utils
 
         foreach (Complex root in roots)
         {
-            if (Math.Abs(root.Imaginary) < MathConst.QuarticEpsilon) // if imaginary part falls under error
+            if (IsEqual(Math.Abs(root.Imaginary), 0, MathConst.QuarticEpsilon))
                 realRoots.Add(root.Real);
         }
 
-        return [.. realRoots]; // unpack list into an array
+        return [.. realRoots];
     }
 
     /// <summary>

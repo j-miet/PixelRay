@@ -74,7 +74,7 @@ public class Renderer(
     {
         double closestT = double.MaxValue;
         bool hitAnything = false;
-        HitRecord closestHit = default; // use object references to recycle data structs
+        HitRecord closestHit = default;
 
         foreach (IHittable obj in scene.Objects)
         {
@@ -93,13 +93,13 @@ public class Renderer(
         if (!hitAnything)
             return BackGroundColor;
 
-        return ApplyLighting(scene, ref closestHit);
+        return ApplyLighting(scene, in closestHit);
     }
 
     /// <summary>
     /// Apply lighting to traced pixel
     /// </summary>
-    private ColorRGB ApplyLighting(Scene scene, ref HitRecord closestHit)
+    private ColorRGB ApplyLighting(Scene scene, in HitRecord closestHit)
     {
         ColorRGB finalColor = new(0, 0, 0);
 
@@ -107,7 +107,7 @@ public class Renderer(
         {
             if (light is DirectionalLight directionalLight)
             {
-                if (!CheckShadow(closestHit, scene, directionalLight))
+                if (!CheckShadow(in closestHit, scene, directionalLight))
                 {
                     double lightAngle = Math.Max(0, Vec3.Dot(closestHit.Normal, -directionalLight.Direction));
                     double diffused = _ambient + (1 - _ambient) * lightAngle;
@@ -117,7 +117,6 @@ public class Renderer(
                     finalColor += contribution;
                     // TODO add optional quantizing + mode of quantizing: individually for each light source or only
                     // after summing all lights
-                    // TODO rewrite ambient lighting, it's currently implemented just for testing purposes
                 }
             }
         }
@@ -132,7 +131,7 @@ public class Renderer(
     /// <summary>
     /// Check if space between traced pixel and a directional light ray is blocked by any scene object.
     /// </summary>
-    private static bool CheckShadow(HitRecord hit, Scene scene, DirectionalLight light)
+    private static bool CheckShadow(in HitRecord hit, Scene scene, DirectionalLight light)
     {
         Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, -light.Direction);

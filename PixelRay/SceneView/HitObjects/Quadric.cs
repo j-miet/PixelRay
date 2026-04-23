@@ -8,7 +8,6 @@ namespace PixelRay.SceneView.HitObjects;
 /// General quadric primitive Ax^2 + By^2 + Cz^2 + Dxy + Exz + Fyz + Gx + Hy + Iz + J = 0
 /// Can describe same objects as some of the existing primitive classes e.g. unit sphere would be generated with
 /// A=B=C=1, J = -r*r, set rest to 0.
-/// Does not implement cutting => objects can expand indefinitely.
 /// </summary>
 public class Quadric(
     ColorRGB color,
@@ -16,12 +15,8 @@ public class Quadric(
     double d, double e, double f,
     double g, double h, double i,
     double j,
-    double xmin = -0.5,
-    double xmax = 0.5,
-    double ymin = -0.5,
-    double ymax = 0.5,
-    double zmin = -0.5,
-    double zmax = 0.5
+    Vec3 minBounds,
+    Vec3 maxBounds
 ) : IHittable
 {
     public ColorRGB Color = color;
@@ -29,7 +24,8 @@ public class Quadric(
     public double D = d, E = e, F = f; // product terms
     public double H = h, G = g, I = i; // linear terms
     public double J = j; // constant
-    public double Xmin = xmin, Xmax = xmax, Ymin = ymin, Ymax = ymax, Zmin = zmin, Zmax = zmax;
+    public Vec3 MinBounds = minBounds;
+    public Vec3 MaxBounds = maxBounds;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
@@ -81,9 +77,9 @@ public class Quadric(
         foreach (double candidate in roots)
         {
             p = ray.At(candidate);
-            if (p.X >= Xmin && p.X <= Xmax && // check bounding conditions
-                p.Y >= Ymin && p.Y <= Ymax &&
-                p.Z >= Zmin && p.Z <= Zmax)
+            if (p.X >= MinBounds.X && p.X <= MaxBounds.X && // check bounding conditions
+                p.Y >= MinBounds.Y && p.Y <= MaxBounds.Y &&
+                p.Z >= MinBounds.Z && p.Z <= MaxBounds.Z)
             {
                 t = candidate;
                 break;

@@ -5,10 +5,9 @@ using PixelRay.SceneView.Hittable;
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
-/// Origin-centered torus with normal (0, 1, 0) and specified major and minor radii. Default: majorRadius = 0.2, 
-/// minorRadius = 0.1
+/// Origin-centered torus with normal (0, 1, 0) and specified major and minor radii
 /// </summary>
-public class Torus(ColorRGB color, double majorRadius = 0.2, double minorRadius = 0.1) : IHittable
+public class Torus(ColorRGB color, double majorRadius, double minorRadius) : IHittable
 {
     public ColorRGB Color = color;
     public double MajorR = majorRadius;
@@ -48,8 +47,7 @@ public class Torus(ColorRGB color, double majorRadius = 0.2, double minorRadius 
 
         hit.T = closest;
         hit.Point = ray.At(closest);
-        Vec3 normal = CalculateNormal(hit.Point).Unit();
-        hit.SetFaceNormal(ray, normal);
+        hit.SetFaceNormal(ray, CalculateNormal(hit.Point).Unit());
         hit.Color = Color;
         hit.Object = this;
 

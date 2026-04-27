@@ -1,6 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
@@ -8,9 +9,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// Cylinder with bottom cap center at origin, normal (0, 1, 0) and radius 1 i.e. bottom cap is unit circle
 /// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top discs are included.
 /// </summary>
-public class Cylinder(ColorRGB color) : IHittable
+public class Cylinder(Material material) : IHittable
 {
-    public ColorRGB Color = color;
+    public Material Material = material;
     public Vec3 Axis = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
@@ -93,10 +94,10 @@ public class Cylinder(ColorRGB color) : IHittable
             }
         }
 
+        hit.T = finalT;
         hit.Point = finalPoint;
         hit.SetFaceNormal(ray, finalNormal);
-        hit.T = finalT;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return hitAnything;

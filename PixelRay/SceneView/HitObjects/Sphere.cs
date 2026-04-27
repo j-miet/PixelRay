@@ -1,15 +1,16 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Origin-centered unit sphere.
 /// </summary>
-public class Sphere(ColorRGB color) : IHittable
+public class Sphere(Material material) : IHittable
 {
-    public ColorRGB Color = color;
+    public Material Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
@@ -34,10 +35,10 @@ public class Sphere(ColorRGB color) : IHittable
                 return false;
         }
 
+        hit.T = t;
         hit.Point = ray.At(t);
         hit.SetFaceNormal(ray, hit.Point.Unit());
-        hit.T = t;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

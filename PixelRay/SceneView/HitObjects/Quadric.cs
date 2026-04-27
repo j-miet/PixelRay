@@ -1,6 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
@@ -10,16 +11,16 @@ namespace PixelRay.SceneView.HitObjects;
 /// A=B=C=1, J = -r*r, set rest to 0.
 /// </summary>
 public class Quadric(
-    ColorRGB color,
     double a, double b, double c,
     double d, double e, double f,
     double g, double h, double i,
     double j,
     Vec3 minBounds,
-    Vec3 maxBounds
+    Vec3 maxBounds,
+    Material material
 ) : IHittable
 {
-    public ColorRGB Color = color;
+    public Material Material = material;
     public double A = a, B = b, C = c; // square terms
     public double D = d, E = e, F = f; // product terms
     public double H = h, G = g, I = i; // linear terms
@@ -38,11 +39,6 @@ public class Quadric(
         //     [ G/2 H/2 I/2  J  ]
         // and P = (x, y, z) is (row) vector, P^T its transpose
         // (In literature this usually has multipliers of 2 with D, E, F, G, H, I to cancel denominator terms)
-        // This can be written in compact form using matrices: if W is the upper-left 3x3 matrix of M (top-left is A, 
-        // bottom-right is C) and L = (G, H, I) then P^T M P = P^T W P + L^T P + J 
-        // Now substituting P = O + t*Q (Q ray direction as D already used) yields a quadratic with following 
-        // coefficients:
-        // a = Q^T W Q, b = 2*O^T W Q + L^T Q, c = O^T W O + L^T O + J
 
         double Ox = ray.Origin.X, Oy = ray.Origin.Y, Oz = ray.Origin.Z;
         double Dx = ray.Direction.X, Dy = ray.Direction.Y, Dz = ray.Direction.Z;
@@ -98,10 +94,10 @@ public class Quadric(
         )
         .Unit();
 
+        hit.T = t;
         hit.Point = p;
         hit.SetFaceNormal(ray, normal);
-        hit.T = t;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

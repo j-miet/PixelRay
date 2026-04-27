@@ -1,6 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
@@ -10,11 +11,11 @@ namespace PixelRay.SceneView.HitObjects;
 /// </summary>
 /// <param name="minBounds">Lower x, y and z bounds</param>
 /// <param name="maxBounds">Upper x, y and z bounds</param>
-public class AABox(ColorRGB color, Vec3 minBounds, Vec3 maxBounds) : IHittable
+public class AABox(Vec3 minBounds, Vec3 maxBounds, Material material) : IHittable
 {
-    public ColorRGB Color = color;
     public Vec3 MinBounds = minBounds;
     public Vec3 MaxBounds = maxBounds;
+    public Material Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
@@ -26,10 +27,10 @@ public class AABox(ColorRGB color, Vec3 minBounds, Vec3 maxBounds) : IHittable
         if (!rayT.InClosed(t))
             return false;
 
+        hit.T = t;
         hit.Point = ray.At(t);
         hit.SetFaceNormal(ray, CalculateNormal(hit.Point, MinBounds, MaxBounds));
-        hit.T = t;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

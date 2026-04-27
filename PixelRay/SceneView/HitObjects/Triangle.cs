@@ -1,18 +1,19 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Triangle defined by its vertices v1, v2 and v3.
 /// </summary>
-public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
+public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, Material material) : IHittable
 {
     public Vec3 V1 = v1;
     public Vec3 V2 = v2;
     public Vec3 V3 = v3;
-    public ColorRGB Color = color;
+    public Material Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
@@ -75,11 +76,10 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, ColorRGB color) : IHittable
         if (!rayT.InClosed(t))
             return false;
 
-        hit.Point = ray.At(t);
-        Vec3 normal = Vec3.Cross(e1, e2).Unit();
-        hit.SetFaceNormal(ray, normal);
         hit.T = t;
-        hit.Color = Color;
+        hit.Point = ray.At(t);
+        hit.SetFaceNormal(ray, Vec3.Cross(e1, e2).Unit());
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

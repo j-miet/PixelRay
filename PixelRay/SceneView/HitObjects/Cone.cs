@@ -1,6 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
@@ -10,9 +11,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// Cones with small radii might become pitch black due dot products of normal and lighting vanishing.
 /// Use higher lightingbands and/or ambient values to combat this OR just use a bit larger radius.
 /// </summary>
-public class Cone(ColorRGB color) : IHittable
+public class Cone(Material material) : IHittable
 {
-    public ColorRGB Color = color;
+    public Material Material = material;
     public Vec3 Axis = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
@@ -76,10 +77,10 @@ public class Cone(ColorRGB color) : IHittable
             }
         }
 
+        hit.T = finalT;
         hit.Point = finalPoint;
         hit.SetFaceNormal(ray, finalNormal);
-        hit.T = finalT;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return hitAnything;

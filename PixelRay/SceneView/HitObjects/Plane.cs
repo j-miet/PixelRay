@@ -1,15 +1,16 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Plane y=0 with normal (0, 1, 0)
 /// </summary>
-public class Plane(ColorRGB color) : IHittable
+public class Plane(Material material) : IHittable
 {
-    public ColorRGB Color = color;
+    public Material Material = material;
     public Vec3 Normal = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
@@ -24,10 +25,10 @@ public class Plane(ColorRGB color) : IHittable
         if (!rayT.InClosed(t))
             return false;
 
+        hit.T = t;
         hit.Point = ray.At(t);
         hit.SetFaceNormal(ray, Normal);
-        hit.T = t;
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

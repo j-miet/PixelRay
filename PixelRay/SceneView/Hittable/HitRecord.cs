@@ -1,5 +1,6 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.Hittable;
 
@@ -11,7 +12,7 @@ public struct HitRecord
     public Vec3 Point;
     public Vec3 Normal;
     public double T;
-    public ColorRGB Color;
+    public Material Material;
     public IHittable Object;
 
     /// <summary>

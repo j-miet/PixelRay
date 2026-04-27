@@ -1,17 +1,18 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
 /// Origin-centered torus with normal (0, 1, 0) and specified major and minor radii
 /// </summary>
-public class Torus(ColorRGB color, double majorRadius, double minorRadius) : IHittable
+public class Torus(double majorRadius, double minorRadius, Material material) : IHittable
 {
-    public ColorRGB Color = color;
     public double MajorR = majorRadius;
     public double MinorR = minorRadius;
+    public Material Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {
@@ -48,7 +49,7 @@ public class Torus(ColorRGB color, double majorRadius, double minorRadius) : IHi
         hit.T = closest;
         hit.Point = ray.At(closest);
         hit.SetFaceNormal(ray, CalculateNormal(hit.Point).Unit());
-        hit.Color = Color;
+        hit.Material = Material;
         hit.Object = this;
 
         return true;

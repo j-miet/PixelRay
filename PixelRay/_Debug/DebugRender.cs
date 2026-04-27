@@ -1,7 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
+using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Scene;
 using static PixelRay.Const;
 
 namespace PixelRay.Debug;
@@ -22,6 +22,8 @@ public static class DebugRender
     /// </summary>
     static public ColorRGB Debug(Ray ray, Scene scene, DebugMode mode)
     {
+        ColorRGB defaultColor = new(1, 1, 1);
+
         double closestT = double.MaxValue;
         bool hitAnything = false;
         HitRecord closestHit = default;
@@ -70,10 +72,10 @@ public static class DebugRender
                     double b = ((id >> 16) & 255) / 255.0;
                     return new ColorRGB(r, g, b);
                 }
-                return closestHit.Color;
+                return defaultColor;
 
             default:
-                return closestHit.Color;
+                return defaultColor;
         }
     }
 }

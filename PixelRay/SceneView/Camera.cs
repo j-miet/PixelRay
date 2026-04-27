@@ -1,7 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 
-namespace PixelRay.SceneView.Camera;
+namespace PixelRay.SceneView;
 
 /// <summary>
 /// Creates a camera i.e. a collection of rays from center to viewport pixels

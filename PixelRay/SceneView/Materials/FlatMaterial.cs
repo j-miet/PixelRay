@@ -8,8 +8,7 @@ namespace PixelRay.SceneView.Materials;
 /// <summary>
 /// Material that reflects light to a single direction with respect to surface normal (i.e. standard vector projection)
 /// </summary>
-/// <param name="color"></param>
-/// <param name="reflectivity"></param>
+/// <param name="reflectivity">How much the surface reflects light. Ranges from 0 to 1, default is 0</param>
 public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : Material
 {
     public ColorRGB Color = color;
@@ -22,23 +21,44 @@ public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : Material
 
         foreach (Light light in scene.Lights)
         {
-            if (light is DirectionalLight directionalLight)
+            if (light is AmbientLight ambient)
             {
-                if (!Renderer.CheckShadow(scene, in hit, directionalLight))
+                finalColor += Color * ambient.Color * ambient.Intensity;
+            }
+            else if (light is DirectionalLight directionalLight)
+            {
+                Vec3 lightDir = directionalLight.Direction.Unit();
+
+                if (!Renderer.CheckShadow(scene, in hit, lightDir))
                 {
-                    double lightAngle = Math.Max(0, Vec3.Dot(hit.Normal, -directionalLight.Direction));
-                    double diffused = renderer.AmbientFactor + (1 - renderer.AmbientFactor) * lightAngle;
-                    ColorRGB quantized = (diffused * Color).Quantize(renderer.LightingBands);
+                    double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, lightDir));
+                    ColorRGB quantized = (NdotL * Color).Quantize(renderer.LightingBands);
                     ColorRGB contribution = quantized * directionalLight.Color;
+
+                    finalColor += contribution;
+                }
+            }
+            else if (light is PointLight pointLight)
+            {
+                Vec3 toLight = pointLight.Position - hit.Point;
+                double distance = toLight.Length();
+                Vec3 lightDir = toLight / distance; // must be unit vector!
+
+                if (!Renderer.CheckShadow(scene, in hit, lightDir, distance))
+                {
+                    // this will reduce light quickly but smoothly, making it look natural
+                    double attenuation = pointLight.Intensity / (distance * distance);
+
+                    double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, lightDir));
+                    ColorRGB quantized = (NdotL * Color).Quantize(renderer.LightingBands);
+                    ColorRGB contribution = quantized * pointLight.Color * attenuation;
 
                     finalColor += contribution;
                 }
             }
         }
 
-        finalColor += Color * renderer.AmbientFactor;
-
-        if (Reflectivity > 0.0 && depth < renderer.MaxDepth)
+        if (Reflectivity > 0.0 && Reflectivity <= 1.0 && depth < renderer.MaxDepth)
         {
             Vec3 reflectDir = Vec3.Reflect(ray.Direction, hit.Normal).Unit();
             Vec3 reflectOrigin = hit.Point + hit.Normal * MathConst.RayEpsilon;

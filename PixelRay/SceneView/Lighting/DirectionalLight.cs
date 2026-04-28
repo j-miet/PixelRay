@@ -7,6 +7,5 @@ namespace PixelRay.SceneView.Lighting;
 /// </summary>
 public class DirectionalLight(Vec3 direction, ColorRGB color) : Light(color)
 {
-    // Light direction (so -1*Direction gives direction TO light source )
     public Vec3 Direction { get; } = direction.Unit();
 }

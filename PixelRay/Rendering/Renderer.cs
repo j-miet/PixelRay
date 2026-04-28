@@ -25,7 +25,7 @@ public class Renderer(
     int maxDepth = 1 // keep this very low, preferably at 1, for pixelated look
 )
 {
-    public ColorRGB BackGroundColor = new(0.1, 0.1, 0.1);
+    public ColorRGB BackGroundColor = new(0, 0, 0);
     public readonly int LightingBands = lightingBands;
     public readonly double AmbientFactor = ambientFactor;
     public readonly int MaxDepth = maxDepth;
@@ -101,18 +101,25 @@ public class Renderer(
     }
 
     /// <summary>
-    /// Check if directional light produces a shadow for current hit
+    /// Check if a hit point get blocked from a light source
     /// </summary>
-    public static bool CheckShadow(Scene scene, in HitRecord hit, DirectionalLight light)
+    /// <param name="lightDirection">Direction vector from hit point to light source</param>
+    /// <param name="maxDistance">Shadow ray upper bound for t</param>
+    public static bool CheckShadow(
+        Scene scene,
+        in HitRecord hit,
+        Vec3 lightDirection,
+        double maxDistance = double.MaxValue
+    )
     {
         Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
-        Ray shadowRay = new(origin, -light.Direction);
-        Interval rayT = new(MathConst.RayEpsilon, double.MaxValue);
+        Ray shadowRay = new(origin, lightDirection);
+        Interval rayT = new(MathConst.RayEpsilon, maxDistance);
 
         foreach (IHittable obj in scene.Objects)
         {
             if (!ReferenceEquals(obj, hit.Object) && obj.Hit(shadowRay, rayT, out HitRecord shadow) &&
-                shadow.T > MathConst.RayEpsilon)
+                shadow.T > MathConst.RayEpsilon && shadow.T < maxDistance)
             {
                 return true;
             }

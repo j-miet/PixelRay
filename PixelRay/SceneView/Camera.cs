@@ -9,38 +9,41 @@ namespace PixelRay.SceneView;
 public class Camera
 {
     public Camera(
-        Vec3 center,
-        int width,
-        int height,
-        double viewportHeight = 2,
-        double focalLength = 1
+        Vec3 position,
+        Vec3 lookAt,
+        Vec3 upDirection,
+        double fovDegrees,
+        double aspectRatio
     )
     {
-        _cameraCenter = center;
+        _cameraOrigin = position;
 
-        double aspectRatio = width / (double)height;
+        Vec3 forward = (lookAt - position).Normalize();
+        Vec3 right = Vec3.Cross(forward, upDirection).Normalize();
+        Vec3 up = Vec3.Cross(right, forward).Normalize(); // ensure orthogonality of axes
+
+        double theta = fovDegrees * Math.PI / 180.0;
+        double viewportHeight = 2.0 * Math.Tan(theta / 2.0); // sensor size = theta, focal length = 1
         double viewportWidth = viewportHeight * aspectRatio;
 
-        Vec3 horizontal = new(viewportWidth, 0, 0);
-        Vec3 vertical = new(0, -viewportHeight, 0);
+        _horizontal = right * viewportWidth;
+        _vertical = up * viewportHeight;
 
-        _horizontalDelta = horizontal / width;
-        _verticalDelta = vertical / height;
-
-        // screen center and camera vectors must be perpendicular -> center coordinate = center - (0, 0, focalLength)
-        Vec3 viewportTopLeft = _cameraCenter - new Vec3(0, 0, focalLength) - horizontal / 2 - vertical / 2;
-        _topLeft = viewportTopLeft + 0.5 * (_horizontalDelta + _verticalDelta);
+        _topLeft = _cameraOrigin + forward - _horizontal / 2 + _vertical / 2;
     }
 
-    public Ray GetRay(int x, int y)
+    public Ray GetRay(int x, int y, int width, int height)
     {
-        Vec3 pixelCenter = _topLeft + x * _horizontalDelta + y * _verticalDelta;
-        Vec3 rayDirection = pixelCenter - _cameraCenter;
-        return new Ray(_cameraCenter, rayDirection);
+        double w = (x + 0.5) / width;
+        double h = (y + 0.5) / height;
+
+        Vec3 pixelCenter = _topLeft + w * _horizontal - h * _vertical;
+        Vec3 rayDirection = pixelCenter - _cameraOrigin;
+        return new Ray(_cameraOrigin, rayDirection);
     }
 
-    private readonly Vec3 _cameraCenter;
-    private readonly Vec3 _horizontalDelta;
-    private readonly Vec3 _verticalDelta;
+    private readonly Vec3 _cameraOrigin;
+    private readonly Vec3 _horizontal;
+    private readonly Vec3 _vertical;
     private readonly Vec3 _topLeft;
 }

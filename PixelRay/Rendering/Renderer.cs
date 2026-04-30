@@ -52,7 +52,7 @@ public class Renderer(
                 int baseX = (int)Math.Floor(x / (double)upScale);
                 int baseY = (int)Math.Floor(y / (double)upScale);
 
-                Ray ray = camera.GetRay(baseX, baseY);
+                Ray ray = camera.GetRay(baseX, baseY, _width, _height);
                 ColorRGB color = mode switch
                 {
                     DebugMode.None => Trace(ray, scene),

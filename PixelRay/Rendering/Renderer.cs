@@ -22,7 +22,9 @@ public class Renderer(
     Palette palette,
     int lightingBands = 4,
     double ambientFactor = 0,
-    int maxDepth = 1 // keep this very low, preferably at 1, for pixelated look
+    int maxDepth = 1, // keep this very low, preferably at 1, for pixelated look
+    bool useDithering = false,
+    double ditherSpread = 0.1
 )
 {
     public ColorRGB BackGroundColor = new(0, 0, 0);
@@ -57,6 +59,13 @@ public class Renderer(
                     DebugMode.BlockedShadows => BlockedShadows.TraceDebug(ray, scene),
                     _ => DebugRender.Debug(ray, scene, mode),
                 };
+
+                if (_useDithering)
+                    color = Palette.MapDithered(color, x, y, _ditherSpread, 4); // dimension = 8 also valid
+
+                if (_palette.Colors.Length > 0) // always apply palette color last
+                    color = _palette.Map(color);
+
                 buffer.SetPixel(x, y, color.Clamp());
             }
         }
@@ -95,9 +104,7 @@ public class Renderer(
 
         ColorRGB shaded = closestHit.Material.Shade(closestHit, scene, this, ray, depth);
 
-        if (_palette.Colors.Length == 0)
-            return shaded;
-        return _palette.Map(shaded);
+        return shaded;
     }
 
     /// <summary>
@@ -131,4 +138,6 @@ public class Renderer(
     private readonly int _width = width;
     private readonly int _height = height;
     private readonly Palette _palette = palette;
+    private readonly bool _useDithering = useDithering;
+    private readonly double _ditherSpread = ditherSpread;
 }

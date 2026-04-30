@@ -31,4 +31,20 @@ public class Palette(ColorRGB[] colors)
 
         return closestColor;
     }
+
+    /// <summary>
+    /// Apply ordered dithering to a pixel at (x, y)
+    /// </summary>
+    public static ColorRGB MapDithered(ColorRGB inputColor, int x, int y, double strength = 0.1, int ditherDim = 4)
+    {
+        double threshold = Dither.GetThreshold(x, y, ditherDim) - 0.5; // subtract 0.5 for even offset distribution
+
+        ColorRGB dithered = new(
+            inputColor.R + threshold * strength,
+            inputColor.G + threshold * strength,
+            inputColor.B + threshold * strength
+        );
+
+        return dithered;
+    }
 }

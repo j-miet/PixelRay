@@ -13,7 +13,6 @@ public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : Material
 {
     public ColorRGB Color = color;
     public double Reflectivity = reflectivity;
-    // add ambient lighting as a custom attribute?
 
     public override ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
     {

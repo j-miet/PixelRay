@@ -6,10 +6,13 @@ using PixelRay.SceneView.Lighting;
 namespace PixelRay.SceneView.Materials;
 
 /// <summary>
-/// Material that reflects light to a single direction with respect to surface normal (i.e. standard vector projection)
+/// Basic material which can re-emit light by reflections (projections) and diffusion (sampled/randomized)
+/// Modulates reflection with base color, preventing it becoming full mirror even when value is set to 1.0
+/// Also allows diffusion which randomly samples a direction. The color strength can similarly be adjusted.
 /// </summary>
 /// <param name="reflectivity">How much the surface reflects light. Ranges from 0 to 1, default is 0</param>
-public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : IMaterial
+/// <param name="diffuseStrength"How much light the surface reflects diffusely. Ranges from 0 to 1, default is 0</param>
+public class FlatMaterial(ColorRGB color, double reflectivity = 0.0, double diffuseStrength = 0.0) : IMaterial
 {
     public ColorRGB Color = color;
     public double Reflectivity = reflectivity;
@@ -66,7 +69,19 @@ public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : IMaterial
 
             ColorRGB reflectColor = renderer.Trace(reflectRay, scene, depth + 1);
 
-            finalColor = finalColor * (1 - Reflectivity) + reflectColor * Reflectivity;
+            finalColor = finalColor * (1 - Reflectivity) + reflectColor * Color * Reflectivity;
+        }
+
+        if (diffuseStrength > 0 && diffuseStrength <= 1.0 && depth < renderer.MaxBounces)
+        {
+            Vec3 bounceDir = Vec3.RandomHemisphere(hit.Normal);
+            Vec3 bounceOrigin = hit.Point + hit.Normal * MathConst.RayEpsilon;
+
+            Ray bounceRay = new(bounceOrigin, bounceDir);
+
+            ColorRGB bounceColor = renderer.Trace(bounceRay, scene, depth + 1);
+
+            finalColor += bounceColor * Color * diffuseStrength;
         }
 
         return finalColor;

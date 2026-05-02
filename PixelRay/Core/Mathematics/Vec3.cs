@@ -138,4 +138,31 @@ public readonly struct Vec3
 
         return 1 / t * v;
     }
+
+    /// <summary>
+    /// Generate a random direction vector from a surface point
+    /// </summary>
+    /// <param name="normal"></param>
+    /// <returns></returns>
+    public static Vec3 RandomHemisphere(Vec3 normal)
+    {
+        Vec3 dir;
+
+        do
+        {
+            dir = new(
+                Random.Shared.NextDouble() * 2 - 1,
+                Random.Shared.NextDouble() * 2 - 1,
+                Random.Shared.NextDouble() * 2 - 1
+            );
+        }
+        while (dir.NormSquared() < MathConst.Epsilon);
+
+        dir = dir.Unit();
+
+        if (Dot(dir, normal) < 0)
+            dir = -dir;
+
+        return dir;
+    }
 }

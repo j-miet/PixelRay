@@ -57,7 +57,7 @@ public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : IMaterial
             }
         }
 
-        if (Reflectivity > 0.0 && Reflectivity <= 1.0 && depth < renderer.MaxDepth)
+        if (Reflectivity > 0.0 && Reflectivity <= 1.0 && depth < renderer.MaxBounces)
         {
             Vec3 reflectDir = Vec3.Reflect(ray.Direction, hit.Normal).Unit();
             Vec3 reflectOrigin = hit.Point + hit.Normal * MathConst.RayEpsilon;

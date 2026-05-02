@@ -12,7 +12,7 @@ public struct HitRecord
     public Vec3 Point;
     public Vec3 Normal;
     public double T;
-    public Material Material;
+    public IMaterial Material;
     public IHittable Object;
 
     /// <summary>

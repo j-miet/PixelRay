@@ -1,3 +1,4 @@
+using PixelRay.Core.Mathematics;
 
 namespace PixelRay.Rendering;
 
@@ -43,4 +44,19 @@ public static class Dither
         { 15, 47,  7, 39, 13, 45,  5, 37 },
         { 63, 31, 55, 23, 61, 29, 53, 21 }
     };
+
+    /// <summary>
+    /// Quantizes a color by applying the Bayer bias threshold then snapping to closest step level
+    /// </summary>
+    /// <param name="c">RGB color component value</param>
+    /// <param name="levels">Quantization levels</param>
+    /// <param name="threshold">Boundary threshold</param>
+    /// <returns></returns>
+    public static double DitherQuantize(double c, int levels, double threshold)
+    {
+        // map color to discrete steps and apply boundary shifting
+        double scaled = c * (levels - 1) + threshold;
+
+        return Math.Clamp(Math.Round(scaled) / (levels - 1), 0.0, 1.0);
+    }
 }

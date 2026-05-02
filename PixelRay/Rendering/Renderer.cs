@@ -3,7 +3,6 @@ using PixelRay.Debug;
 using PixelRay.Rendering;
 using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Lighting;
 using static PixelRay.Const;
 
 namespace PixelRay.Core;
@@ -15,22 +14,26 @@ namespace PixelRay.Core;
 /// <param name="height">Resolution height></param>
 /// <param name="palette">Used color palette. If you wish to use no palette, pass 'new Palette([])' instead</param>
 /// <param name="lightingBands">Amount of lighting quantization levels. Default is 1</param>
-/// <param name="ambientFactor">Base amount of lighting in environment, takes scalar values [0, 1]. Default is 0</param>
+/// <param name="maxBounces">Max amount of ray bounces. Default is 1 and should be kept at low value for pixel look
+/// </param>
+/// <param name="useDithering">If ordered dithering is used or not</param>
+/// <param name="ditherStrength">Only if dithering == true: how aggressive the dithering thresholds are, ranges from 0 
+/// to 1</param>
+/// <param name="ditherDimension">Threshold Bayer matrix dimension. Only 4 and 8 are supported, default is 4.</param>
 public class Renderer(
     int width,
     int height,
     Palette palette,
     int lightingBands = 4,
-    double ambientFactor = 0,
-    int maxDepth = 1, // keep this very low, preferably at 1, for pixelated look
+    int maxBounces = 1, // keep this very low, preferably at 1, for pixelated look
     bool useDithering = false,
-    double ditherSpread = 0.1
+    int ditherLevels = 16,
+    int ditherDimension = 4
 )
 {
     public ColorRGB BackGroundColor = new(0, 0, 0);
     public readonly int LightingBands = lightingBands;
-    public readonly double AmbientFactor = ambientFactor;
-    public readonly int MaxDepth = maxDepth;
+    public readonly int MaxBounces = maxBounces;
 
     /// <summary>
     /// Render a scene through camera and return pixel buffer of rendered image.
@@ -61,7 +64,7 @@ public class Renderer(
                 };
 
                 if (_useDithering)
-                    color = Palette.MapDithered(color, x, y, _ditherSpread, 4); // dimension = 8 also valid
+                    color = Palette.MapDithered(color, x, y, _ditherDimension, _ditherLevels);
 
                 if (_palette.Colors.Length > 0) // always apply palette color last
                     color = _palette.Map(color);
@@ -78,7 +81,7 @@ public class Renderer(
     /// </summary>
     public ColorRGB Trace(Ray ray, Scene scene, int depth = 0)
     {
-        if (depth > MaxDepth)
+        if (depth > MaxBounces)
             return new ColorRGB(0, 0, 0);
 
         double closestT = double.MaxValue;
@@ -139,5 +142,6 @@ public class Renderer(
     private readonly int _height = height;
     private readonly Palette _palette = palette;
     private readonly bool _useDithering = useDithering;
-    private readonly double _ditherSpread = ditherSpread;
+    private readonly int _ditherLevels = ditherLevels;
+    private readonly int _ditherDimension = ditherDimension;
 }

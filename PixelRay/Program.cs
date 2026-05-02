@@ -8,6 +8,7 @@ static class CreatePixelRay
 {
     public static void Main(string[] args)
     {
+        // TODO implement better parser which doesn't depend on arg writing order
         if (args.Length >= 3 &&
             (args[0] == "-i" || args[0] == "--image") &&
             args[1] != null && args[2] != null)
@@ -17,6 +18,7 @@ static class CreatePixelRay
 
             int width = settings.Width;
             int height = settings.Height;
+            int upScaleFactor = settings.UpScaleFactor;
 
             // if more options are added, consider passing settings itself and let renderer handle rest
             Renderer renderer = new(
@@ -30,18 +32,34 @@ static class CreatePixelRay
                 settings.DitherDimension
             );
 
-            int upScaleFactor = 3;
-
-            FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor, DebugMode.None);
-            ImageWriter.WritePPM(args[2].ToString() + "ppm", buffer);
-
-            if (args.Length == 4 && args[3] == "-p") // preview image
+            // debug 
+            DebugMode debug = DebugMode.None;
+            if (args.Length >= 5 && args[4] == "--debug" && args[5] != null)
             {
+                string mode = args[5].ToString();
+                debug = mode switch
+                {
+                    "normals" => DebugMode.Normals,
+                    "distance" => DebugMode.DepthHeat,
+                    "id" => DebugMode.ObjectID,
+                    _ => DebugMode.None
+                };
+            }
+
+            FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor, debug);
+            ImageWriter.WritePPM(args[2].ToString() + ".ppm", buffer);
+
+            if (args.Length >= 4 && args[3] == "-p") // preview image
+            {
+                int speed = 0;
+                if (args.Length == 5 && int.TryParse(args[4], out int value))
+                    speed = value >= 0 ? value : 0;
+
                 // ensure upscaled resolution has even coordinates, otherwise image display crashes
                 int w = (width % 2 == 0) ? width * upScaleFactor : (width - 1) * upScaleFactor;
                 int h = (height % 2 == 0) ? height * upScaleFactor : (height - 1) * upScaleFactor;
 
-                ImageDisplay display = new(w, h, buffer, 0);
+                ImageDisplay display = new(w, h, buffer, speed);
                 display.Display();
             }
         }

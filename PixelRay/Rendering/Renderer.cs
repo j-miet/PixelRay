@@ -39,8 +39,8 @@ public class Renderer(
     /// Render a scene through camera and return pixel buffer of rendered image.
     /// </summary>
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
-    /// <param name="debugMode">What debug mode is used. Pass value as DebugMode enum, which are: None, BlockedShadows,
-    /// Normals, DepthHeat, ObjectId 
+    /// <param name="mode">What debug mode is used. Pass value as any DebugMode enum, which are: <br/>
+    /// None, Normals, DepthHeat, ObjectId 
     /// </param>
     public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, DebugMode mode = DebugMode.None)
     {
@@ -59,7 +59,6 @@ public class Renderer(
                 ColorRGB color = mode switch
                 {
                     DebugMode.None => Trace(ray, scene),
-                    DebugMode.BlockedShadows => BlockedShadows.TraceDebug(ray, scene),
                     _ => DebugRender.Debug(ray, scene, mode),
                 };
 

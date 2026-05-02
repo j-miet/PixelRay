@@ -81,8 +81,8 @@ public class Renderer(
     /// </summary>
     public ColorRGB Trace(Ray ray, Scene scene, int depth = 0)
     {
-        if (depth > MaxBounces)
-            return new ColorRGB(0, 0, 0);
+        if (depth > MaxBounces + 1)
+            return BackGroundColor;
 
         double closestT = double.MaxValue;
         bool hitAnything = false;

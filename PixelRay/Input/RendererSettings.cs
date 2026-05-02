@@ -9,6 +9,7 @@ public class RendererSettings
 {
     public int Width { get; set; }
     public int Height { get; set; }
+    public int UpScaleFactor { get; set; } = 1;
 
     public Palette Palette { get; set; } = new([]);
 

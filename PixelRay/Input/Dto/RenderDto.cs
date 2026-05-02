@@ -9,6 +9,7 @@ public class RenderDto
 {
     public int Width { get; set; }
     public int Height { get; set; }
+    public int UpScaleFactor { get; set; } = 1;
 
     public double[][] Palette { get; set; } = [[]];
 

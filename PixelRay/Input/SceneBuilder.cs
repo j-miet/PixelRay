@@ -63,6 +63,7 @@ public static class SceneBuilder
         {
             Width = dto.Width,
             Height = dto.Height,
+            UpScaleFactor = dto.UpScaleFactor,
             Palette = new Palette([.. colors]),
 
             LightingBands = dto.LightingBands,

@@ -11,11 +11,11 @@ namespace PixelRay.SceneView.HitObjects;
 /// </summary>
 /// <param name="minBounds">Lower x, y and z bounds</param>
 /// <param name="maxBounds">Upper x, y and z bounds</param>
-public class AABox(Vec3 minBounds, Vec3 maxBounds, Material material) : IHittable
+public class AABox(Vec3 minBounds, Vec3 maxBounds, IMaterial material) : IHittable
 {
     public Vec3 MinBounds = minBounds;
     public Vec3 MaxBounds = maxBounds;
-    public Material Material = material;
+    public IMaterial Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {

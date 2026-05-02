@@ -8,9 +8,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// <summary>
 /// Origin-centered unit sphere.
 /// </summary>
-public class Sphere(Material material) : IHittable
+public class Sphere(IMaterial material) : IHittable
 {
-    public Material Material = material;
+    public IMaterial Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {

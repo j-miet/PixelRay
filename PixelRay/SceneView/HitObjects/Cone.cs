@@ -11,9 +11,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// Cones with small radii might become pitch black due dot products of normal and lighting vanishing.
 /// Use higher lightingbands and/or ambient values to combat this OR just use a bit larger radius.
 /// </summary>
-public class Cone(Material material) : IHittable
+public class Cone(IMaterial material) : IHittable
 {
-    public Material Material = material;
+    public IMaterial Material = material;
     public Vec3 Axis = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)

@@ -4,7 +4,7 @@ using PixelRay.SceneView.Hittable;
 
 namespace PixelRay.SceneView.Materials;
 
-public abstract class Material
+public interface IMaterial
 {
-    public abstract ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth);
+    public ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth);
 }

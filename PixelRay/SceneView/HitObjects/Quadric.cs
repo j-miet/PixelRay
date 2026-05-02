@@ -17,10 +17,10 @@ public class Quadric(
     double j,
     Vec3 minBounds,
     Vec3 maxBounds,
-    Material material
+    IMaterial material
 ) : IHittable
 {
-    public Material Material = material;
+    public IMaterial Material = material;
     public double A = a, B = b, C = c; // square terms
     public double D = d, E = e, F = f; // product terms
     public double H = h, G = g, I = i; // linear terms

@@ -9,9 +9,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// Cylinder with bottom cap center at origin, normal (0, 1, 0) and radius 1 i.e. bottom cap is unit circle
 /// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top discs are included.
 /// </summary>
-public class Cylinder(Material material) : IHittable
+public class Cylinder(IMaterial material) : IHittable
 {
-    public Material Material = material;
+    public IMaterial Material = material;
     public Vec3 Axis = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)

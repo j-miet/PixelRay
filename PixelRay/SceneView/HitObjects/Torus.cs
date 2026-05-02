@@ -8,11 +8,11 @@ namespace PixelRay.SceneView.HitObjects;
 /// <summary>
 /// Origin-centered torus with normal (0, 1, 0) and specified major and minor radii
 /// </summary>
-public class Torus(double majorRadius, double minorRadius, Material material) : IHittable
+public class Torus(double majorRadius, double minorRadius, IMaterial material) : IHittable
 {
     public double MajorR = majorRadius;
     public double MinorR = minorRadius;
-    public Material Material = material;
+    public IMaterial Material = material;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
     {

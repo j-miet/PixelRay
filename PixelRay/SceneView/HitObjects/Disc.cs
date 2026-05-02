@@ -8,9 +8,9 @@ namespace PixelRay.SceneView.HitObjects;
 /// <summary>
 /// Unit origin-centered disc on plane y=0 with normal (0, 1, 0)
 /// </summary>
-public class Disc(Material material) : IHittable
+public class Disc(IMaterial material) : IHittable
 {
-    public Material Material = material;
+    public IMaterial Material = material;
     public Vec3 Normal = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)

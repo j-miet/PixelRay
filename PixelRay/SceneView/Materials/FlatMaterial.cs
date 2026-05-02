@@ -9,12 +9,12 @@ namespace PixelRay.SceneView.Materials;
 /// Material that reflects light to a single direction with respect to surface normal (i.e. standard vector projection)
 /// </summary>
 /// <param name="reflectivity">How much the surface reflects light. Ranges from 0 to 1, default is 0</param>
-public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : Material
+public class FlatMaterial(ColorRGB color, double reflectivity = 0.0) : IMaterial
 {
     public ColorRGB Color = color;
     public double Reflectivity = reflectivity;
 
-    public override ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
+    public ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
     {
         ColorRGB finalColor = new(0, 0, 0);
 

@@ -16,14 +16,12 @@ public class ImageDisplay
     private readonly FrameBuffer _buffer;
     private readonly int _renderSpeed;
     private readonly byte[] _frameBuffer;
-    private readonly byte[] _emptyBuffer;
     private volatile bool _dirty;
 
     private uint _vao;
     private uint _vbo;
     private uint _shaderProgram;
 
-    private WindowOptions _options;
     private IWindow? _window;
     private GL? _gl;
     private uint _texture;
@@ -42,8 +40,6 @@ public class ImageDisplay
         _height = height;
         _buffer = buffer;
         _renderSpeed = renderSpeed < 0 ? 1 : renderSpeed;
-
-        _emptyBuffer = new byte[_width * _height * 3]; // for creating initial black background image
         _frameBuffer = new byte[_width * _height * 3]; // rendered image
         _dirty = true;
     }
@@ -53,16 +49,16 @@ public class ImageDisplay
     /// </summary>
     public void Display()
     {
-        _options = WindowOptions.Default;
-        _options.Title = "PixelRay.Image";
-        _options.Size = new Silk.NET.Maths.Vector2D<int>(_width, _height);
-        _options.API = new GraphicsAPI(
+        WindowOptions options = WindowOptions.Default;
+        options.Title = "PixelRay.Image";
+        options.Size = new Silk.NET.Maths.Vector2D<int>(_width, _height);
+        options.API = new GraphicsAPI(
             ContextAPI.OpenGL,
             ContextProfile.Core,
             ContextFlags.Default,
             new APIVersion(3, 3));
 
-        _window = Window.Create(_options);
+        _window = Window.Create(options);
 
         _window.Load += OnLoad;
         _window.Render += OnRender;
@@ -90,7 +86,7 @@ public class ImageDisplay
             0,
             PixelFormat.Rgb,
             PixelType.UnsignedByte,
-            _emptyBuffer);
+            ReadOnlySpan<byte>.Empty);
 
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);

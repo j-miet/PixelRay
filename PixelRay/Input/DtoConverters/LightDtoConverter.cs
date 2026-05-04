@@ -21,12 +21,9 @@ public class LightDtoConverter : JsonConverter<ILightDto>
 
         return type switch
         {
-            "directional" => JsonSerializer.Deserialize<DirectionalLightDto>(root.GetRawText(), options)
-                ?? throw new Exception("DirectionalLight deserialization failed"),
-            "ambient" => JsonSerializer.Deserialize<AmbientLightDto>(root.GetRawText(), options)
-                ?? throw new Exception("AmbientLight deserialization failed"),
-            "point" => JsonSerializer.Deserialize<PointLightDto>(root.GetRawText(), options)
-                ?? throw new Exception("PointLight deserialization failed"),
+            "directional" => JsonSerializer.Deserialize<DirectionalLightDto>(root.GetRawText(), options)!,
+            "ambient" => JsonSerializer.Deserialize<AmbientLightDto>(root.GetRawText(), options)!,
+            "point" => JsonSerializer.Deserialize<PointLightDto>(root.GetRawText(), options)!,
             _ => throw new Exception($"Unknown light type: {type}")
         };
     }

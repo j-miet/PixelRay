@@ -21,8 +21,8 @@ public class MaterialDtoConverter : JsonConverter<IMaterialDto>
 
         return type switch
         {
-            "flat" => JsonSerializer.Deserialize<FlatMaterialDto>(root.GetRawText(), options)
-                ?? throw new Exception("FlatMaterial deserialization failed"),
+            "flat" => JsonSerializer.Deserialize<SurfaceMaterialDto>(root.GetRawText(), options)!,
+            "mirror" => JsonSerializer.Deserialize<MirrorMaterialDto>(root.GetRawText(), options)!,
             _ => throw new Exception($"Unknown material type: {type}")
         };
     }

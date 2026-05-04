@@ -6,16 +6,59 @@ using PixelRay.SceneView.Lighting;
 namespace PixelRay.SceneView.Materials;
 
 /// <summary>
-/// Basic material which can re-emit light by reflections (projections) and diffusion (sampled/randomized)
-/// Modulates reflection with base color, preventing it becoming full mirror even when value is set to 1.0
-/// Also allows diffusion which randomly samples a direction. The color strength can similarly be adjusted.
+/// General material which can re-emit light by projections and diffusion.
 /// </summary>
-/// <param name="reflectivity">How much the surface reflects light. Ranges from 0 to 1, default is 0</param>
-/// <param name="diffuseStrength"How much light the surface reflects diffusely. Ranges from 0 to 1, default is 0</param>
-public class FlatMaterial(ColorRGB color, double reflectivity = 0.0, double diffuseStrength = 0.0) : IMaterial
+/// <param name="color">Material color</param>
+/// <param name="reflectivity">Distribution of projections and diffusion. Values closer to 0 make direction scatter
+/// randomly, values around 1 project rays w.r.t normals, producing mirror surfaces.</param>
+/// <param name="roughness">Sharpness/blur i.e. strength of diffusion. 0 is sharp, 1 is very rough/diffused. Note that
+/// if reflectivity is already very low, this has small/no noticeable effect.</param>
+/// <param name="bounce">Distribution of light that keeps continuing after hi. 0 = absorbs all so nothing leaves, 1 = 
+/// all of it bounces off. Good for making dim/darker vs detailed/colored projections with high reflectivity</param>
+public class SurfaceMaterial(
+    ColorRGB color,
+    double reflectivity = 0.0,
+    double roughness = 0.0,
+    double bounce = 0.0
+) : IMaterial
 {
     public ColorRGB Color = color;
     public double Reflectivity = reflectivity;
+    public double Roughness = roughness;
+    public double Bounce { get; } = bounce;
+
+    public bool Scatter(Ray rayIn, HitRecord hit, out ColorRGB attenuation, out Ray scattered)
+    {
+        attenuation = Color;
+        double r = Random.Shared.NextDouble();
+
+        Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon;
+
+        Vec3 reflectDir = Vec3.Reflect(rayIn.Direction, hit.Normal);
+        Vec3 diffuseDir = Vec3.RandomHemisphere(hit.Normal);
+
+        Vec3 direction;
+
+        if (r < Reflectivity)
+        {
+            direction = reflectDir;
+
+            if (Roughness > 0)
+                direction = Vec3.Lerp(direction, diffuseDir, Roughness).Unit();
+
+            attenuation *= Reflectivity;
+        }
+        else
+        {
+            direction = diffuseDir;
+
+            attenuation *= 1.0 - Reflectivity;
+        }
+
+        scattered = new Ray(origin, direction);
+
+        return true;
+    }
 
     public ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
     {
@@ -58,30 +101,6 @@ public class FlatMaterial(ColorRGB color, double reflectivity = 0.0, double diff
                     finalColor += contribution;
                 }
             }
-        }
-
-        if (Reflectivity > 0.0 && Reflectivity <= 1.0 && depth < renderer.MaxBounces)
-        {
-            Vec3 reflectDir = Vec3.Reflect(ray.Direction, hit.Normal).Unit();
-            Vec3 reflectOrigin = hit.Point + hit.Normal * MathConst.RayEpsilon;
-
-            Ray reflectRay = new(reflectOrigin, reflectDir);
-
-            ColorRGB reflectColor = renderer.Trace(reflectRay, scene, depth + 1);
-
-            finalColor = finalColor * (1 - Reflectivity) + reflectColor * Color * Reflectivity;
-        }
-
-        if (diffuseStrength > 0 && diffuseStrength <= 1.0 && depth < renderer.MaxBounces)
-        {
-            Vec3 bounceDir = Vec3.RandomHemisphere(hit.Normal);
-            Vec3 bounceOrigin = hit.Point + hit.Normal * MathConst.RayEpsilon;
-
-            Ray bounceRay = new(bounceOrigin, bounceDir);
-
-            ColorRGB bounceColor = renderer.Trace(bounceRay, scene, depth + 1);
-
-            finalColor += bounceColor * Color * diffuseStrength;
         }
 
         return finalColor;

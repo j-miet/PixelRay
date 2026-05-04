@@ -21,24 +21,15 @@ public class ObjectDtoConverter : JsonConverter<IObjectDto>
 
         return type switch
         {
-            "sphere" => JsonSerializer.Deserialize<SphereDto>(root.GetRawText(), options)
-                ?? throw new Exception("Sphere deserialization failed"),
-            "plane" => JsonSerializer.Deserialize<PlaneDto>(root.GetRawText(), options)
-                ?? throw new Exception("Plane deserialization failed"),
-            "disc" => JsonSerializer.Deserialize<DiscDto>(root.GetRawText(), options)
-                ?? throw new Exception("Disc deserialization failed"),
-            "triangle" => JsonSerializer.Deserialize<TriangleDto>(root.GetRawText(), options)
-                ?? throw new Exception("Triangle deserialization failed"),
-            "cylinder" => JsonSerializer.Deserialize<CylinderDto>(root.GetRawText(), options)
-                ?? throw new Exception("Cylinder deserialization failed"),
-            "cone" => JsonSerializer.Deserialize<ConeDto>(root.GetRawText(), options)
-                ?? throw new Exception("Cone deserialization failed"),
-            "torus" => JsonSerializer.Deserialize<TorusDto>(root.GetRawText(), options)
-                ?? throw new Exception("Torus deserialization failed"),
-            "quadric" => JsonSerializer.Deserialize<QuadricDto>(root.GetRawText(), options)
-                ?? throw new Exception("Quadric deserialization failed"),
-            "aabox" => JsonSerializer.Deserialize<AABoxDto>(root.GetRawText(), options)
-                ?? throw new Exception("AABox deserialization failed"),
+            "sphere" => JsonSerializer.Deserialize<SphereDto>(root.GetRawText(), options)!,
+            "plane" => JsonSerializer.Deserialize<PlaneDto>(root.GetRawText(), options)!,
+            "disc" => JsonSerializer.Deserialize<DiscDto>(root.GetRawText(), options)!,
+            "triangle" => JsonSerializer.Deserialize<TriangleDto>(root.GetRawText(), options)!,
+            "cylinder" => JsonSerializer.Deserialize<CylinderDto>(root.GetRawText(), options)!,
+            "cone" => JsonSerializer.Deserialize<ConeDto>(root.GetRawText(), options)!,
+            "torus" => JsonSerializer.Deserialize<TorusDto>(root.GetRawText(), options)!,
+            "quadric" => JsonSerializer.Deserialize<QuadricDto>(root.GetRawText(), options)!,
+            "aabox" => JsonSerializer.Deserialize<AABoxDto>(root.GetRawText(), options)!,
             _ => throw new Exception($"Unknown object type: {type}")
         };
     }

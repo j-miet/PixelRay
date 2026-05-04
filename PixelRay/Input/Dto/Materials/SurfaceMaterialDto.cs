@@ -2,18 +2,20 @@ using PixelRay.SceneView.Materials;
 
 namespace PixelRay.Input.Dto.Materials;
 
-public class FlatMaterialDto : IMaterialDto
+public class SurfaceMaterialDto : IMaterialDto
 {
     public required double[] Color { get; set; }
     public double Reflectivity { get; set; } = 0;
-    public double Diffusion { get; set; } = 0;
+    public double Roughness { get; set; } = 0;
+    public double Bounce { get; set; } = 0;
 
     public IMaterial Build()
     {
-        return new FlatMaterial(
+        return new SurfaceMaterial(
             InputUtils.ToColor(Color),
             Reflectivity,
-            Diffusion
+            Roughness,
+            Bounce
         );
     }
 }

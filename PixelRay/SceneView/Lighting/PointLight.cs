@@ -1,5 +1,3 @@
-
-
 using PixelRay.Core.Mathematics;
 
 namespace PixelRay.SceneView.Lighting;

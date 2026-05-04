@@ -3,6 +3,7 @@ using PixelRay.Debug;
 using PixelRay.Rendering;
 using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.Materials;
 using static PixelRay.Const;
 
 namespace PixelRay.Core;
@@ -17,9 +18,8 @@ namespace PixelRay.Core;
 /// <param name="maxBounces">Max amount of ray bounces. Default is 1 and should be kept at low value for pixel look
 /// </param>
 /// <param name="useDithering">If ordered dithering is used or not</param>
-/// <param name="ditherStrength">Only if dithering == true: how aggressive the dithering thresholds are, ranges from 0 
-/// to 1</param>
-/// <param name="ditherDimension">Threshold Bayer matrix dimension. Only 4 and 8 are supported, default is 4.</param>
+/// <param name="ditherLevels">Amount of quantization levels in dithering</param>
+/// <param name="ditherDimension">Bayer matrix dimension. Only 4 and 8 are supported, default is 4.</param>
 public class Renderer(
     int width,
     int height,
@@ -80,9 +80,6 @@ public class Renderer(
     /// </summary>
     public ColorRGB Trace(Ray ray, Scene scene, int depth = 0)
     {
-        if (depth > MaxBounces + 1)
-            return BackGroundColor;
-
         double closestT = double.MaxValue;
         bool hitAnything = false;
         HitRecord closestHit = default;
@@ -104,9 +101,25 @@ public class Renderer(
         if (!hitAnything || closestHit.Material is null)
             return BackGroundColor;
 
-        ColorRGB shaded = closestHit.Material.Shade(closestHit, scene, this, ray, depth);
+        ColorRGB direct = closestHit.Material.Shade(closestHit, scene, this, ray, depth);
+        ColorRGB indirect = new(0, 0, 0);
 
-        return shaded;
+        if (depth < MaxBounces)
+        {
+            var mat = closestHit.Material;
+
+            if (mat.Scatter(ray, closestHit, out ColorRGB attenuation, out Ray scattered))
+            {
+                indirect = Trace(scattered, scene, depth + 1) * attenuation;
+            }
+
+            if (mat is FlatMaterial m)
+                return direct + indirect * m.Bounce;
+
+            return direct + indirect;
+        }
+
+        return direct;
     }
 
     /// <summary>

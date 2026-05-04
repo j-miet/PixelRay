@@ -9,11 +9,12 @@ static class CreatePixelRay
     public static void Main(string[] args)
     {
         // TODO implement better parser which doesn't depend on arg writing order
+        // should separate input and output (-i / -o) so -p flag can be used without needing to save the image
         if (args.Length >= 3 &&
             (args[0] == "-i" || args[0] == "--image") &&
             args[1] != null && args[2] != null)
         {
-            var dto = SceneLoader.Load((args[1] + ".json").ToString());
+            var dto = SceneLoader.Load(args[1].ToString());
             var (scene, camera, settings) = SceneBuilder.Build(dto);
 
             int width = settings.Width;
@@ -47,9 +48,26 @@ static class CreatePixelRay
             }
 
             FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor, debug);
-            ImageWriter.WritePPM(args[2].ToString() + ".ppm", buffer);
 
-            if (args.Length >= 4 && args[3] == "-p") // preview image
+            // output file
+            string outputFile = args[2].ToString();
+            string imageFormat = outputFile.Split(".")[1];
+
+            if (imageFormat == "ppm")
+            {
+                ImageWriter.WritePPM(outputFile, buffer);
+            }
+            else if (imageFormat == "png")
+            {
+                ImageWriter.WritePNG(outputFile, buffer);
+            }
+            else
+            {
+                throw new Exception("Unsupported image format: use .ppm or .png");
+            }
+
+            // preview image
+            if (args.Length >= 4 && args[3] == "-p")
             {
                 int speed = 0;
                 if (args.Length == 5 && int.TryParse(args[4], out int value))

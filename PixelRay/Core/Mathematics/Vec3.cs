@@ -109,6 +109,38 @@ public readonly struct Vec3
     }
 
     /// <summary>
+    /// Generate a random direction vector from a surface point
+    /// </summary>
+    /// <param name="normal"></param>
+    /// <returns></returns>
+    public static Vec3 RandomHemisphere(Vec3 normal)
+    {
+        Vec3 dir;
+
+        do
+        {
+            dir = new(
+                Random.Shared.NextDouble() * 2 - 1,
+                Random.Shared.NextDouble() * 2 - 1,
+                Random.Shared.NextDouble() * 2 - 1
+            );
+        }
+        while (dir.NormSquared() < MathConst.Epsilon);
+
+        dir = dir.Unit();
+
+        if (Dot(dir, normal) < 0)
+            dir = -dir;
+
+        return dir;
+    }
+
+    /// <summary>
+    /// Linear interpolation
+    /// </summary>
+    public static Vec3 Lerp(Vec3 a, Vec3 b, double t) => a * (1 - t) + b * t;
+
+    /// <summary>
     /// Reflection of vector v against a surface normal n
     /// </summary>
     /// <param name="v">Vector pointing at normal n</param>
@@ -137,32 +169,5 @@ public readonly struct Vec3
             return new();
 
         return 1 / t * v;
-    }
-
-    /// <summary>
-    /// Generate a random direction vector from a surface point
-    /// </summary>
-    /// <param name="normal"></param>
-    /// <returns></returns>
-    public static Vec3 RandomHemisphere(Vec3 normal)
-    {
-        Vec3 dir;
-
-        do
-        {
-            dir = new(
-                Random.Shared.NextDouble() * 2 - 1,
-                Random.Shared.NextDouble() * 2 - 1,
-                Random.Shared.NextDouble() * 2 - 1
-            );
-        }
-        while (dir.NormSquared() < MathConst.Epsilon);
-
-        dir = dir.Unit();
-
-        if (Dot(dir, normal) < 0)
-            dir = -dir;
-
-        return dir;
     }
 }

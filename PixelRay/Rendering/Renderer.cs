@@ -113,10 +113,7 @@ public class Renderer(
                 indirect = Trace(scattered, scene, depth + 1) * attenuation;
             }
 
-            if (mat is FlatMaterial m)
-                return direct + indirect * m.Bounce;
-
-            return direct + indirect;
+            return direct + indirect * mat.Bounce;
         }
 
         return direct;

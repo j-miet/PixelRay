@@ -16,7 +16,7 @@ public class SpotLight(
 {
     public Vec3 Direction { get; } = direction.Unit();
     public double Angle { get; } = angle;
-    public double InnerAngle { get; } = innerAngle;
+    public double InnerAngle { get; } = innerAngle < angle ? innerAngle : angle;
 
     public new double Shade(Scene scene, in HitRecord hit)
     {

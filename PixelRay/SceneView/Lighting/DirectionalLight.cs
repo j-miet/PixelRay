@@ -7,7 +7,7 @@ namespace PixelRay.SceneView.Lighting;
 /// A directional light ray
 /// Light direction is from hit point TO light
 /// </summary>
-public class DirectionalLight(Vec3 direction, ColorRGB color, double intensity) : ILight
+public class DirectionalLight(Vec3 direction, ColorRGB color, double intensity = 1.0) : ILight
 {
     public Vec3 Direction { get; } = direction.Unit();
     public ColorRGB Color { get; } = color;

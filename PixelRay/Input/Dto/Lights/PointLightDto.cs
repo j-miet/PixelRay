@@ -8,7 +8,6 @@ public class PointLightDto : ILightDto
     public required double[] Color { get; set; }
     public double Intensity { get; set; } = 1.0;
     public double Radius { get; set; } = 0;
-    public double Attenuation { get; set; } = 1.0;
 
     public ILight Build()
     {
@@ -16,8 +15,7 @@ public class PointLightDto : ILightDto
             InputUtils.ToVec3(Position),
             InputUtils.ToColor(Color),
             Intensity,
-            Radius,
-            Attenuation
+            Radius
         );
     }
 }

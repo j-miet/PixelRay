@@ -6,12 +6,14 @@ public class DirectionalLightDto : ILightDto
 {
     public required double[] Direction { get; set; }
     public required double[] Color { get; set; }
+    public double Intensity { get; set; } = 1.0;
 
-    public Light Build()
+    public ILight Build()
     {
         return new DirectionalLight(
             InputUtils.ToVec3(Direction),
-            InputUtils.ToColor(Color)
+            InputUtils.ToColor(Color),
+            Intensity
         );
     }
 }

@@ -5,9 +5,9 @@ namespace PixelRay.Input.Dto.Lights;
 public class AmbientLightDto : ILightDto
 {
     public required double[] Color { get; set; }
-    public double Intensity { get; set; }
+    public double Intensity { get; set; } = 1.0;
 
-    public Light Build()
+    public ILight Build()
     {
         return new AmbientLight(
             InputUtils.ToColor(Color),

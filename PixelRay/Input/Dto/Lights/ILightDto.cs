@@ -7,5 +7,5 @@ namespace PixelRay.Input.Dto.Lights;
 /// </summary>
 public interface ILightDto
 {
-    Light Build();
+    ILight Build();
 }

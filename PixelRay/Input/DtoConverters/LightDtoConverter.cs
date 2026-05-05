@@ -24,6 +24,7 @@ public class LightDtoConverter : JsonConverter<ILightDto>
             "directional" => JsonSerializer.Deserialize<DirectionalLightDto>(root.GetRawText(), options)!,
             "ambient" => JsonSerializer.Deserialize<AmbientLightDto>(root.GetRawText(), options)!,
             "point" => JsonSerializer.Deserialize<PointLightDto>(root.GetRawText(), options)!,
+            "spot" => JsonSerializer.Deserialize<SpotLightDto>(root.GetRawText(), options)!,
             _ => throw new Exception($"Unknown light type: {type}")
         };
     }

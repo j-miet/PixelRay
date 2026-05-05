@@ -10,8 +10,9 @@ public class SpotLight(
     double innerAngle,
     ColorRGB color,
     double intensity,
-    double radius = 0
-) : PointLight(position, color, intensity, radius)
+    double radius = 0,
+    double attenuation = 1.0
+) : PointLight(position, color, intensity, radius, attenuation)
 {
     public Vec3 Direction { get; } = direction.Unit();
     public double Angle { get; } = angle;
@@ -51,7 +52,7 @@ public class SpotLight(
         if (NdotL <= 0)
             return 0;
 
-        double attenuation = 1.0 / (distance * distance);
+        double attenuation = 1.0 / (Attenuation * distance * distance);
 
         return NdotL * shadow * coneFactor * attenuation;
     }

@@ -50,22 +50,15 @@ public static class Utils
     }
 
     /// <summary>
-    /// Builds a orthonormal basis from a single vector representing y-axis of new basis.
-    /// Sets reference values of v1 and v3 as x- and z-axis vectors respectively. This means the new basis can be used
-    /// to rotate between standard basis and new basis with v2 as the y-axis correspondent.
+    /// Builds a orthonormal basis from a single vector representing the upward axis normal.
+    /// Doesn't return a value. Instead sets values for tangent and bitangent references
     /// </summary>
-    /// <param name="w">Reference to vector which becomes analogous to x-axis under new system</param>
-    /// <param name="u">Y-axis of new basis</param>
-    /// <param name="v">Reference to new z-axis vector</param>
-    public static void BuildOrthonormalBasisFromY(out Vec3 xAxisRef, Vec3 yAxis, out Vec3 zAxisRef)
+    public static void BuildOrthonormalBasis(Vec3 normal, out Vec3 tangent, out Vec3 bitangent)
     {
-        // helper vector for creating orthogonal basis. Checks x-coordinate of axis vector and ensures that it's not
-        // too aligned with helper, otherwise cross product might create a vector with norm almost zero.
-        Vec3 helper = Math.Abs(yAxis.X) > 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+        Vec3 up = Math.Abs(normal.Z) < 0.999 ? new(0, 1, 0) : new(1, 0, 0);
 
-        // update x and z references; cross product creates orthogonal vector
-        xAxisRef = Vec3.Cross(helper, yAxis).Unit();
-        zAxisRef = Vec3.Cross(yAxis, xAxisRef); // both vectors already normalized means cross product is too
+        tangent = Vec3.Cross(up, normal).Unit();
+        bitangent = Vec3.Cross(normal, tangent);
     }
 
     /// <summary>

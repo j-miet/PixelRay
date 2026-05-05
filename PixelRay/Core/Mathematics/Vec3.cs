@@ -109,7 +109,12 @@ public readonly struct Vec3
     }
 
     /// <summary>
-    /// Generate a random direction vector from a surface point
+    /// Sample a random number from interval [-1, 1)
+    /// </summary>
+    public static double RandomDouble() => Random.Shared.NextDouble() * 2 - 1;
+
+    /// <summary>
+    /// Sample a random direction vector from a surface point
     /// </summary>
     /// <param name="normal"></param>
     /// <returns></returns>
@@ -120,9 +125,9 @@ public readonly struct Vec3
         do
         {
             dir = new(
-                Random.Shared.NextDouble() * 2 - 1,
-                Random.Shared.NextDouble() * 2 - 1,
-                Random.Shared.NextDouble() * 2 - 1
+                RandomDouble(),
+                RandomDouble(),
+                RandomDouble()
             );
         }
         while (dir.NormSquared() < MathConst.Epsilon);

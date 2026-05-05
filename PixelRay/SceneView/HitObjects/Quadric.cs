@@ -63,16 +63,21 @@ public class Quadric(
         double t1 = (-b - sqrtD) / (2 * a);
         double t2 = (-b + sqrtD) / (2 * a);
 
-        double t = double.PositiveInfinity;
         List<double> roots = [];
-        Vec3 p;
+        roots.Add(t1);
+        roots.Add(t2);
+        roots.Sort(); // always start from closest
 
-        if (rayT.InClosed(t1)) roots.Add(t1);
-        if (rayT.InClosed(t2)) roots.Add(t2);
+        double t = double.PositiveInfinity;
+        Vec3 p;
 
         foreach (double candidate in roots)
         {
+            if (!rayT.InClosed(candidate))
+                continue;
+
             p = ray.At(candidate);
+
             if (p.X >= MinBounds.X && p.X <= MaxBounds.X && // check bounding conditions
                 p.Y >= MinBounds.Y && p.Y <= MaxBounds.Y &&
                 p.Z >= MinBounds.Z && p.Z <= MaxBounds.Z)

@@ -3,7 +3,7 @@ using PixelRay.Debug;
 using PixelRay.Rendering;
 using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Materials;
+using PixelRay.SceneView.Lighting;
 using static PixelRay.Const;
 
 namespace PixelRay.Core;
@@ -101,7 +101,22 @@ public class Renderer(
         if (!hitAnything || closestHit.Material is null)
             return BackGroundColor;
 
-        ColorRGB direct = closestHit.Material.Shade(closestHit, scene, this, ray, depth);
+        ColorRGB direct = new(0, 0, 0);
+
+        // add light quantization
+        foreach (ILight light in scene.Lights)
+        {
+            ColorRGB lightColor;
+
+            double lightFactor = light.Shade(scene, in closestHit);
+            if (lightFactor <= 0)
+                continue;
+
+            lightColor = closestHit.Material.Color * lightFactor;
+            lightColor = lightColor.Quantize(LightingBands);
+            direct += lightColor * light.Color * light.Intensity;
+        }
+
         ColorRGB indirect = new(0, 0, 0);
 
         if (depth < MaxBounces)
@@ -117,34 +132,6 @@ public class Renderer(
         }
 
         return direct;
-    }
-
-    /// <summary>
-    /// Check if a hit point get blocked from a light source
-    /// </summary>
-    /// <param name="lightDirection">Direction vector from hit point to light source</param>
-    /// <param name="maxDistance">Shadow ray upper bound for t</param>
-    public static bool CheckShadow(
-        Scene scene,
-        in HitRecord hit,
-        Vec3 lightDirection,
-        double maxDistance = double.MaxValue
-    )
-    {
-        Vec3 origin = hit.Point + hit.Normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
-        Ray shadowRay = new(origin, lightDirection);
-        Interval rayT = new(MathConst.RayEpsilon, maxDistance);
-
-        foreach (IHittable obj in scene.Objects)
-        {
-            if (!ReferenceEquals(obj, hit.Object) && obj.Hit(shadowRay, rayT, out HitRecord shadow) &&
-                shadow.T > MathConst.RayEpsilon && shadow.T < maxDistance)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private readonly int _width = width;

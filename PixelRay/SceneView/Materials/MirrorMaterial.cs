@@ -6,7 +6,7 @@ namespace PixelRay.SceneView.Materials;
 
 public class MirrorMaterial(ColorRGB color, double bounce = 1.0) : IMaterial
 {
-    public ColorRGB Color = color;
+    public ColorRGB Color { get; } = color;
     public double Bounce { get; } = bounce;
 
     public bool Scatter(Ray rayIn, HitRecord hit, out ColorRGB attenuation, out Ray scattered)

@@ -22,7 +22,7 @@ public class SurfaceMaterial(
     double bounce = 0.0
 ) : IMaterial
 {
-    public ColorRGB Color = color;
+    public ColorRGB Color { get; } = color;
     public double Reflectivity = reflectivity;
     public double Roughness = roughness;
     public double Bounce { get; } = bounce;
@@ -58,51 +58,5 @@ public class SurfaceMaterial(
         scattered = new Ray(origin, direction);
 
         return true;
-    }
-
-    public ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
-    {
-        ColorRGB finalColor = new(0, 0, 0);
-
-        foreach (Light light in scene.Lights)
-        {
-            if (light is AmbientLight ambient)
-            {
-                finalColor += Color * ambient.Color * ambient.Intensity;
-            }
-            else if (light is DirectionalLight directionalLight)
-            {
-                Vec3 lightDir = directionalLight.Direction.Unit();
-
-                if (!Renderer.CheckShadow(scene, in hit, lightDir))
-                {
-                    double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, lightDir));
-                    ColorRGB quantized = (NdotL * Color).Quantize(renderer.LightingBands);
-                    ColorRGB contribution = quantized * directionalLight.Color;
-
-                    finalColor += contribution;
-                }
-            }
-            else if (light is PointLight pointLight)
-            {
-                Vec3 toLight = pointLight.Position - hit.Point;
-                double distance = toLight.Length();
-                Vec3 lightDir = toLight / distance; // must be unit vector!
-
-                if (!Renderer.CheckShadow(scene, in hit, lightDir, distance))
-                {
-                    // this will reduce light quickly but smoothly, making it look natural
-                    double attenuation = pointLight.Intensity / (distance * distance);
-
-                    double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, lightDir));
-                    ColorRGB quantized = (NdotL * Color).Quantize(renderer.LightingBands);
-                    ColorRGB contribution = quantized * pointLight.Color * attenuation;
-
-                    finalColor += contribution;
-                }
-            }
-        }
-
-        return finalColor;
     }
 }

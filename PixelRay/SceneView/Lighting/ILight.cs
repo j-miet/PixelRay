@@ -1,4 +1,5 @@
 using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Hittable;
 
 namespace PixelRay.SceneView.Lighting;
 
@@ -7,7 +8,13 @@ namespace PixelRay.SceneView.Lighting;
 /// Lights should follow the principle of hit point -> light e.g. define any light
 /// direction vectors from hit point to light source, invert to move from light source to hit point.
 /// </summary>
-public abstract class Light(ColorRGB color)
+public interface ILight
 {
-    public ColorRGB Color { get; } = color;
+    public ColorRGB Color { get; }
+    public double Intensity { get; }
+
+    public double Shade(
+        Scene scene,
+        in HitRecord hit
+    );
 }

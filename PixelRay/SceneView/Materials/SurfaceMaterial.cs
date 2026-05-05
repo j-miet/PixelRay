@@ -1,7 +1,6 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Lighting;
 
 namespace PixelRay.SceneView.Materials;
 

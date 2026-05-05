@@ -22,10 +22,11 @@ public static class InputUtils
         Matrix4x4 rotation = Matrix4x4.Identity();
 
         // applies all rotations in order. Each rotation is a 4d vector where first 3 components matches to axis
-        // direction and last is the angle [0, 2*PI]
+        // direction and last is the angle [0, 360] which gets converted to radians for internal use
         foreach (var r in dto.Rotation)
         {
-            rotation *= Matrix4x4.Rotate(new(r[0], r[1], r[2]), r[3]);
+            double radianAngle = r[3] * Math.PI / 180;
+            rotation *= Matrix4x4.Rotate(new(r[0], r[1], r[2]), radianAngle);
         }
 
         return new Transform(obj, translate * rotation * scale);

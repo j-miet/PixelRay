@@ -1,6 +1,6 @@
 {
     "camera": {
-        "position": [0, 0, 0],
+        "position": [0, 0, 0.05],
         "lookAt": [0, 0, -1],
         "upDirection": [0, 1, 0],
         "fov": 90
@@ -8,10 +8,10 @@
     "render": {
         "width": 249,
         "height": 140,
-        "upScaleFactor": 3,
+		"upScaleFactor": 3,
 		"palette": [],
-		"lightingBands": 32,
-		"maxBounces": 1,
+		"lightingBands": 16,
+		"maxBounces": 3,
 		"dithering": false,
 		"ditherLevels": 4,
 		"ditherDimension": 4
@@ -20,9 +20,8 @@
         {
             "type": "sphere",
             "material": {
-                "type": "flat",
-                "color": [0.7, 0.2, 0.2],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [0.8, 0.2, 0.8]
             },
 			"transform": {
                 "scale": [0.05, 0.05, 0.05],
@@ -35,17 +34,18 @@
             "vertex2": [1.1, -0.25, -0.8],
             "vertex3": [0.9, 0.25, -0.65],
             "material": {
-                "type": "flat",
-                "color": [0.8, 0.9, 0.1],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [0.8, 0.9, 0.1]
             }
         },
         {
             "type": "cylinder",
             "material": {
-                "type": "flat",
+                "type": "mirror",
                 "color": [0.1, 0.3, 0.9],
-                "reflectivity": 0.5
+                "reflectivity": 1,
+				"roughness": 0,
+				"bounce": 1
             },
             "transform": {
                 "position": [-0.6, -0.25, -0.75],
@@ -55,32 +55,32 @@
         {
             "type": "cone",
             "material": {
-                "type": "flat",
-                "color": [0.8, 0.1, 0.1],
-                "reflectivity": 0,
-				"diffusion": 1
+                "type": "surface",
+                "color": [0.8, 0.1, 0.1]
             },
             "transform": {
                 "position": [-0.6, 0.45, -0.75],
                 "scale": [0.25, 0.35, 0.25],
                 "rotation": [
-                    [1, 0, 0, 3.14]
+                    [1, 0, 0, 180]
                 ]
             }
         },
         {
             "type": "disc",
             "material": {
-                "type": "flat",
-                "color": [0.8, 0.2, 0.8],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [0.9, 0.7, 0.3],
+                "reflectivity": 1,
+                "roughness": 1,
+                "bounce": 1
             },
             "transform": {
                 "position": [-1.55, 0.7, -1.2],
                 "scale": [0.25, 1, 0.25],
                 "rotation": [
-                    [1, 0, 0, 1.57],
-                    [0, 1, 0, -0.098]
+                    [1, 0, 0, 90],
+                    [0, 1, 0, 5.625]
                 ]
             }
         },
@@ -89,14 +89,13 @@
             "minorRadius": 0.2,
             "majorRadius": 0.1,
             "material": {
-                "type": "flat",
-                "color": [0.5, 1, 0.5],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [0.5, 1, 0.5]
             },
             "transform": {
-                "position": [0, 0.1, -0.75],
+                "position": [0, 0.05, -0.75],
                 "rotation": [
-                    [1, 0, 0, 1.57]
+                    [1, 0, 0, 90]
                 ]
             }
         },
@@ -111,12 +110,11 @@
             "minBounds": [-3, -3, -3],
             "maxBounds": [3, 3, 3],
             "material": {
-                "type": "flat",
-                "color": [0.5, 0.5, 0.5],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [0.8, 0.8, 0.8]
             },
             "transform": {
-                "position": [2, 0.5, -3]
+                "position": [2, 0.5, -2]
             }
         },
         {
@@ -124,9 +122,8 @@
             "minBounds": [-0.05, -0.05, -0.05],
             "maxBounds": [0.05, 0.05, 0.05],
             "material": {
-                "type": "flat",
-                "color": [1, 0.65, 0],
-                "reflectivity": 0
+                "type": "surface",
+                "color": [1, 0.65, 0]
             },
             "transform": {
                 "position": [0.22, -0.2, -0.45]
@@ -135,10 +132,8 @@
         {
 			"type": "plane",
 			"material": {
-				"type": "flat",
-				"color": [0.1, 0.8, 0.8],
-				"reflectivity": 0,
-				"diffusion": 1
+				"type": "mirror",
+				"color": [0.1, 0.6, 0.6]
 			},
 			"transform": {
 				"position": [0, -0.25, 0]
@@ -147,34 +142,55 @@
 		{
 			"type": "plane",
 			"material": {
-				"type": "flat",
-				"color": [1, 1, 1],
-				"reflectivity": 0
+				"type": "surface",
+				"color": [1, 1, 1]
 			},
 			"transform": {
 				"position": [0, 0, -20],
 				"rotation": [
-					[1, 0, 0, 1.57]
+					[1, 0, 0, 90]
 				]
 			}
 		}
     ],
     "lights": [
-		{
+        {
 			"type": "ambient",
 			"color": [1, 1, 1],
 			"intensity": 0.05
 		},
         {
             "type": "directional",
-            "direction": [0.2, 2, 1],
-            "color": [0.2, 0.2, 0.2]
+            "direction": [-0.3, 0.5, 1],
+            "color": [0.2, 0.2, 0.2],
+            "intensity": 0.9
         },
 		{
 			"type": "point",
-			"position": [0, 0.5, -0.05],
+			"position": [0, -0.1, -0.05],
 			"color": [0.5, 0.5, 0.5],
-			"intensity": 1.5
-		}
+			"intensity": 0.5,
+            "radius": 1
+		},
+        {
+            "type": "spot",
+            "position": [1.2, -0.2, -0.1],
+            "direction": [-1, 0, -1],
+            "angle": 10,
+            "innerAngle": 8,
+            "color": [0.9, 0.6, 0.3],
+            "intensity": 1,
+            "radius": 1
+        },
+        {
+            "type": "spot",
+            "position": [-0.6, 0.45, -0.74],
+            "direction": [-1, 0.3, -1],
+            "angle": 30,
+            "innerAngle": 25,
+            "color": [1, 1, 1],
+            "intensity": 1,
+            "radius": 1
+        }
     ]
 }

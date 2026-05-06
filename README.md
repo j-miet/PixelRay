@@ -9,10 +9,9 @@
 - [<u>Scenes</u>](#scenes)
     - [<u>Rendering</u>](#rendering)
     - [<u>Objects</u>](#objects)
-    - []
+    - [<u>Materials</u>](#materials)
     - [<u>Lights</u>](#lights)
-- [<u>Scenes</u>](#installation)
-- [<u>First-time setup</u>](#first-time-setup)
+- [<u>Building from source</u>](#building-from-source)
 
 
 ## CLI
@@ -71,6 +70,7 @@ Default scene file can be found [here](docs/scene.json).
 
 #### render
 
+- threading (for rendering, disabled by default)
 - width
 - height
 - upscaling factor

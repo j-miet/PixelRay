@@ -13,7 +13,15 @@ public static class SceneLoader
 
     public static SceneViewDto Load(string path)
     {
-        string json = File.ReadAllText(path);
+        string json;
+        try
+        {
+            json = File.ReadAllText(path);
+        }
+        catch (FileNotFoundException)
+        {
+            throw new Exception($"Input json file not found on path: {path}");
+        }
 
         options ??= new JsonSerializerOptions
         {

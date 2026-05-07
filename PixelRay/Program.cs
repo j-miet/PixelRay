@@ -168,7 +168,7 @@ static class CreatePixelRay
             _ => DebugMode.None
         };
 
-        FrameBuffer buffer = renderer.Render(scene, camera, upScaleFactor, debug);
+        FrameBuffer buffer = renderer.Render(scene, camera, settings.Threading, upScaleFactor, debug);
 
         string outputFile = values["output"];
         string imageFormat = values["outputFormat"];

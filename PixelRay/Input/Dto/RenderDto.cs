@@ -19,4 +19,6 @@ public class RenderDto
     public bool Dithering { get; set; } = false;
     public int DitherLevels { get; set; } = 16;
     public int DitherDimension { get; set; } = 4;
+
+    public bool Threading { get; set; } = false;
 }

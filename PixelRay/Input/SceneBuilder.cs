@@ -72,6 +72,8 @@ public static class SceneBuilder
             Dithering = dto.Dithering,
             DitherLevels = dto.DitherLevels,
             DitherDimension = dto.DitherDimension,
+
+            Threading = dto.Threading
         };
 
         return settings;

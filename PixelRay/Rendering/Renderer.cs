@@ -42,7 +42,13 @@ public class Renderer(
     /// <param name="mode">What debug mode is used. Pass value as any DebugMode enum, which are: <br/>
     /// None, Normals, DepthHeat, ObjectId 
     /// </param>
-    public FrameBuffer Render(Scene scene, Camera camera, int upScale = 1, DebugMode mode = DebugMode.None)
+    public FrameBuffer Render(
+        Scene scene,
+        Camera camera,
+        bool threading,
+        int upScale = 1,
+        DebugMode mode = DebugMode.None
+    )
     {
         int scaledW = upScale * _width;
         int scaledH = upScale * _height;
@@ -50,25 +56,52 @@ public class Renderer(
 
         for (int y = 0; y < scaledH; y++)
         {
-            for (int x = 0; x < scaledW; x++)
+            if (threading)
             {
-                int baseX = (int)Math.Floor(x / (double)upScale);
-                int baseY = (int)Math.Floor(y / (double)upScale);
-
-                Ray ray = camera.GetRay(baseX, baseY, _width, _height);
-                ColorRGB color = mode switch
+                Parallel.For(0, scaledW, x =>
                 {
-                    DebugMode.None => Trace(ray, scene),
-                    _ => DebugRender.Debug(ray, scene, mode),
-                };
 
-                if (_useDithering)
-                    color = Palette.MapDithered(color, x, y, _ditherDimension, _ditherLevels);
+                    int baseX = (int)Math.Floor(x / (double)upScale);
+                    int baseY = (int)Math.Floor(y / (double)upScale);
 
-                if (_palette.Colors.Length > 0) // always apply palette color last
-                    color = _palette.Map(color);
+                    Ray ray = camera.GetRay(baseX, baseY, _width, _height);
+                    ColorRGB color = mode switch
+                    {
+                        DebugMode.None => Trace(ray, scene),
+                        _ => DebugRender.Debug(ray, scene, mode),
+                    };
 
-                buffer.SetPixel(x, y, color.Clamp());
+                    if (_useDithering)
+                        color = Palette.MapDithered(color, x, y, _ditherDimension, _ditherLevels);
+
+                    if (_palette.Colors.Length > 0) // always apply palette color last
+                        color = _palette.Map(color);
+
+                    buffer.SetPixel(x, y, color.Clamp());
+                });
+            }
+            else
+            {
+                for (int x = 0; x < scaledW; x++)
+                {
+                    int baseX = (int)Math.Floor(x / (double)upScale);
+                    int baseY = (int)Math.Floor(y / (double)upScale);
+
+                    Ray ray = camera.GetRay(baseX, baseY, _width, _height);
+                    ColorRGB color = mode switch
+                    {
+                        DebugMode.None => Trace(ray, scene),
+                        _ => DebugRender.Debug(ray, scene, mode),
+                    };
+
+                    if (_useDithering)
+                        color = Palette.MapDithered(color, x, y, _ditherDimension, _ditherLevels);
+
+                    if (_palette.Colors.Length > 0)
+                        color = _palette.Map(color);
+
+                    buffer.SetPixel(x, y, color.Clamp());
+                }
             }
         }
 

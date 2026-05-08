@@ -26,7 +26,7 @@ public class Triangle(Vec3 v1, Vec3 v2, Vec3 v3, IMaterial material) : IHittable
         Vec3 rayCrossE2 = Vec3.Cross(ray.Direction, e2); // system matrix determinant written as cross product
         double determinant = Vec3.Dot(e1, rayCrossE2);
 
-        if (Utils.LessThan(determinant, 0)) // if ray and normal are parallel
+        if (Utils.IsEqual(determinant, 0)) // if ray and normal are parallel
             return false;
 
         Vec3 v1ToOrigin = ray.Origin - V1;

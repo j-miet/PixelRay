@@ -48,9 +48,6 @@ public static class SceneBuilder
         return (scene, camera, settings);
     }
 
-    /// <summary>
-    /// Creates an settings object for easy rendering settings access
-    /// </summary>
     private static RendererSettings LoadRendererSettings(RenderDto dto)
     {
         List<ColorRGB> colors = [];

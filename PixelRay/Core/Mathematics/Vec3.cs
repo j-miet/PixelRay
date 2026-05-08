@@ -26,13 +26,11 @@ public readonly struct Vec3
     /// <summary>
     /// Display Vec3 object in (x, y, z) format
     /// </summary>
-    /// <returns></returns>
     public override string ToString() => string.Format("({0}, {1}, {2})", X, Y, Z);
 
     /// <summary>
     /// Index operator overload; access vector coordinates by corresponding index: v[0] = X , v[1] = Y, v[2] = Z 
     /// </summary>
-    /// <param name="index"></param>
     /// <returns>Index position coordinate</returns>
     public double this[int index]
     {
@@ -43,7 +41,6 @@ public readonly struct Vec3
     /// Access coordinate by index. This method itself is not very useful and is more so a helper function to allow
     /// bracket syntax i.e. v[0] = v.X, v[1] = v.Y, v[2] = v.Z
     /// </summary>
-    /// <exception cref="ArgumentException"></exception>
     public double GetValue(int index)
     {
         return index switch
@@ -116,8 +113,6 @@ public readonly struct Vec3
     /// <summary>
     /// Sample a random direction vector from a surface point
     /// </summary>
-    /// <param name="normal"></param>
-    /// <returns></returns>
     public static Vec3 RandomHemisphere(Vec3 normal)
     {
         Vec3 dir;
@@ -166,13 +161,10 @@ public readonly struct Vec3
     public static Vec3 operator -(Vec3 v) => (-1) * v;
 
     /// <summary>
-    /// Scalar division 1/t * v; if t = 0, the zero vector
+    /// Scalar division 1/t * v
     /// </summary>
     public static Vec3 operator /(Vec3 v, double t)
     {
-        if (t == 0)
-            return new();
-
-        return 1 / t * v;
+        return (1 / t) * v;
     }
 }

@@ -54,17 +54,13 @@ public class Renderer(
         int scaledH = upScale * _height;
         FrameBuffer buffer = new(scaledW, scaledH);
 
-        for (int y = 0; y < scaledH; y++)
+        for (int y = 0; y < _height; y++)
         {
             if (threading)
             {
-                Parallel.For(0, scaledW, x =>
+                Parallel.For(0, _width, x =>
                 {
-
-                    int baseX = (int)Math.Floor(x / (double)upScale);
-                    int baseY = (int)Math.Floor(y / (double)upScale);
-
-                    Ray ray = camera.GetRay(baseX, baseY, _width, _height);
+                    Ray ray = camera.GetRay(x, y, _width, _height);
                     ColorRGB color = mode switch
                     {
                         DebugMode.None => Trace(ray, scene),
@@ -77,17 +73,20 @@ public class Renderer(
                     if (_palette.Colors.Length > 0) // always apply palette color last
                         color = _palette.Map(color);
 
-                    buffer.SetPixel(x, y, color.Clamp());
+                    // use nearest neighbor scaling: copy current pixel, no need to trace same pixel multiple times
+                    color = color.Clamp();
+                    for (int j = 0; j < upScale; j++)
+                    {
+                        for (int i = 0; i < upScale; i++)
+                            buffer.SetPixel(upScale * x + i, upScale * y + j, color);
+                    }
                 });
             }
             else
             {
-                for (int x = 0; x < scaledW; x++)
+                for (int x = 0; x < _width; x++)
                 {
-                    int baseX = (int)Math.Floor(x / (double)upScale);
-                    int baseY = (int)Math.Floor(y / (double)upScale);
-
-                    Ray ray = camera.GetRay(baseX, baseY, _width, _height);
+                    Ray ray = camera.GetRay(x, y, _width, _height);
                     ColorRGB color = mode switch
                     {
                         DebugMode.None => Trace(ray, scene),
@@ -100,7 +99,12 @@ public class Renderer(
                     if (_palette.Colors.Length > 0)
                         color = _palette.Map(color);
 
-                    buffer.SetPixel(x, y, color.Clamp());
+                    color = color.Clamp();
+                    for (int j = 0; j < upScale; j++)
+                    {
+                        for (int i = 0; i < upScale; i++)
+                            buffer.SetPixel(upScale * x + i, upScale * y + j, color);
+                    }
                 }
             }
         }

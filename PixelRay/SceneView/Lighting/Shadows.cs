@@ -105,9 +105,9 @@ public static class Shadows
                 double r = Math.Sqrt(dx);
                 double theta = 2 * Math.PI * dy;
 
-                Vec3 disk = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
+                Vec3 disc = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
 
-                Vec3 samplePos = lightPos + (u * disk.X + v * disk.Y) * lightRadius;
+                Vec3 samplePos = lightPos + (u * disc.X + v * disc.Y) * lightRadius;
 
                 if (!IsOccluded(scene, point, samplePos))
                     visible++;
@@ -120,9 +120,9 @@ public static class Shadows
             double r = Math.Sqrt(Random.Shared.NextDouble());
             double theta = 2.0 * Math.PI * Random.Shared.NextDouble();
 
-            Vec3 diskSample = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
+            Vec3 discSample = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
 
-            Vec3 samplePos = lightPos + (u * diskSample.X + v * diskSample.Y) * radius;
+            Vec3 samplePos = lightPos + (u * discSample.X + v * discSample.Y) * radius;
 
             if (!IsOccluded(scene, point, samplePos))
                 visible++;

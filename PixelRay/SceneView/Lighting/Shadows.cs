@@ -10,53 +10,136 @@ namespace PixelRay.SceneView.Lighting;
 public static class Shadows
 {
     /// <summary>
-    /// Sample an occluded point
+    /// Sample a shadow color of occluded point using pre-determined disc offsets
     /// </summary>
-    public static double SampleShadowPoint(
+    public static double SampleShadowPointPreset(
         Scene scene,
         Vec3 point,
         Vec3 lightPos,
-        double radius
+        double lightRadius,
+        int shadowBands
     )
     {
+        // good-looking pixel-themed soft shadows still require work, but fixed offset integration will do for now
+        // values larger relative to any object size will still produce very rough/diffused shadow borders
+
         Vec3 toLight = lightPos - point;
         double dist = toLight.Length();
         Vec3 dir = toLight / dist;
 
-        Ray ray = new(point + dir * MathConst.RayEpsilon, dir);
+        Ray shadowRay = new(point + dir * MathConst.RayEpsilon, dir);
         Interval t = new(MathConst.RayEpsilon, dist);
 
-        bool blocked = IsOccluded(scene, ray, t);
-        if (radius <= 0) // only hard shadows
-            return blocked ? 0.0 : 1.0;
+        bool centerBlocked = OcclusionCheck(scene, shadowRay, t);
+        if (lightRadius <= 0.0)
+            return centerBlocked ? 0.0 : 1.0;
 
-        double lightAngle = Math.Atan(radius / dist);
-        double blockerScale = 0.5; // constant blocking angle approximation, could replace
+        Utils.BuildOrthonormalBasis(dir, out Vec3 u, out Vec3 v);
 
-        return ComputePenumbra(blocked, lightAngle, blockerScale);
+        int visible = 0;
+        int total = offsets.Length;
+
+        foreach (var o in offsets)
+        {
+            Vec3 samplePos = lightPos + u * (o.X * lightRadius) + v * (o.Y * lightRadius);
+
+            if (!IsOccluded(scene, point, samplePos))
+                visible++;
+        }
+
+        double visibility = visible / (double)total;
+
+        // umbra and penumbra scaling + banding
+
+        if (centerBlocked)
+            visibility *= 0.9;
+
+        visibility = Math.Pow(visibility, 1.35);
+
+        if (shadowBands > 1)
+            visibility = Math.Round(visibility * shadowBands) / shadowBands;
+
+        return Math.Clamp(visibility, 0.0, 1.0);
     }
 
     /// <summary>
-    /// Analytically calculate penumbra of a shadow
+    /// Sample a shadow color of occluded point from a disc
     /// </summary>
-    public static double ComputePenumbra(bool blocked, double lightAngle, double blockerAngle)
+    public static double SampleShadowPointDisc(
+        Scene scene,
+        Vec3 point,
+        Vec3 lightPos,
+        double lightRadius,
+        int samples
+    )
     {
-        if (!blocked)
-            return 1.0;
+        /// -- Currently unused --
+        /// - Sampling via Monte Carlo integration is not very effective for pixel-styled shadows: too rough/diffused
+        /// shadows unless samples are increased a lot (which in turn makes rendering very slow)
+        /// - Should be kept here if shadows will be expanded in the future
 
-        // overlap ratio between blocker and light
-        double overlap = blockerAngle / (lightAngle + MathConst.Epsilon);
-        overlap = Math.Clamp(overlap, 0.0, 1.0);
+        Vec3 toLight = lightPos - point;
+        double dist = toLight.Length();
+        Vec3 dir = toLight / dist;
 
-        // more overlap = darker shadow
-        double shadow = 1.0 - overlap;
-        shadow = Math.Round(shadow * 4) / 4.0; // TODO add parameter to adjust levels in scenes
+        Ray shadowRay = new(point + dir * MathConst.RayEpsilon, dir);
+        Interval t = new(MathConst.RayEpsilon, dist);
 
-        return 0.15 + 0.85 * shadow; //
+        if (lightRadius <= 0)
+            return OcclusionCheck(scene, shadowRay, t) ? 0.0 : 1.0;
+
+        // build local coordinate system for offset sampling
+        Utils.BuildOrthonormalBasis(dir, out Vec3 u, out Vec3 v);
+
+        int visible = 0;
+        int sqrtSamples = (int)Math.Sqrt(samples);
+        double invSqrtN = 1.0 / sqrtSamples;
+
+        for (int y = 0; y < sqrtSamples; y++)
+        {
+            for (int x = 0; x < sqrtSamples; x++)
+            {
+                double dx = (x + Random.Shared.NextDouble()) * invSqrtN;
+                double dy = (y + Random.Shared.NextDouble()) * invSqrtN;
+
+                double r = Math.Sqrt(dx);
+                double theta = 2 * Math.PI * dy;
+
+                Vec3 disk = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
+
+                Vec3 samplePos = lightPos + (u * disk.X + v * disk.Y) * lightRadius;
+
+                if (!IsOccluded(scene, point, samplePos))
+                    visible++;
+            }
+        }
+
+        /* // pure disc sampling (no square root or loop index)
+        for (int i = 0; i < samples; i++)
+        {
+            double r = Math.Sqrt(Random.Shared.NextDouble());
+            double theta = 2.0 * Math.PI * Random.Shared.NextDouble();
+
+            Vec3 diskSample = new(r * Math.Cos(theta), r * Math.Sin(theta), 0);
+
+            Vec3 samplePos = lightPos + (u * diskSample.X + v * diskSample.Y) * radius;
+
+            if (!IsOccluded(scene, point, samplePos))
+                visible++;
+        }
+        */
+
+        double visibility = visible / (double)samples;
+
+        visibility = Math.Pow(visibility, 1.35);
+        visibility = Math.Round(visibility * 4.0) / 4.0;
+
+        return Math.Clamp(visibility, 0.0, 1.0);
     }
 
     /// <summary>
     /// Sample a binary shadow value for directional light: 0 for no shadow , 1 for hard shadow
+    /// Shadow direction is FROM hit TO light
     /// </summary>
     public static double SampleShadowDirectional(
         Scene scene,
@@ -68,22 +151,34 @@ public static class Shadows
         Ray shadowRay = new(origin, direction);
         Interval rayT = new(MathConst.RayEpsilon, double.MaxValue);
 
-        foreach (IHittable obj in scene.Objects)
-        {
-            if (obj.Hit(shadowRay, rayT, out HitRecord shadow) &&
-                shadow.T > MathConst.RayEpsilon && shadow.T < double.MaxValue)
-            {
-                return 0.0;
-            }
-        }
-
-        return 1.0;
+        return OcclusionCheck(scene, shadowRay, rayT) ? 0.0 : 1.0;
     }
 
-    /// <summary>
-    /// Check if a shadow ray hits any scene objects
-    /// </summary>
-    public static bool IsOccluded(Scene scene, Ray shadowRay, Interval t)
+    private static readonly Vec3[] offsets =
+    [
+        new(-1,  0, 0),
+        new( 1,  0, 0),
+        new( 0, -1, 0),
+        new( 0,  1, 0),
+        new(-0.7, -0.7, 0),
+        new( 0.7, -0.7, 0),
+        new(-0.7,  0.7, 0),
+        new( 0.7,  0.7, 0),
+    ];
+
+    private static bool IsOccluded(Scene scene, Vec3 point, Vec3 lightPos)
+    {
+        Vec3 toLight = lightPos - point;
+        double dist = toLight.Length();
+        Vec3 dir = toLight / dist;
+
+        Ray shadowRay = new(point + dir * MathConst.RayEpsilon, dir);
+        Interval t = new(MathConst.RayEpsilon, dist);
+
+        return OcclusionCheck(scene, shadowRay, t);
+    }
+
+    private static bool OcclusionCheck(Scene scene, Ray shadowRay, Interval t)
     {
         foreach (IHittable obj in scene.Objects)
         {

@@ -4,8 +4,7 @@ using PixelRay.SceneView.Hittable;
 namespace PixelRay.SceneView.Lighting;
 
 /// <summary>
-/// Spotlight, uses half-angles (e.g. 20 degrees = 40 degree full cone). Angle is limited to 90 degrees, otherwise
-/// visuals get distorted/unintuitive.
+/// Spotlight, uses full angles
 /// </summary>
 public class SpotLight(
     Vec3 position,
@@ -14,8 +13,9 @@ public class SpotLight(
     double innerAngle,
     ColorRGB color,
     double intensity = 1.0,
-    double radius = 0
-) : PointLight(position, color, intensity, radius)
+    double lightRadius = 0,
+    int shadowBands = 0
+) : PointLight(position, color, intensity, lightRadius, shadowBands)
 {
     public Vec3 Direction { get; } = direction.Unit();
     public double Angle { get; } = angle;
@@ -29,26 +29,24 @@ public class SpotLight(
 
         double cosAngle = Vec3.Dot(-dir, Direction); // invert to make both point into same direction
 
-        double outerHalfAngle = Math.Cos(Angle * Math.PI / 180);
-        outerHalfAngle = Math.Min(outerHalfAngle, 89.99);
+        double outerCos = Math.Cos(Angle * 0.5 * Math.PI / 180); // halve the input angle
 
         // cosine is decreasing on [0, PI/2]: angle larger than outer = point is outside cone's vision
-        if (cosAngle < outerHalfAngle)
+        if (cosAngle < outerCos)
             return 0.0;
 
-        double innerHalfAngle = Math.Cos(InnerAngle * Math.PI / 180);
-        innerHalfAngle = Math.Min(innerHalfAngle, outerHalfAngle);
+        double innerCos = Math.Cos(InnerAngle * 0.5 * Math.PI / 180);
         double coneFactor;
 
-        if (cosAngle > innerHalfAngle)
+        if (cosAngle > innerCos)
             // smaller than inner = inside the cone means max brightness
             coneFactor = 1.0;
         else
             // linear interpolation in cosine space (non-linear curve)so falloff is slower.
             // Here inner gives 1, outer gives 0
-            coneFactor = (cosAngle - outerHalfAngle) / (innerHalfAngle - outerHalfAngle);
+            coneFactor = (cosAngle - outerCos) / (innerCos - outerCos);
 
-        double shadow = Shadows.SampleShadowPoint(scene, hit.Point, Position, Radius);
+        double shadow = Shadows.SampleShadowPointPreset(scene, hit.Point, Position, LightRadius, ShadowBands);
         if (shadow <= 0)
             return 0.0;
 
@@ -56,7 +54,7 @@ public class SpotLight(
         if (NdotL <= 0)
             return 0.0;
 
-        double attenuation = Intensity / (distance * distance);
+        double attenuation = Intensity / (1.0 + distance * distance);
 
         return NdotL * shadow * coneFactor * attenuation;
     }

@@ -10,13 +10,15 @@ public class PointLight(
     Vec3 position,
     ColorRGB color,
     double intensity = 1.0,
-    double radius = 0.0
+    double lightRadius = 0.0,
+    int shadowBands = 0
 ) : ILight
 {
     public Vec3 Position { get; } = position;
     public ColorRGB Color { get; } = color;
-    public double Radius { get; } = radius;
+    public double LightRadius { get; } = lightRadius;
     public double Intensity { get; } = intensity;
+    public int ShadowBands { get; } = shadowBands;
 
     public virtual double Shade(Scene scene, in HitRecord hit)
     {
@@ -24,7 +26,7 @@ public class PointLight(
         double distance = toLight.Length();
         Vec3 dir = toLight / distance;
 
-        double shadow = Shadows.SampleShadowPoint(scene, hit.Point, Position, Radius);
+        double shadow = Shadows.SampleShadowPointPreset(scene, hit.Point, Position, LightRadius, ShadowBands);
         double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, dir));
         double attenuation = Intensity / (distance * distance);
 

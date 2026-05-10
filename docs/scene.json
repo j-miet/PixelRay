@@ -1,20 +1,19 @@
 {
     "camera": {
-        "position": [0, 0, 0.05],
+        "position": [0, 0, 0],
         "lookAt": [0, 0, -1],
         "upDirection": [0, 1, 0],
         "fov": 90
     },
     "render": {
-        "threading": true,
-        "width": 249,
+        "width": 250,
         "height": 140,
-		"upScaleFactor": 3,
+        "upScaleFactor": 3,
 		"palette": [],
-		"lightingBands": 32,
-		"maxBounces": 3,
-		"dithering": false,
-		"ditherLevels": 4,
+		"lightingBands": 4,
+		"maxBounces": 1,
+		"dithering": true,
+		"ditherLevels": 12,
 		"ditherDimension": 4
     },
     "objects": [
@@ -22,7 +21,7 @@
             "type": "sphere",
             "material": {
                 "type": "surface",
-                "color": [0.8, 0.2, 0.8]
+                "color": [0.7, 0.2, 0.2]
             },
 			"transform": {
                 "scale": [0.05, 0.05, 0.05],
@@ -43,10 +42,8 @@
             "type": "cylinder",
             "material": {
                 "type": "mirror",
-                "color": [0.1, 0.3, 0.9],
-                "reflectivity": 1,
-				"roughness": 0,
-				"bounce": 1
+                "color": [0.5, 0.5, 0.9],
+                "linearBounce": true
             },
             "transform": {
                 "position": [-0.6, -0.25, -0.75],
@@ -72,8 +69,7 @@
             "material": {
                 "type": "surface",
                 "color": [0.9, 0.7, 0.3],
-                "reflectivity": 1,
-                "roughness": 1,
+                "reflectivity": 0,
                 "bounce": 1
             },
             "transform": {
@@ -112,10 +108,10 @@
             "maxBounds": [3, 3, 3],
             "material": {
                 "type": "surface",
-                "color": [0.8, 0.8, 0.8]
+                "color": [0.6, 0.6, 0.6]
             },
             "transform": {
-                "position": [2, 0.5, -2]
+                "position": [2, 0.5, -3]
             }
         },
         {
@@ -124,7 +120,7 @@
             "maxBounds": [0.05, 0.05, 0.05],
             "material": {
                 "type": "surface",
-                "color": [1, 0.65, 0]
+                "color": [1, 0.65, 0]              
             },
             "transform": {
                 "position": [0.22, -0.2, -0.45]
@@ -133,8 +129,8 @@
         {
 			"type": "plane",
 			"material": {
-				"type": "mirror",
-				"color": [0.1, 0.6, 0.6]
+				"type": "surface",
+				"color": [0.1, 0.8, 0.8]
 			},
 			"transform": {
 				"position": [0, -0.25, 0]
@@ -155,33 +151,32 @@
 		}
     ],
     "lights": [
-        {
+		{
 			"type": "ambient",
 			"color": [1, 1, 1],
-			"intensity": 0.05
+			"intensity": 0.0
 		},
         {
             "type": "directional",
-            "direction": [-0.3, 0.5, 1],
-            "color": [0.2, 0.2, 0.2],
-            "intensity": 0.9
+            "direction": [-0.2, 0.5, 1],
+            "color": [0.1, 0.1, 0.1]
         },
 		{
 			"type": "point",
-			"position": [0, -0.1, 0.1],
+			"position": [0, 0.5, -0.05],
 			"color": [0.5, 0.5, 0.5],
-			"intensity": 1,
-            "lightRadius": 0.05,
+			"intensity": 1.5,
+            "lightRadius": 0.1,
             "shadowBands": 4
 		},
         {
             "type": "spot",
-            "position": [1.5, -0.19, 0.3],
+            "position": [1.5, -0.15, 0.3],
             "direction": [-1, 0, -1],
             "angle": 10,
             "innerAngle": 8,
             "color": [0.9, 0.6, 0.3],
-            "intensity": 5,
+            "intensity": 3,
             "lightRadius": 0,
             "shadowBands": 0
         },
@@ -189,8 +184,8 @@
             "type": "spot",
             "position": [-0.6, 0.45, -0.74],
             "direction": [-1, 0.3, -1],
-            "angle": 60,
-            "innerAngle": 55,
+            "angle": 25,
+            "innerAngle": 15,
             "color": [1, 1, 1],
             "intensity": 1.5,
             "lightRadius": 0,

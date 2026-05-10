@@ -13,7 +13,7 @@ public interface ILight
     public ColorRGB Color { get; }
     public double Intensity { get; }
 
-    public double Shade(
+    public LightContribution Shade(
         Scene scene,
         in HitRecord hit
     );

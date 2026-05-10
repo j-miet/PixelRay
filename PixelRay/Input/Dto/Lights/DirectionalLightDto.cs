@@ -4,9 +4,10 @@ namespace PixelRay.Input.Dto.Lights;
 
 public class DirectionalLightDto : ILightDto
 {
-    public required double[] Direction { get; set; }
     public required double[] Color { get; set; }
     public double Intensity { get; set; } = 1.0;
+
+    public required double[] Direction { get; set; }
 
     public ILight Build()
     {

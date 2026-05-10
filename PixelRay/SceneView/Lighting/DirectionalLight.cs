@@ -13,13 +13,13 @@ public class DirectionalLight(Vec3 direction, ColorRGB color, double intensity =
     public ColorRGB Color { get; } = color;
     public double Intensity { get; } = intensity;
 
-    public double Shade(Scene scene, in HitRecord hit)
+    public LightContribution Shade(Scene scene, in HitRecord hit)
     {
-        Vec3 dir = Direction.Normalize();
+        Vec3 dir = Direction.Unit();
 
-        double shadow = Shadows.SampleShadowDirectional(scene, hit.Point, dir);
+        double shadow = Shadows.SampleShadowDirectional(scene, hit.Point, hit.Normal, dir);
         double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, dir));
 
-        return NdotL * shadow * Intensity;
+        return new(Shading: NdotL * shadow);
     }
 }

@@ -144,10 +144,11 @@ public static class Shadows
     public static double SampleShadowDirectional(
         Scene scene,
         Vec3 point,
+        Vec3 normal,
         Vec3 direction
     )
     {
-        Vec3 origin = point + direction * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
+        Vec3 origin = point + normal * MathConst.RayEpsilon; // slight nudge to avoid surface self-collision
         Ray shadowRay = new(origin, direction);
         Interval rayT = new(MathConst.RayEpsilon, double.MaxValue);
 

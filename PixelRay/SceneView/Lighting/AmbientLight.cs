@@ -11,8 +11,8 @@ public class AmbientLight(ColorRGB color, double intensity = 1.0) : ILight
     public ColorRGB Color { get; } = color;
     public double Intensity { get; } = intensity;
 
-    public double Shade(Scene scene, in HitRecord hit)
+    public LightContribution Shade(Scene scene, in HitRecord hit)
     {
-        return Intensity;
+        return new(Shading: 1.0);
     }
 }

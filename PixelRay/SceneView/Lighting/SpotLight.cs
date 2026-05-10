@@ -21,7 +21,7 @@ public class SpotLight(
     public double Angle { get; } = angle;
     public double InnerAngle { get; } = innerAngle <= angle ? innerAngle : angle;
 
-    public override double Shade(Scene scene, in HitRecord hit)
+    public override LightContribution Shade(Scene scene, in HitRecord hit)
     {
         Vec3 toLight = Position - hit.Point;
         double distance = toLight.Length();
@@ -33,7 +33,7 @@ public class SpotLight(
 
         // cosine is decreasing on [0, PI/2]: angle larger than outer = point is outside cone's vision
         if (cosAngle < outerCos)
-            return 0.0;
+            return new LightContribution(Shading: 0.0);
 
         double innerCos = Math.Cos(InnerAngle * 0.5 * Math.PI / 180);
         double coneFactor;
@@ -48,14 +48,17 @@ public class SpotLight(
 
         double shadow = Shadows.SampleShadowPointPreset(scene, hit.Point, Position, LightRadius, ShadowBands);
         if (shadow <= 0)
-            return 0.0;
+            return new LightContribution(Shading: 0.0);
 
         double NdotL = Math.Max(0, Vec3.Dot(hit.Normal, dir));
         if (NdotL <= 0)
-            return 0.0;
+            return new LightContribution(Shading: 0.0);
 
-        double attenuation = Intensity / (1.0 + distance * distance);
+        double attenuation = 1.0 / (0.01 + distance * distance);
 
-        return NdotL * shadow * coneFactor * attenuation;
+        return new(
+            Shading: NdotL * shadow * coneFactor,
+            Attenuation: attenuation
+        );
     }
 }

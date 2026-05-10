@@ -8,6 +8,8 @@ namespace PixelRay.Input.Dto.Materials;
 public interface IMaterialDto
 {
     public double[] Color { get; set; }
+    public double Bounce { get; set; }
+    public bool LinearBounce { get; set; }
 
     IMaterial Build();
 }

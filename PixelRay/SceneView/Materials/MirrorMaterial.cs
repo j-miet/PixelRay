@@ -4,10 +4,11 @@ using PixelRay.SceneView.Hittable;
 
 namespace PixelRay.SceneView.Materials;
 
-public class MirrorMaterial(ColorRGB color, double bounce = 1.0) : IMaterial
+public class MirrorMaterial(ColorRGB color, double bounce = 1.0, bool linearBounce = false) : IMaterial
 {
     public ColorRGB Color { get; } = color;
     public double Bounce { get; } = bounce;
+    public bool LinearBounce { get; } = linearBounce;
 
     public bool Scatter(Ray rayIn, HitRecord hit, out ColorRGB attenuation, out Ray scattered)
     {
@@ -19,10 +20,5 @@ public class MirrorMaterial(ColorRGB color, double bounce = 1.0) : IMaterial
         scattered = new Ray(origin, dir);
 
         return true;
-    }
-
-    public ColorRGB Shade(HitRecord hit, Scene scene, Renderer renderer, Ray ray, int depth)
-    {
-        return Color.Quantize(renderer.LightingBands);
     }
 }

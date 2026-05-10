@@ -18,13 +18,16 @@ public class SurfaceMaterial(
     ColorRGB color,
     double reflectivity = 0.0,
     double roughness = 0.0,
-    double bounce = 0.0
+    double bounce = 0.0,
+    bool linearBounce = false
 ) : IMaterial
 {
     public ColorRGB Color { get; } = color;
+    public double Bounce { get; } = bounce;
+    public bool LinearBounce { get; } = linearBounce;
+
     public double Reflectivity = reflectivity;
     public double Roughness = roughness;
-    public double Bounce { get; } = bounce;
 
     public bool Scatter(Ray rayIn, HitRecord hit, out ColorRGB attenuation, out Ray scattered)
     {

@@ -12,4 +12,6 @@ public interface IMaterial
 
     public ColorRGB Color { get; }
     public double Bounce { get; } // amount of light bouncing off of material
+    // if true, light is applied as {direct * (1-Bounce) + indirect * Bounce} instead of {direct + indirect}
+    public bool LinearBounce { get; }
 }

@@ -15,16 +15,23 @@ public class ImageDisplay
     private readonly int _height;
     private readonly FrameBuffer _buffer;
     private readonly int _renderSpeed;
-    private readonly byte[] _frameBuffer;
-    private volatile bool _dirty;
+
+    private byte[] _frontBuffer;
+    private byte[] _backBuffer;
+
+    private readonly object _swapLock = new();
+    private volatile bool _hasNewFrame;
+
+    private IWindow? _window;
+    private GL? _gl;
 
     private uint _vao;
     private uint _vbo;
     private uint _shaderProgram;
-
-    private IWindow? _window;
-    private GL? _gl;
     private uint _texture;
+
+    private Thread? _renderThread;
+    private bool _running;
 
     /// <summary>
     /// Create a new ImageDisplay instance. Then call Display(...) to render image in a new window.
@@ -39,9 +46,10 @@ public class ImageDisplay
         _width = width;
         _height = height;
         _buffer = buffer;
-        _renderSpeed = renderSpeed < 0 ? 1 : renderSpeed;
-        _frameBuffer = new byte[_width * _height * 3]; // rendered image
-        _dirty = true;
+        _renderSpeed = Math.Max(0, renderSpeed);
+
+        _frontBuffer = new byte[_width * _height * 3];
+        _backBuffer = new byte[_width * _height * 3];
     }
 
     /// <summary>
@@ -91,6 +99,9 @@ public class ImageDisplay
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+        _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
         // a square screen can be represented with 2 triangles
         // position coordinates range from -1 to 1 whereas OpenGL texture coordinates are from 0 to 1
         // texture coordinates start from bottom-left (0, 0)
@@ -115,38 +126,49 @@ public class ImageDisplay
         _gl.BindVertexArray(_vao);
         _gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
         _gl.BufferData(BufferTargetARB.ArrayBuffer, vertices, BufferUsageARB.StaticDraw);
+
         _gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 0);
         _gl.EnableVertexAttribArray(0);
+
         _gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
         _gl.EnableVertexAttribArray(1);
 
         _shaderProgram = CreateShader();
 
         // start a separate thread which reads data into render buffer
-        new Thread(RenderLoop).Start();
+        _running = true;
+        _renderThread = new Thread(RenderLoop)
+        {
+            IsBackground = true
+        };
+        _renderThread.Start();
     }
 
     private void OnRender(double deltaTime)
     {
         if (_gl == null)
-            throw new Exception("GL object is null");
+            return;
 
-        if (_dirty)
+        if (_hasNewFrame)
         {
-            // Rendered texture
-            _gl.BindTexture(TextureTarget.Texture2D, _texture);
-            _gl.TexSubImage2D(
-                TextureTarget.Texture2D,
-                0,
-                0,
-                0,
-                (uint)_width,
-                (uint)_height,
-                PixelFormat.Rgb,
-                PixelType.UnsignedByte,
-                _frameBuffer);
+            lock (_swapLock)
+            {
+                _gl.BindTexture(TextureTarget.Texture2D, _texture);
+                _gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
-            _dirty = false;
+                _gl.TexSubImage2D(
+                    TextureTarget.Texture2D,
+                    0,
+                    0,
+                    0,
+                    (uint)_width,
+                    (uint)_height,
+                    PixelFormat.Rgb,
+                    PixelType.UnsignedByte,
+                    _frontBuffer);
+
+                _hasNewFrame = false;
+            }
         }
 
         _gl.Clear((uint)ClearBufferMask.ColorBufferBit);
@@ -158,8 +180,11 @@ public class ImageDisplay
 
     private void OnClose()
     {
+        _running = false;
+        _renderThread?.Join();
+
         if (_gl == null)
-            throw new Exception("GL object is null");
+            return;
 
         _gl.DeleteTexture(_texture);
     }
@@ -173,7 +198,6 @@ public class ImageDisplay
         #version 330 core
         layout (location = 0) in vec2 aPos;
         layout (location = 1) in vec2 aTex;
-
         out vec2 TexCoord;
 
         void main()
@@ -188,7 +212,6 @@ public class ImageDisplay
         #version 330 core
         out vec4 FragColor;
         in vec2 TexCoord;
-
         uniform sampler2D screenTexture;
 
         void main()
@@ -196,41 +219,60 @@ public class ImageDisplay
             FragColor = texture(screenTexture, vec2(TexCoord.x, 1.0 - TexCoord.y));
         }";
 
-        uint vertex = _gl.CreateShader(ShaderType.VertexShader);
-        _gl.ShaderSource(vertex, vertexShaderSource);
-        _gl.CompileShader(vertex);
+        uint v = _gl.CreateShader(ShaderType.VertexShader);
+        _gl.ShaderSource(v, vertexShaderSource);
+        _gl.CompileShader(v);
 
-        uint fragment = _gl.CreateShader(ShaderType.FragmentShader);
-        _gl.ShaderSource(fragment, fragmentShaderSource);
-        _gl.CompileShader(fragment);
+        uint f = _gl.CreateShader(ShaderType.FragmentShader);
+        _gl.ShaderSource(f, fragmentShaderSource);
+        _gl.CompileShader(f);
 
-        uint program = _gl.CreateProgram();
-        _gl.AttachShader(program, vertex);
-        _gl.AttachShader(program, fragment);
-        _gl.LinkProgram(program);
+        uint p = _gl.CreateProgram();
+        _gl.AttachShader(p, v);
+        _gl.AttachShader(p, f);
+        _gl.LinkProgram(p);
 
-        _gl.DeleteShader(vertex);
-        _gl.DeleteShader(fragment);
+        _gl.DeleteShader(v);
+        _gl.DeleteShader(f);
 
-        return program;
+        return p;
     }
 
     private void RenderLoop()
     {
-        for (int y = 0; y < _height; y++)
-        {
-            for (int x = 0; x < _width; x++)
-            {
-                int i = (y * _width + x) * 3;
+        int srcWidth = _buffer.Width;
+        int srcHeight = _buffer.Height;
 
-                ColorRGB pixelColor = _buffer.GetPixel(x, y);
-                _frameBuffer[i] = (byte)(pixelColor.R * 255);
-                _frameBuffer[i + 1] = (byte)(pixelColor.G * 255);
-                _frameBuffer[i + 2] = (byte)(pixelColor.B * 255);
+        float scaleX = (float)_width / srcWidth;
+        float scaleY = (float)_height / srcHeight;
+
+        while (_running)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                int srcY = (int)(y / scaleY);
+
+                for (int x = 0; x < _width; x++)
+                {
+                    int srcX = (int)(x / scaleX);
+                    int dst = (y * _width + x) * 3;
+
+                    ColorRGB c = _buffer.GetPixel(srcX, srcY);
+
+                    _backBuffer[dst] = (byte)(c.R * 255);
+                    _backBuffer[dst + 1] = (byte)(c.G * 255);
+                    _backBuffer[dst + 2] = (byte)(c.B * 255);
+                }
             }
 
-            _dirty = true;
-            Thread.Sleep(_renderSpeed);
+            lock (_swapLock)
+            {
+                (_frontBuffer, _backBuffer) = (_backBuffer, _frontBuffer);
+                _hasNewFrame = true;
+            }
+
+            if (_renderSpeed > 0)
+                Thread.Sleep(_renderSpeed);
         }
     }
 }

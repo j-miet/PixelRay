@@ -190,11 +190,7 @@ static class CreatePixelRay
             if (int.TryParse(values["previewSpeed"], out int speedValue))
                 speed = speedValue;
 
-            // ensure upscaled resolution has even coordinates, otherwise image preview crashes
-            int w = (width % 2 == 0) ? width * upScaleFactor : (width - 1) * upScaleFactor;
-            int h = (height % 2 == 0) ? height * upScaleFactor : (height - 1) * upScaleFactor;
-
-            ImageDisplay display = new(w, h, buffer, speed);
+            ImageDisplay display = new(width * upScaleFactor, height * upScaleFactor, buffer, speed);
             display.Display();
         }
     }

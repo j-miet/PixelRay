@@ -140,18 +140,16 @@ public class Renderer(
 
         ColorRGB direct = new(0, 0, 0);
 
-        // add light quantization
         foreach (ILight light in scene.Lights)
         {
-            ColorRGB lightColor;
-
-            double lightFactor = light.Shade(scene, in closestHit);
-            if (lightFactor <= 0)
+            LightContribution sample = light.Shade(scene, in closestHit);
+            if (sample.Shading <= 0)
                 continue;
 
-            lightColor = closestHit.Material.Color * lightFactor;
-            lightColor = lightColor.Quantize(LightingBands);
-            direct += lightColor * light.Color * light.Intensity;
+            ColorRGB lightColor = closestHit.Material.Color * sample.Shading;
+            lightColor = lightColor.Quantize(LightingBands); // quantization step before attenuation!
+            direct += lightColor * light.Color * light.Intensity * sample.Attenuation;
+
         }
 
         ColorRGB indirect = new(0, 0, 0);
@@ -164,6 +162,9 @@ public class Renderer(
             {
                 indirect = Trace(scattered, scene, depth + 1) * attenuation;
             }
+
+            if (mat.LinearBounce)
+                return direct * (1 - mat.Bounce) + indirect * mat.Bounce;
 
             return direct + indirect * mat.Bounce;
         }

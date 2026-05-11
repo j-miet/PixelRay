@@ -1,10 +1,10 @@
 using PixelRay.Core.Mathematics;
 using PixelRay.Debug;
+using PixelRay.Output.Progress;
 using PixelRay.Rendering;
 using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
 using PixelRay.SceneView.Lighting;
-using static PixelRay.Const;
 
 namespace PixelRay.Core;
 
@@ -54,6 +54,12 @@ public class Renderer(
         int scaledH = upScale * _height;
         FrameBuffer buffer = new(scaledW, scaledH);
 
+        var consoleBar = new ProgressBar(30);
+        var reporter = new ProgressReporter(
+            _width * _height,
+            consoleBar.Update
+        );
+
         for (int y = 0; y < _height; y++)
         {
             if (threading)
@@ -80,6 +86,8 @@ public class Renderer(
                         for (int i = 0; i < upScale; i++)
                             buffer.SetPixel(upScale * x + i, upScale * y + j, color);
                     }
+
+                    reporter.Increment();
                 });
             }
             else
@@ -105,6 +113,8 @@ public class Renderer(
                         for (int i = 0; i < upScale; i++)
                             buffer.SetPixel(upScale * x + i, upScale * y + j, color);
                     }
+
+                    reporter.Increment();
                 }
             }
         }

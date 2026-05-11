@@ -1,3 +1,12 @@
+// --Unused--
+// Was previously used for displaying output image in a new window after rendering
+// However this function has been replaced by simple "produce output then auto-open the file" system
+// Code can stay here for now, maybe it can be adapted eventually into progress window during rendering
+// but currently CLI progress bar + auto-open output is enough
+//
+// This implementation required cross-platform compatible SILK.NET library so it would need to be installed again.
+
+/*
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
@@ -276,3 +285,4 @@ public class ImageDisplay
         }
     }
 }
+*/

@@ -1,8 +1,9 @@
-﻿using PixelRay.Core;
+﻿using System.Diagnostics;
+
+using PixelRay.Core;
+using PixelRay.Debug;
 using PixelRay.Input;
 using PixelRay.Output;
-
-using DebugMode = PixelRay.Const.DebugMode;
 
 static class CreatePixelRay
 {
@@ -13,7 +14,6 @@ static class CreatePixelRay
         values.Add("output", "");
         values.Add("outputFormat", "");
         values.Add("preview", "");
-        values.Add("previewSpeed", "0");
         values.Add("debug", "");
 
         // parse CLI args and update config dictionary values
@@ -75,31 +75,7 @@ static class CreatePixelRay
                     break;
 
                 case "-p" or "--preview":
-                    try
-                    {
-                        values["preview"] = "enabled";
-                        string speedVal = args[i + 1];
-
-                        if (speedVal is not null)
-                        {
-                            if (int.TryParse(speedVal, out int intValue))
-                            {
-                                string intToStr = intValue.ToString();
-                                values["previewSpeed"] = intValue >= 0 ? intToStr : "0";
-                                i++;
-                                break;
-                            }
-                            {
-                                Console.WriteLine($"Invalid speed value: {speedVal}");
-                                return;
-                            }
-                        }
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        Console.WriteLine("Usage: -p <value>");
-                        return;
-                    }
+                    values["preview"] = "enabled";
                     break;
 
                 case "--debug":
@@ -178,20 +154,25 @@ static class CreatePixelRay
             if (imageFormat == "ppm")
                 ImageWriter.WritePPM(outputFile, buffer);
             else if (imageFormat == "png")
+            {
                 ImageWriter.WritePNG(outputFile, buffer);
+
+                // open output png image with default image viewing tool via shell execution
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = outputFile,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to open image: {ex.Message}");
+                }
+            }
             else
                 throw new Exception($"Unsupported image format {values["output"]}");
-        }
-
-        if (values["preview"] == "enabled")
-        {
-            int speed = 0;
-            // parser already does the user input -> int -> str conversion. This is only to convert string -> int again
-            if (int.TryParse(values["previewSpeed"], out int speedValue))
-                speed = speedValue;
-
-            ImageDisplay display = new(width * upScaleFactor, height * upScaleFactor, buffer, speed);
-            display.Display();
         }
     }
 }

@@ -157,18 +157,21 @@ static class CreatePixelRay
             {
                 ImageWriter.WritePNG(outputFile, buffer);
 
-                // open output png image with default image viewing tool via shell execution
-                try
+                if (values["preview"] == "enabled")
                 {
-                    Process.Start(new ProcessStartInfo
+                    // open output png image with default image viewing tool via shell execution
+                    try
                     {
-                        FileName = outputFile,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to open image: {ex.Message}");
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = outputFile,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to open image: {ex.Message}");
+                    }
                 }
             }
             else

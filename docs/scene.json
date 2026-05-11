@@ -6,6 +6,7 @@
         "fov": 90
     },
     "render": {
+        "threading": true,
         "width": 250,
         "height": 140,
         "upScaleFactor": 3,

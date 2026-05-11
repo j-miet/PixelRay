@@ -2,7 +2,6 @@ using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView;
 using PixelRay.SceneView.Hittable;
-using static PixelRay.Const;
 
 namespace PixelRay.Debug;
 

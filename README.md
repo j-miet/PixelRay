@@ -8,6 +8,7 @@
 - [<u>Scene</u>](#scene)
 - [<u>Pixel-look</u>](#pixel-look)
 - [<u>Building from source</u>](#building-from-source)
+- [<u>Future additions</u>](#future-additions)
 
 
 ## How to use

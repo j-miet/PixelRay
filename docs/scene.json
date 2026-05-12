@@ -31,9 +31,9 @@
         },
         {
             "type": "triangle",
-            "vertex1": [0.2, -0.25, -0.3],
-            "vertex2": [1.1, -0.25, -0.8],
-            "vertex3": [0.9, 0.25, -0.65],
+            "v1": [0.2, -0.25, -0.3],
+            "v2": [1.1, -0.25, -0.8],
+            "v3": [0.9, 0.25, -0.65],
             "material": {
                 "type": "surface",
                 "color": [0.8, 0.9, 0.1]
@@ -174,7 +174,7 @@
             "type": "spot",
             "position": [1.5, -0.15, 0.3],
             "direction": [-1, 0, -1],
-            "angle": 10,
+            "outerAngle": 10,
             "innerAngle": 8,
             "color": [0.9, 0.6, 0.3],
             "intensity": 3,
@@ -185,7 +185,7 @@
             "type": "spot",
             "position": [-0.6, 0.45, -0.74],
             "direction": [-1, 0.3, -1],
-            "angle": 25,
+            "outerAngle": 25,
             "innerAngle": 15,
             "color": [1, 1, 1],
             "intensity": 1.5,

@@ -1,6 +1,6 @@
 ![](docs/Images/Demo/default.png)
 
-Demo images can be found [here](docs/Images/Demo/)
+> More demo images can be found [here](docs/Images/Demo/)
 
 ## Table of contents
 

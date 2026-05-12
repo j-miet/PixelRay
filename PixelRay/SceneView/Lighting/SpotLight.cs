@@ -9,7 +9,7 @@ namespace PixelRay.SceneView.Lighting;
 public class SpotLight(
     Vec3 position,
     Vec3 direction,
-    double angle,
+    double outerAngle,
     double innerAngle,
     ColorRGB color,
     double intensity = 1.0,
@@ -18,8 +18,8 @@ public class SpotLight(
 ) : PointLight(position, color, intensity, lightRadius, shadowBands)
 {
     public Vec3 Direction { get; } = direction.Unit();
-    public double Angle { get; } = angle;
-    public double InnerAngle { get; } = innerAngle <= angle ? innerAngle : angle;
+    public double Angle { get; } = outerAngle;
+    public double InnerAngle { get; } = innerAngle <= outerAngle ? innerAngle : outerAngle;
 
     public override LightContribution Shade(Scene scene, in HitRecord hit)
     {

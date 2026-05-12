@@ -1,5 +1,3 @@
-using PixelRay.Rendering;
-
 namespace PixelRay.Input.Dto;
 
 /// <summary>

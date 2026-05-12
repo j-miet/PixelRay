@@ -6,9 +6,9 @@ namespace PixelRay.Input.Dto.Objects;
 
 public class TriangleDto : IObjectDto
 {
-    public required double[] Vertex1 { get; set; }
-    public required double[] Vertex2 { get; set; }
-    public required double[] Vertex3 { get; set; }
+    public required double[] V1 { get; set; }
+    public required double[] V2 { get; set; }
+    public required double[] V3 { get; set; }
 
     public required IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; } = new();
@@ -18,9 +18,9 @@ public class TriangleDto : IObjectDto
         return InputUtils.ToTransform(
             Transform,
             new Triangle(
-                InputUtils.ToVec3(Vertex1),
-                InputUtils.ToVec3(Vertex2),
-                InputUtils.ToVec3(Vertex3),
+                InputUtils.ToVec3(V1),
+                InputUtils.ToVec3(V2),
+                InputUtils.ToVec3(V3),
                 Material.Build())
         );
     }

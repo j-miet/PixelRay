@@ -9,7 +9,7 @@ public class SpotLightDto : ILightDto
 
     public required double[] Position { get; set; }
     public required double[] Direction { get; set; }
-    public required double Angle { get; set; }
+    public required double OuterAngle { get; set; }
     public required double InnerAngle { get; set; }
     public double LightRadius { get; set; } = 0.0;
     public int ShadowBands { get; set; } = 0;
@@ -19,7 +19,7 @@ public class SpotLightDto : ILightDto
         return new SpotLight(
             InputUtils.ToVec3(Position),
             InputUtils.ToVec3(Direction),
-            Angle,
+            OuterAngle,
             InnerAngle,
             InputUtils.ToColor(Color),
             Intensity,

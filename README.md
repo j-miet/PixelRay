@@ -18,7 +18,8 @@ To produce an output image, paths for scene and output files are required:
 PixelRay -i <inputPath> -o <outputPath>
 ```
 
-If you want to automatically open the output after rendering, add the `-p`/`--preview` flag. This will attempt to call default image opener program via shell execution:
+If you want to automatically open the output after rendering, add the `-p`/`--preview` flag. This will attempt to 
+call default image opener program via shell execution:
 
 ```bash
 PixelRay -i scene.json -o output.png -p
@@ -36,7 +37,8 @@ PixelRay -i scene.json -o output.png -p
     Output file path. Image format is either **png** or **ppm**-
 - `-p` or `--preview`:
 
-    Attempts to open the output image after rendering by executing the image file, thus calling the default viewing tool in process. Only available for png images as basic editors seldom support ppm.
+    Attempts to open the output image after rendering by executing the image file, thus calling the default viewing 
+    tool in process. Only available for png images as basic editors seldom support ppm.
 - `--debug <mode>`
     
     Renders image based on selected debug mode. These are:
@@ -70,8 +72,8 @@ To enforce pixelated theme:
 - ordered dithering
 - custom color palettes. Works just fine without, but these can certainly change the aesthetics a lot
 
-=> no anti-aliasing, resampling or realistic lighting (global illumination), focus is on aliasing the initial output
- for to achieve a stylistic look
+=> no anti-aliasing, resampling or realistic lighting (global illumination). Focus is on aliasing the initial output
+ to achieve a stylistic look
 
 ## Building from source
 
@@ -95,7 +97,7 @@ There are generally two ways to build into an executable:
 1. Self-contained exe with glfw3.dll. This dll is SILK.NET native dependency and needs be included
     - large exe (~37 MB) but runs on its own, no .NET runtime required except for building
 2. minimal exe + DLLs 
-    - very small, however end user must have installed **.NET 10.0 Runtime**
+    - very small, however end user must have **.NET 10.0 Runtime** installed
 
 Instead of modifying *PixelRay.csproj* for each, both can be done by passing additional args.
 
@@ -143,8 +145,8 @@ Release build can be found in "PixelRay/bin/Release/net10.0/win-x64/publish" or 
 
 ## Future additions
 
-The goal of this project is not to become become a large, heavily optimized ray/path tracing tool. Yet it should 
-still have good amount of customization options so here's a short list of what could be added:
+The goal of this project is not to become become a large, heavily optimized ray/path tracing tool yet it should 
+still have a good amount of customization options. So here's a short list of what most likely gets added:
 
 - build-in color palettes + read palettes from files (so scene.json would only require the file path instead of 
 copy-pasting all the colors)
@@ -155,6 +157,6 @@ copy-pasting all the colors)
     - shaders/meshes for custom shapes. Also some kind of preview tool could be useful
     - maybe some new primitives
     - maybe new transforms like shear
-- performance (at least BHV, some minor optimizations here and there)
-- scripting support via Lua language (complex scene creation + animation support)
-- unit tests (better later than never: current ones are outdated)
+- performance (at least BHV when meshed get added, some minor optimizations here and there)
+- scripting support via Lua language (complex scene creation + animations)
+- unit tests (better later than never: current ones are extremely outdated)

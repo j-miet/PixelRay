@@ -1,46 +1,73 @@
-/*
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 
-namespace PixelRay.Tests;
+namespace PixelRay.Tests.CoreTests;
 
-/// <summary>
-/// Tests for Ray class
-/// </summary>
 public class RayTests
 {
     [Fact]
-    public void TestRay()
+    public void Constructor_NormalizesDirection()
     {
-        Vec3 origin = new(1, 2, 3);
-        Vec3 direction = new(0, 0, 1);
+        var origin = new Vec3(0, 0, 0);
+        var direction = new Vec3(10, 0, 0); // not normalized
 
-        Ray r = new(origin, direction);
-        Assert.True(r.Origin.X == origin.X);
-        Assert.True(r.Origin.Y == origin.Y);
-        Assert.True(r.Origin.Z == origin.Z);
-        Assert.True(r.Direction.X == direction.X);
-        Assert.True(r.Direction.Y == direction.Y);
-        Assert.True(r.Direction.Z == direction.Z);
+        var ray = new Ray(origin, direction); // ray handles direction normalization
+        var expected = new Vec3(1, 0, 0);
+
+        Assert.True(CoreHelper.NearlyEqual(ray.Direction, expected));
     }
 
-    [Theory]
-    [MemberData(nameof(TestAtData))]
-    public void TestRayAt(Vec3 origin, Vec3 direction, double t, Vec3 rayEnd)
+    [Fact]
+    public void At_Zero_ReturnsOrigin()
     {
-        Ray r = new(origin, direction);
-        Vec3 at = r.At(t);
-        Assert.True(at.X == rayEnd.X);
-        Assert.True(at.Y == rayEnd.Y);
-        Assert.True(at.Z == rayEnd.Z);
+        var ray = new Ray(
+            new Vec3(1, 2, 3),
+            new Vec3(0, 1, 0)
+        );
+
+        var result = ray.At(0);
+
+        Assert.True(CoreHelper.NearlyEqual(result, ray.Origin));
     }
 
-    public static IEnumerable<object[]> TestAtData()
+    [Fact]
+    public void At_PositiveT_MovesAlongDirection()
     {
-        yield return new object[] { new Vec3(0, 0, 0), new Vec3(0, 0, 0), 1, new Vec3(0, 0, 0) };
-        yield return new object[] { new Vec3(0, 0, 0), new Vec3(1, 0, 0), 2.5, new Vec3(2.5, 0, 0) };
-        yield return new object[] { new Vec3(1, 1, 1), new Vec3(-1, 0, 0), 1, new Vec3(0, 1, 1) };
-        yield return new object[] { new Vec3(-2, 0, 10), new Vec3(0, -2, 0), -3, new Vec3(-2, 6, 10) };
+        var ray = new Ray(
+            new Vec3(0, 0, 0),
+            new Vec3(0, 0, 10)
+        );
+
+        var result = ray.At(2);
+        var expected = new Vec3(0, 0, 2);
+
+        Assert.True(CoreHelper.NearlyEqual(result, expected));
+    }
+
+    [Fact]
+    public void At_NegativeT_MovesOppositeDirection()
+    {
+        var ray = new Ray(
+            new Vec3(0, 0, 0),
+            new Vec3(1, 0, 0)
+        );
+
+        var result = ray.At(-3);
+        var expected = new Vec3(-3, 0, 0);
+
+        Assert.True(CoreHelper.NearlyEqual(result, expected));
+    }
+
+    [Fact]
+    public void Direction_IsAlwaysUnitLength()
+    {
+        var ray = new Ray(
+            new Vec3(0, 0, 0),
+            new Vec3(3, 4, 0)
+        );
+
+        var len = ray.Direction.Length();
+
+        Assert.True(Math.Abs(len - 1.0) < 1e-10);
     }
 }
-*/

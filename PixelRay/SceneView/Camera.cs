@@ -8,6 +8,11 @@ namespace PixelRay.SceneView;
 /// </summary>
 public class Camera
 {
+    // these are exposed for unit testing purposes
+    public readonly Vec3 Forward;
+    public readonly Vec3 Right;
+    public readonly Vec3 Up;
+
     public Camera(
         Vec3 position,
         Vec3 lookAt,
@@ -18,18 +23,18 @@ public class Camera
     {
         _cameraOrigin = position;
 
-        Vec3 forward = (lookAt - position).Normalize();
-        Vec3 right = Vec3.Cross(forward, upDirection).Normalize();
-        Vec3 up = Vec3.Cross(right, forward).Normalize(); // ensure orthogonality of axes
+        Forward = (lookAt - position).Normalize();
+        Right = Vec3.Cross(Forward, upDirection).Normalize();
+        Up = Vec3.Cross(Right, Forward).Normalize(); // ensure orthogonality of axes
 
         double theta = fovDegrees * Math.PI / 180.0;
         double viewportHeight = 2.0 * Math.Tan(theta / 2.0); // sensor size = theta, focal length = 1
         double viewportWidth = viewportHeight * aspectRatio;
 
-        _horizontal = right * viewportWidth;
-        _vertical = up * viewportHeight;
+        _horizontal = Right * viewportWidth;
+        _vertical = Up * viewportHeight;
 
-        _topLeft = _cameraOrigin + forward - _horizontal / 2 + _vertical / 2;
+        _topLeft = _cameraOrigin + Forward - _horizontal / 2 + _vertical / 2;
     }
 
     public Ray GetRay(int x, int y, int width, int height)

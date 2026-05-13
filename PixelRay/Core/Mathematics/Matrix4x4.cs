@@ -69,11 +69,11 @@ public readonly struct Matrix4x4(
         // applied to scaling transforms and inverse must be calculated manually, but final inverse has still the same 
         // structure as stated above
 
-        // determinant of rotation matrix
-        double _r00 = M11 * M22 - M12 * M21;
-        double _r01 = M10 * M22 - M12 * M20;
-        double _r02 = M10 * M21 - M11 * M20;
-        double det = M00 * _r00 - M01 * _r01 + M02 * _r02;
+        // determinant of matrix 3x3 A
+        double _a00 = M11 * M22 - M12 * M21;
+        double _a01 = M10 * M22 - M12 * M20;
+        double _a02 = M10 * M21 - M11 * M20;
+        double det = M00 * _a00 - M01 * _a01 + M02 * _a02;
 
         if (Utils.IsEqual(det, 0, MathConst.MatrixEpsilon))
             throw new InvalidOperationException("Rotation matrix not invertible");
@@ -81,27 +81,27 @@ public readonly struct Matrix4x4(
         double invDet = 1.0 / det;
 
         // nxn matrix inverse can be calculated as A^-1 = (1 / det) * Adj(A) where Adj(A) is the adjugate matrix.
-        double r00 = _r00 * invDet;
-        double r01 = _r01 * invDet;
-        double r02 = _r02 * invDet;
+        double a00 = _a00 * invDet;
+        double a01 = _a01 * invDet;
+        double a02 = _a02 * invDet;
 
-        double r10 = (M12 * M20 - M10 * M22) * invDet;
-        double r11 = (M00 * M22 - M02 * M20) * invDet;
-        double r12 = (M02 * M10 - M00 * M12) * invDet;
+        double a10 = (M12 * M20 - M10 * M22) * invDet;
+        double a11 = (M00 * M22 - M02 * M20) * invDet;
+        double a12 = (M02 * M10 - M00 * M12) * invDet;
 
-        double r20 = (M10 * M21 - M11 * M20) * invDet;
-        double r21 = (M01 * M20 - M00 * M21) * invDet;
-        double r22 = (M00 * M11 - M01 * M10) * invDet;
+        double a20 = (M10 * M21 - M11 * M20) * invDet;
+        double a21 = (M01 * M20 - M00 * M21) * invDet;
+        double a22 = (M00 * M11 - M01 * M10) * invDet;
 
-        // -(R⁻¹ * t); this applies transform properly so vector x is shifted to x - (R^-1)*t
-        double t0 = -(r00 * M03 + r01 * M13 + r02 * M23);
-        double t1 = -(r10 * M03 + r11 * M13 + r12 * M23);
-        double t2 = -(r20 * M03 + r21 * M13 + r22 * M23);
+        // -(A⁻¹ * t); this applies transform properly so vector x is shifted to x - (A^-1)*t
+        double t0 = -(a00 * M03 + a01 * M13 + a02 * M23);
+        double t1 = -(a10 * M03 + a11 * M13 + a12 * M23);
+        double t2 = -(a20 * M03 + a21 * M13 + a22 * M23);
 
         return new Matrix4x4(
-            r00, r01, r02, t0,
-            r10, r11, r12, t1,
-            r20, r21, r22, t2,
+            a00, a01, a02, t0,
+            a10, a11, a12, t1,
+            a20, a21, a22, t2,
             0, 0, 0, 1
         );
     }

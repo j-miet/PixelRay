@@ -8,6 +8,7 @@
 - [<u>Scene</u>](#scene)
 - [<u>Pixel-look</u>](#pixel-look)
 - [<u>Building from source</u>](#building-from-source)
+- [<u>Running tests</u>](#running-tests)
 - [<u>Future additions</u>](#future-additions)
 
 
@@ -79,33 +80,29 @@ To enforce pixelated theme:
 ## Building from source
 
 `SixLabors.ImageSharp` is the only required third-party package
-and happens to be well-supported on both Linux and macOS. It's used to produce output images in PNG format
+and happens to be well-supported on both Linux and macOS. It's used for producing output images in PNG format
 
 ---
 
-To build the executable, you need to have installed [.NET Runtime](https://dotnet.microsoft.com/en-us/download); 
-PixelRay uses version 10.0.
+To build the executable, you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). PixelRay uses version 10.0.
 
-General build command .NET is
 
-> dotnet publish -c Release -r \<os\> \<args\>
+Build command for .NET is
 
-For example Windows 64-bit would be
-
-`dotnet publish -c Release -r win-x64 <args>`
+> dotnet publish -c Release -r \<rid\> \<args\>
 
 There are generally two ways to build into an executable:
 1. Self-contained exe with glfw3.dll. This dll is SILK.NET native dependency and needs be included
-    - large exe (~37 MB) but runs on its own, no .NET runtime required except for building
+    - larger executable (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation required for end user
 2. minimal exe + DLLs 
-    - very small, however end user must have **.NET 10.0 Runtime** installed
+    - very small, but end user must have **.NET 10.0 Runtime** installed
 
 Instead of modifying *PixelRay.csproj* for each, both can be done by passing additional args.
 
 - for args specification check 
 [this](https://learn.microsoft.com/en-us/dotnet/core/deploying/single-file/overview?tabs=cli)
-- examples below use Windows as runtime; for other identifiers, see 
-[this](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog#known-rids).
+- examples below use 64-bit Windows as runtime identifier; for other RIDs, see 
+[this](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog#known-rids)
 
 #### Powershell
 
@@ -134,15 +131,21 @@ No differences here, same commands work:
 2. minimal, but requires .NET
     ```bash
     dotnet publish -c Release -r win-x64 \
-      --self-contained true \
-      -p:PublishSingleFile=true \
-      -p:EnableCompressionInSingleFile=true
+      --self-contained false
     ```
 
 #### Output
 
-Release build can be found in "PixelRay/bin/Release/net10.0/win-x64/publish" or similar.
+Release build can be found in "PixelRay/bin/Release/net10.0/win-x64/publish" or similar depending on which RID was used e.g. linux-x64 instead of win-x64
 
+
+## Running tests
+
+[.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux) version 10.0 is required.
+
+[xUnit](https://xunit.net/docs/getting-started/v3/getting-started) is used for testing. You don't need to download this manually, tests.csproj includes all dependencies.
+
+**To run tests:** cd into "PixelRay/tests" then use command `dotnet test`
 
 ## Future additions
 
@@ -153,11 +156,19 @@ still have a good amount of customization options. So here's a short list of wha
 copy-pasting all the colors)
 - maybe depth of field/blur in some form
 - materials/mediums: glass, matte, lambertian, fog/gas
-    - maybe eventually emissive materials
+    - maybe also simplistic emissive materials
 - objects:
-    - shaders/meshes for custom shapes. Also some kind of preview tool could be useful
+    - simple meshes for custom shapes. Also some kind of preview tool could be useful
     - maybe some new primitives
     - maybe new transforms like shear
-- performance (at least BHV when meshed get added, some minor optimizations here and there)
-- scripting support via Lua language (complex scene creation + animations)
-- unit tests (better later than never: current ones are extremely outdated)
+- performance 
+    - at least BHV when meshes get added
+    - otherwise some smaller optimizations here and there
+- scripting support via Lua language (complex scenes + animations)
+- more unit tests + maybe a few integration tests
+
+#### Priority
+1. Lua scripting support
+2. meshes + BHV
+3. new materials/mediums
+4. the rest

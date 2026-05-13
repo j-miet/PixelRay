@@ -84,7 +84,8 @@ and happens to be well-supported on both Linux and macOS. It's used for producin
 
 ---
 
-To build the executable, you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). PixelRay uses version 10.0.
+To build the executable, you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). 
+PixelRay uses version 10.0.
 
 
 Build command for .NET is
@@ -92,8 +93,9 @@ Build command for .NET is
 > dotnet publish -c Release -r \<rid\> \<args\>
 
 There are generally two ways to build into an executable:
-1. Self-contained exe with glfw3.dll. This dll is SILK.NET native dependency and needs be included
-    - larger executable (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation required for end user
+1. Self-contained exe. This dll is SILK.NET native dependency and needs be included
+    - larger executable (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation 
+    required for end user
 2. minimal exe + DLLs 
     - very small, but end user must have **.NET 10.0 Runtime** installed
 
@@ -136,14 +138,16 @@ No differences here, same commands work:
 
 #### Output
 
-Release build can be found in "PixelRay/bin/Release/net10.0/win-x64/publish" or similar depending on which RID was used e.g. linux-x64 instead of win-x64
+Release build can be found in "PixelRay/bin/Release/net10.0/win-x64/publish" or similar depending on which RID was 
+used e.g. linux-x64 instead of win-x64
 
 
 ## Running tests
 
 [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux) version 10.0 is required.
 
-[xUnit](https://xunit.net/docs/getting-started/v3/getting-started) is used for testing. You don't need to download this manually, tests.csproj includes all dependencies.
+[xUnit](https://xunit.net/docs/getting-started/v3/getting-started) is used for testing. You don't need to download 
+this manually, tests.csproj includes all dependencies.
 
 **To run tests:** cd into "PixelRay/tests" then use command `dotnet test`
 

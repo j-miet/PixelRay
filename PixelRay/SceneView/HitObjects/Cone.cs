@@ -8,8 +8,6 @@ namespace PixelRay.SceneView.HitObjects;
 /// <summary>
 /// Cone with apex at origin, normal (0, 1, 0) and radius 1. Thus cone extends outward to positive y-axis from 
 /// (0, 0, 0) to unit circle with center (0, 1, 0). Base cap/disc is included.
-/// Cones with small radii might become pitch black due dot products of normal and lighting vanishing.
-/// Use higher lightingbands and/or ambient values to combat this OR just use a bit larger radius.
 /// </summary>
 public class Cone(IMaterial material) : IHittable
 {

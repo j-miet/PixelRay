@@ -16,25 +16,31 @@ public static class SceneBuilder
     /// Builds scene from a dto
     /// </summary>
     /// <param name="dto">Data transfer object produced from input file</param>
-    public static (Scene scene, Camera camera, RendererSettings settings) Build(SceneViewDto dto)
+    public static (Scene scene, RendererSettings settings) Build(SceneViewDto dto)
     {
         if (dto.Camera == null)
             throw new Exception("Camera is missing from scene file");
 
-        Scene scene = new();
+        Scene scene = new()
+        {
+            Camera = BuildCamera(dto.Camera, dto.Render)
+        };
 
-        Camera camera = new(
-            ToVec3(dto.Camera.Position),
-            ToVec3(dto.Camera.LookAt),
-            ToVec3(dto.Camera.UpDirection),
-            dto.Camera.Fov,
-            (double)dto.Render.Width / dto.Render.Height
-        );
+        int id = 0;
 
         if (dto.Objects != null)
         {
             foreach (var obj in dto.Objects)
-                scene.AddObject(obj.Build());
+            {
+                var instance = obj.Build();
+
+                instance.Id = id++;
+
+                scene.AddObject(instance);
+
+                if (!string.IsNullOrEmpty(instance.Name))
+                    scene.NameLookup[instance.Name] = instance.Id;
+            }
         }
 
         if (dto.Lights != null)
@@ -45,7 +51,7 @@ public static class SceneBuilder
 
         RendererSettings settings = LoadRendererSettings(dto.Render);
 
-        return (scene, camera, settings);
+        return (scene, settings);
     }
 
     private static RendererSettings LoadRendererSettings(RenderDto dto)
@@ -74,6 +80,16 @@ public static class SceneBuilder
         };
 
         return settings;
+    }
 
+    private static Camera BuildCamera(CameraDto cam, RenderDto render)
+    {
+        return new Camera(
+            ToVec3(cam.Position),
+            ToVec3(cam.LookAt),
+            ToVec3(cam.UpDirection),
+            cam.Fov,
+            (double)render.Width / render.Height
+        );
     }
 }

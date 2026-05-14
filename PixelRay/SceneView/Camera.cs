@@ -8,10 +8,15 @@ namespace PixelRay.SceneView;
 /// </summary>
 public class Camera
 {
-    // these are exposed for unit testing purposes
-    public readonly Vec3 Forward;
-    public readonly Vec3 Right;
-    public readonly Vec3 Up;
+    public Vec3 Position;
+    public Vec3 LookAt;
+    public Vec3 UpDirection;
+    public double Fov;
+    public double AspectRatio;
+
+    public Vec3 Forward;
+    public Vec3 Right;
+    public Vec3 Up;
 
     public Camera(
         Vec3 position,
@@ -21,22 +26,18 @@ public class Camera
         double aspectRatio
     )
     {
-        _cameraOrigin = position;
+        Position = position;
+        LookAt = lookAt;
+        UpDirection = upDirection;
+        Fov = fovDegrees;
+        AspectRatio = aspectRatio;
 
-        Forward = (lookAt - position).Normalize();
-        Right = Vec3.Cross(Forward, upDirection).Normalize();
-        Up = Vec3.Cross(Right, Forward).Normalize(); // ensure orthogonality of axes
-
-        double theta = fovDegrees * Math.PI / 180.0;
-        double viewportHeight = 2.0 * Math.Tan(theta / 2.0); // sensor size = theta, focal length = 1
-        double viewportWidth = viewportHeight * aspectRatio;
-
-        _horizontal = Right * viewportWidth;
-        _vertical = Up * viewportHeight;
-
-        _topLeft = _cameraOrigin + Forward - _horizontal / 2 + _vertical / 2;
+        Rebuild();
     }
 
+    /// <summary>
+    /// Return ray pointing at pixel location (x, y)
+    /// </summary>
     public Ray GetRay(int x, int y, int width, int height)
     {
         double w = (x + 0.5) / width;
@@ -47,8 +48,29 @@ public class Camera
         return new Ray(_cameraOrigin, rayDirection);
     }
 
-    private readonly Vec3 _cameraOrigin;
-    private readonly Vec3 _horizontal;
-    private readonly Vec3 _vertical;
-    private readonly Vec3 _topLeft;
+    /// <summary>
+    /// Build camera, useful for scripts
+    /// </summary>
+    public void Rebuild()
+    {
+        _cameraOrigin = Position;
+
+        Forward = (LookAt - Position).Normalize();
+        Right = Vec3.Cross(Forward, UpDirection).Normalize();
+        Up = Vec3.Cross(Right, Forward).Normalize(); // ensure orthogonality of axes
+
+        double theta = Fov * Math.PI / 180.0;
+        double viewportHeight = 2.0 * Math.Tan(theta / 2.0); // sensor size = theta, focal length = 1
+        double viewportWidth = viewportHeight * AspectRatio;
+
+        _horizontal = Right * viewportWidth;
+        _vertical = Up * viewportHeight;
+
+        _topLeft = _cameraOrigin + Forward - _horizontal / 2 + _vertical / 2;
+    }
+
+    private Vec3 _cameraOrigin;
+    private Vec3 _horizontal;
+    private Vec3 _vertical;
+    private Vec3 _topLeft;
 }

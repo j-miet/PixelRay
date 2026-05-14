@@ -11,9 +11,10 @@ public class SphereDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
-            new Sphere(Material.Build())
+        return new Instance(
+            new Sphere(),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

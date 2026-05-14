@@ -6,6 +6,8 @@ namespace PixelRay.Input.Dto.Objects;
 
 public class QuadricDto : IObjectDto
 {
+    public string? Name { get; set; }
+
     public required double[] Coefficients { get; set; }
     public required double[] MinBounds { get; set; }
     public required double[] MaxBounds { get; set; }
@@ -20,16 +22,17 @@ public class QuadricDto : IObjectDto
 
         double[] c = Coefficients;
 
-        return InputUtils.ToTransform(
-            Transform,
+        return new Instance(
             new Quadric(
                 c[0], c[1], c[2],
                 c[3], c[4], c[5],
                 c[6], c[7], c[8],
                 c[9],
                 InputUtils.ToVec3(MinBounds),
-                InputUtils.ToVec3(MaxBounds),
-                Material.Build())
+                InputUtils.ToVec3(MaxBounds)
+            ),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

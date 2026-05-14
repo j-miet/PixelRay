@@ -15,13 +15,14 @@ public class TriangleDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
+        return new Instance(
             new Triangle(
                 InputUtils.ToVec3(V1),
                 InputUtils.ToVec3(V2),
-                InputUtils.ToVec3(V3),
-                Material.Build())
+                InputUtils.ToVec3(V3)
+            ),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

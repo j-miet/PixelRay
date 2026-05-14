@@ -11,9 +11,10 @@ public class CylinderDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
-            new Cylinder(Material.Build())
+        return new Instance(
+            new Cylinder(),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

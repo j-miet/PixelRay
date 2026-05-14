@@ -14,12 +14,13 @@ public class TorusDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
+        return new Instance(
             new Torus(
                 MinorRadius,
-                MajorRadius,
-                Material.Build())
+                MajorRadius
+            ),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

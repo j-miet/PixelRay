@@ -11,9 +11,10 @@ public class PlaneDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
-            new Plane(Material.Build())
+        return new Instance(
+            new Plane(),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

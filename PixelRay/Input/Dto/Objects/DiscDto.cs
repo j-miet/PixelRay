@@ -11,9 +11,10 @@ public class DiscDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
-            new Disc(Material.Build())
+        return new Instance(
+            new Disc(),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

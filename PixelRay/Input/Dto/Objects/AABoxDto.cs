@@ -14,12 +14,13 @@ public class AABoxDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
+        return new Instance(
             new AABox(
                 InputUtils.ToVec3(MinBounds),
-                InputUtils.ToVec3(MaxBounds),
-                Material.Build())
+                InputUtils.ToVec3(MaxBounds)
+            ),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

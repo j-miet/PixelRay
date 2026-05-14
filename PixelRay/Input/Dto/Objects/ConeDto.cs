@@ -11,9 +11,10 @@ public class ConeDto : IObjectDto
 
     public IHittable Build()
     {
-        return InputUtils.ToTransform(
-            Transform,
-            new Cone(Material.Build())
+        return new Instance(
+            new Cone(),
+            Material.Build(),
+            Transform.Build()
         );
     }
 }

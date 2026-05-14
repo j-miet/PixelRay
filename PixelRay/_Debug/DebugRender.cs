@@ -63,9 +63,9 @@ public static class DebugRender
                 return new ColorRGB(shade, shade, shade);
 
             case DebugMode.ObjectID:
-                if (closestHit.Object != null)
+                if (closestHit.Geometry != null)
                 {
-                    int id = closestHit.Object.GetHashCode();
+                    int id = closestHit.Geometry.GetHashCode();
                     double r = ((id >> 0) & 255) / 255.0;
                     double g = ((id >> 8) & 255) / 255.0;
                     double b = ((id >> 16) & 255) / 255.0;

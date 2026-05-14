@@ -82,15 +82,15 @@ public readonly struct Matrix4x4(
 
         // nxn matrix inverse can be calculated as A^-1 = (1 / det) * Adj(A) where Adj(A) is the adjugate matrix.
         double a00 = _a00 * invDet;
-        double a01 = _a01 * invDet;
-        double a02 = _a02 * invDet;
+        double a01 = -(M01 * M22 - M02 * M21) * invDet;
+        double a02 = (M01 * M12 - M02 * M11) * invDet;
 
-        double a10 = (M12 * M20 - M10 * M22) * invDet;
+        double a10 = -(_a01 * invDet);
         double a11 = (M00 * M22 - M02 * M20) * invDet;
-        double a12 = (M02 * M10 - M00 * M12) * invDet;
+        double a12 = -(M00 * M12 - M02 * M10) * invDet;
 
-        double a20 = (M10 * M21 - M11 * M20) * invDet;
-        double a21 = (M01 * M20 - M00 * M21) * invDet;
+        double a20 = _a02 * invDet;
+        double a21 = -(M00 * M21 - M01 * M20) * invDet;
         double a22 = (M00 * M11 - M01 * M10) * invDet;
 
         // -(A⁻¹ * t); this applies transform properly so vector x is shifted to x - (A^-1)*t

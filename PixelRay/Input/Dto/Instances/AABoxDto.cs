@@ -1,18 +1,20 @@
 using PixelRay.Input.Dto.Materials;
-using PixelRay.SceneView.HitObjects;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
+using PixelRay.SceneView.InstanceObject.Geometry;
 
-namespace PixelRay.Input.Dto.Objects;
+namespace PixelRay.Input.Dto.Instances;
 
-public class AABoxDto : IObjectDto
+public class AABoxDto : IInstanceDto
 {
+    public string? Name { get; set; }
+
     public required double[] MinBounds { get; set; }
     public required double[] MaxBounds { get; set; }
 
     public required IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; } = new();
 
-    public IHittable Build()
+    public Instance Build()
     {
         return new Instance(
             new AABox(
@@ -21,6 +23,9 @@ public class AABoxDto : IObjectDto
             ),
             Material.Build(),
             Transform.Build()
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

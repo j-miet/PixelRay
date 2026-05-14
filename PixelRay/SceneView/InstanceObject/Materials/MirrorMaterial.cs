@@ -2,7 +2,7 @@ using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
 
-namespace PixelRay.SceneView.Materials;
+namespace PixelRay.SceneView.InstanceObject.Materials;
 
 public class MirrorMaterial(ColorRGB color, double bounce = 1.0, bool linearBounce = false) : IMaterial
 {

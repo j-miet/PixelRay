@@ -1,9 +1,8 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Instance.Geometry;
 
-namespace PixelRay.SceneView.HitObjects;
+namespace PixelRay.SceneView.InstanceObject.Geometry;
 
 /// <summary>
 /// Unit origin-centered disc on plane y=0 with normal (0, 1, 0)

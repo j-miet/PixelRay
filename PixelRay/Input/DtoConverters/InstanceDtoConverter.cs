@@ -1,15 +1,15 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using PixelRay.Input.Dto.Objects;
+using PixelRay.Input.Dto.Instances;
 
 namespace PixelRay.Input.DtoConverters;
 
 /// <summary>
 /// For processing object json data into dtos
 /// </summary>
-public class ObjectDtoConverter : JsonConverter<IObjectDto>
+public class InstanceDtoConverter : JsonConverter<IInstanceDto>
 {
-    public override IObjectDto Read(
+    public override IInstanceDto Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options)
@@ -34,6 +34,6 @@ public class ObjectDtoConverter : JsonConverter<IObjectDto>
         };
     }
 
-    public override void Write(Utf8JsonWriter writer, IObjectDto value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IInstanceDto value, JsonSerializerOptions options)
         => throw new NotImplementedException();
 }

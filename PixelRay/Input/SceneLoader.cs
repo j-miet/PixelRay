@@ -28,7 +28,7 @@ public static class SceneLoader
             PropertyNameCaseInsensitive = true,
         };
 
-        options.Converters.Add(new ObjectDtoConverter());
+        options.Converters.Add(new InstanceDtoConverter());
         options.Converters.Add(new LightDtoConverter());
         options.Converters.Add(new MaterialDtoConverter());
 

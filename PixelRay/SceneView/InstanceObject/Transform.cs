@@ -1,7 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 
-namespace PixelRay.SceneView.Hittable;
+namespace PixelRay.SceneView.InstanceObject;
 
 /// <summary>
 /// Transform matrix for hittable object.
@@ -10,8 +10,8 @@ namespace PixelRay.SceneView.Hittable;
 /// [ 0 0 0 1 ] <br/>
 /// where R (upper-left) is 3x3 matrix and T (upper-right) is 3x1 transform vector. These 
 /// represent linear affine 3D transforms. <br/> <br/>
-/// **Important** Matrix transforms are always applied FROM RIGHT TO LEFT. Keep this in mind when applying
-/// them: Scale*Translate instead of Translate*Scale is likely to yield very different results. 
+/// **Important** Matrix transforms use column-major style and are thus applied FROM LEFT TO RIGHT:
+/// Scale*Translate (first scale then translate) instead of Translate*Scale is likely to yield very different results. 
 /// </summary>
 public struct Transform
 {

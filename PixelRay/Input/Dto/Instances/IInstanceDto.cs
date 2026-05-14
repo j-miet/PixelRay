@@ -1,15 +1,17 @@
 using PixelRay.Input.Dto.Materials;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
 
-namespace PixelRay.Input.Dto.Objects;
+namespace PixelRay.Input.Dto.Instances;
 
 /// <summary>
 /// Object dto template
 /// </summary>
-public interface IObjectDto
+public interface IInstanceDto
 {
+    public string? Name { get; set; }
+
     public IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; }
 
-    IHittable Build();
+    Instance Build();
 }

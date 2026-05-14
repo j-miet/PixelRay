@@ -2,7 +2,7 @@ using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
 
-namespace PixelRay.SceneView.Materials;
+namespace PixelRay.SceneView.InstanceObject.Materials;
 
 /// <summary>
 /// General material which can re-emit light by projections and diffusion.

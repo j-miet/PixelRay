@@ -1,5 +1,5 @@
 using PixelRay.Core.Mathematics;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
 
 namespace PixelRay.Input.Dto;
 

@@ -2,7 +2,7 @@ using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
 
-namespace PixelRay.SceneView.Instance.Geometry;
+namespace PixelRay.SceneView.InstanceObject.Geometry;
 
 /// <summary>
 /// Object with base geometry

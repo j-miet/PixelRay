@@ -1,9 +1,8 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Instance.Geometry;
 
-namespace PixelRay.SceneView.HitObjects;
+namespace PixelRay.SceneView.InstanceObject.Geometry;
 
 /// <summary>
 /// General quadric primitive Ax^2 + By^2 + Cz^2 + Dxy + Exz + Fyz + Gx + Hy + Iz + J = 0

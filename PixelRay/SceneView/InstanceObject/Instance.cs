@@ -1,9 +1,10 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
-using PixelRay.SceneView.Instance.Geometry;
-using PixelRay.SceneView.Materials;
+using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject.Geometry;
+using PixelRay.SceneView.InstanceObject.Materials;
 
-namespace PixelRay.SceneView.Hittable;
+namespace PixelRay.SceneView.InstanceObject;
 
 /// <summary>
 /// Scene instance object
@@ -17,8 +18,13 @@ public class Instance(
     Transform transform
 ) : IHittable
 {
+    // these are for Lua scripting
+    public int Id;
+    public string? Name;
+
     public IGeometry Geometry = geometry;
     public IMaterial Material = material;
+    public Transform BaseTransform = new(transform.LocalToWorld);
     public Transform Transform = transform;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)

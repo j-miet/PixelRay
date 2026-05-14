@@ -1,18 +1,20 @@
 using PixelRay.Input.Dto.Materials;
 using PixelRay.SceneView.HitObjects;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
 
-namespace PixelRay.Input.Dto.Objects;
+namespace PixelRay.Input.Dto.Instances;
 
-public class TorusDto : IObjectDto
+public class TorusDto : IInstanceDto
 {
+    public string? Name { get; set; }
+
     public double MinorRadius { get; set; }
     public double MajorRadius { get; set; }
 
     public required IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; } = new();
 
-    public IHittable Build()
+    public Instance Build()
     {
         return new Instance(
             new Torus(
@@ -21,6 +23,9 @@ public class TorusDto : IObjectDto
             ),
             Material.Build(),
             Transform.Build()
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

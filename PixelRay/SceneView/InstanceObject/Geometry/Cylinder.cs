@@ -1,15 +1,14 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Instance.Geometry;
 
-namespace PixelRay.SceneView.HitObjects;
+namespace PixelRay.SceneView.InstanceObject.Geometry;
 
 /// <summary>
-/// Cone with apex at origin, normal (0, 1, 0) and radius 1. Thus cone extends outward to positive y-axis from 
-/// (0, 0, 0) to unit circle with center (0, 1, 0). Base cap/disc is included.
+/// Cylinder with bottom cap center at origin, normal (0, 1, 0) and radius 1 i.e. bottom cap is unit circle
+/// at (0, 0, 0), top cap unit circle at (0, 1, 0). Both bottom and top discs are included.
 /// </summary>
-public class Cone : IGeometry
+public class Cylinder : IGeometry
 {
     public Vec3 Axis = new(0, 1, 0);
 
@@ -25,9 +24,9 @@ public class Cone : IGeometry
         Vec3 O = ray.Origin;
         Vec3 D = ray.Direction;
 
-        double a = D.X * D.X + D.Z * D.Z - D.Y * D.Y;
-        double b = 2 * (O.X * D.X + O.Z * D.Z - O.Y * D.Y);
-        double c = O.X * O.X + O.Z * O.Z - O.Y * O.Y;
+        double a = D.X * D.X + D.Z * D.Z;
+        double b = 2 * (O.X * D.X + O.Z * D.Z);
+        double c = O.X * O.X + O.Z * O.Z - 1;
 
         if (!Utils.IsEqual(a, 0)) // cone sides
         {
@@ -50,12 +49,31 @@ public class Cone : IGeometry
                         hitAnything = true;
                         finalT = t;
                         finalPoint = rayPoint;
-                        finalNormal = (2 * new Vec3(rayPoint.X, -rayPoint.Y, rayPoint.Z)).Unit();
+                        finalNormal = (2 * new Vec3(rayPoint.X, 0, rayPoint.Z)).Unit();
                     }
                 }
             }
         }
-        if (Utils.LessThan(ray.Direction.Y, 0)) // cone unit disc
+
+        if (Utils.GreaterThan(ray.Direction.Y, 0)) // bottom unit disc with center is (0, 0, 0)
+        {
+            double t = -ray.Origin.Y / ray.Direction.Y;
+
+            if (rayT.InClosed(t))
+            {
+                Vec3 bottomNormal = -Axis;
+                Vec3 rayPoint = ray.At(t);
+                if (Utils.LessThanOrEqual(rayPoint.Norm(), 1) && t < finalT)
+                {
+                    hitAnything = true;
+                    finalT = t;
+                    finalPoint = rayPoint;
+                    finalNormal = bottomNormal;
+                }
+            }
+        }
+
+        if (Utils.LessThanOrEqual(ray.Direction.Y, 0)) // top cap unit disc with center at (0, 1, 0)
         {
             double t = ray.Origin.Y / ray.Direction.Y;
 

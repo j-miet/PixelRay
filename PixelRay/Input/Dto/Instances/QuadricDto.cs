@@ -1,10 +1,10 @@
 using PixelRay.Input.Dto.Materials;
-using PixelRay.SceneView.HitObjects;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
+using PixelRay.SceneView.InstanceObject.Geometry;
 
-namespace PixelRay.Input.Dto.Objects;
+namespace PixelRay.Input.Dto.Instances;
 
-public class QuadricDto : IObjectDto
+public class QuadricDto : IInstanceDto
 {
     public string? Name { get; set; }
 
@@ -15,7 +15,7 @@ public class QuadricDto : IObjectDto
     public required IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; } = new();
 
-    public IHittable Build()
+    public Instance Build()
     {
         if (Coefficients.Length != 10)
             throw new Exception("Quadric requires all 10 coefficients");
@@ -33,6 +33,9 @@ public class QuadricDto : IObjectDto
             ),
             Material.Build(),
             Transform.Build()
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

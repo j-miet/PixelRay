@@ -4,6 +4,8 @@ namespace PixelRay.Input.Dto.Lights;
 
 public class PointLightDto : ILightDto
 {
+    public string? Name { get; set; }
+
     public required double[] Color { get; set; }
     public double Intensity { get; set; } = 1.0;
 

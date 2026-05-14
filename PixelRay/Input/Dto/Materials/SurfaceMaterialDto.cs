@@ -1,4 +1,4 @@
-using PixelRay.SceneView.Materials;
+using PixelRay.SceneView.InstanceObject.Materials;
 
 namespace PixelRay.Input.Dto.Materials;
 

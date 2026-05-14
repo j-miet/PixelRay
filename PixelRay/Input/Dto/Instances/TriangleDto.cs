@@ -1,11 +1,13 @@
 using PixelRay.Input.Dto.Materials;
-using PixelRay.SceneView.HitObjects;
-using PixelRay.SceneView.Hittable;
+using PixelRay.SceneView.InstanceObject;
+using PixelRay.SceneView.InstanceObject.Geometry;
 
-namespace PixelRay.Input.Dto.Objects;
+namespace PixelRay.Input.Dto.Instances;
 
-public class TriangleDto : IObjectDto
+public class TriangleDto : IInstanceDto
 {
+    public string? Name { get; set; }
+
     public required double[] V1 { get; set; }
     public required double[] V2 { get; set; }
     public required double[] V3 { get; set; }
@@ -13,7 +15,7 @@ public class TriangleDto : IObjectDto
     public required IMaterialDto Material { get; set; }
     public TransformDto Transform { get; set; } = new();
 
-    public IHittable Build()
+    public Instance Build()
     {
         return new Instance(
             new Triangle(
@@ -23,6 +25,9 @@ public class TriangleDto : IObjectDto
             ),
             Material.Build(),
             Transform.Build()
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

@@ -1,16 +1,15 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Materials;
+using PixelRay.SceneView.Instance.Geometry;
 
 namespace PixelRay.SceneView.HitObjects;
 
 /// <summary>
-/// Plane y=0 with normal (0, 1, 0)
+/// Unit origin-centered disc on plane y=0 with normal (0, 1, 0)
 /// </summary>
-public class Plane(IMaterial material) : IHittable
+public class Disc : IGeometry
 {
-    public IMaterial Material = material;
     public Vec3 Normal = new(0, 1, 0);
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)
@@ -25,11 +24,14 @@ public class Plane(IMaterial material) : IHittable
         if (!rayT.InClosed(t))
             return false;
 
+        Vec3 point = ray.At(t);
+        if (Utils.GreaterThan(point.Norm(), 1))
+            return false;
+
         hit.T = t;
-        hit.Point = ray.At(t);
+        hit.Point = point;
         hit.SetFaceNormal(ray, Normal);
-        hit.Material = Material;
-        hit.Object = this;
+        hit.Geometry = this;
 
         return true;
     }

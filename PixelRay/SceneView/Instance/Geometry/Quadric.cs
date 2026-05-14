@@ -1,7 +1,7 @@
 using PixelRay.Core;
 using PixelRay.Core.Mathematics;
 using PixelRay.SceneView.Hittable;
-using PixelRay.SceneView.Materials;
+using PixelRay.SceneView.Instance.Geometry;
 
 namespace PixelRay.SceneView.HitObjects;
 
@@ -16,11 +16,9 @@ public class Quadric(
     double g, double h, double i,
     double j,
     Vec3 minBounds,
-    Vec3 maxBounds,
-    IMaterial material
-) : IHittable
+    Vec3 maxBounds
+) : IGeometry
 {
-    public IMaterial Material = material;
     public double A = a, B = b, C = c; // square terms
     public double D = d, E = e, F = f; // product terms
     public double H = h, G = g, I = i; // linear terms
@@ -102,8 +100,7 @@ public class Quadric(
         hit.T = t;
         hit.Point = p;
         hit.SetFaceNormal(ray, normal);
-        hit.Material = Material;
-        hit.Object = this;
+        hit.Geometry = this;
 
         return true;
     }

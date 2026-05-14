@@ -1,9 +1,29 @@
+using PixelRay.Core.Mathematics;
+using PixelRay.SceneView.Hittable;
+
 namespace PixelRay.Input.Dto;
 
 public class TransformDto
 {
-    public double[] Position { get; set; } = [0, 0, 0];
     // axis direction (first three) + angle (final index). Allows multiple rotations.
     public double[][] Rotation { get; set; } = [[0, 0, 0, 0]];
+    public double[] Position { get; set; } = [0, 0, 0];
     public double[] Scale { get; set; } = [1, 1, 1];
+
+    public Transform Build()
+    {
+        Matrix4x4 translate = Matrix4x4.Translate(new(Position[0], Position[1], Position[2]));
+        Matrix4x4 scale = Matrix4x4.Scale(new Vec3(Scale[0], Scale[1], Scale[2]));
+        Matrix4x4 rotation = Matrix4x4.Identity();
+
+        // applies all rotations in order. Each rotation is a 4d vector where first 3 components matches to axis
+        // direction and last is the angle [0, 360] which gets converted to radians for internal use
+        foreach (var r in Rotation)
+        {
+            double radianAngle = r[3] * Math.PI / 180;
+            rotation *= Matrix4x4.Rotate(new(r[0], r[1], r[2]), radianAngle);
+        }
+
+        return new Transform(translate * rotation * scale);
+    }
 }

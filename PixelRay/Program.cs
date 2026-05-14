@@ -3,6 +3,7 @@
 using PixelRay.Core;
 using PixelRay.Debug;
 using PixelRay.Input;
+using PixelRay.Input.Scripting;
 using PixelRay.Output;
 
 static class CreatePixelRay
@@ -13,6 +14,8 @@ static class CreatePixelRay
         values.Add("input", "");
         values.Add("output", "");
         values.Add("outputFormat", "");
+        values.Add("script", "");
+        values.Add("produceGif", "");
         values.Add("preview", "");
         values.Add("debug", "");
 
@@ -74,6 +77,28 @@ static class CreatePixelRay
                     }
                     break;
 
+                case "-s" or "--script":
+                    try
+                    {
+                        if (args[i + 1] is not null)
+                        {
+                            values["script"] = args[i + 1];
+                            i++;
+                        }
+
+                        if (args[i + 1] == "-g")
+                        {
+                            values["produceGif"] = "enabled";
+                            i++;
+                        }
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        Console.WriteLine("Usage: -o <outputPath>");
+                        return;
+                    }
+                    break;
+
                 case "-p" or "--preview":
                     values["preview"] = "enabled";
                     break;
@@ -110,15 +135,17 @@ static class CreatePixelRay
             }
         }
 
-        if (values["output"] == "" && values["preview"] == "")
+        if (values["output"] == "" && values["preview"] == "" && values["script"] == "")
         {
-            Console.WriteLine("Input cannot be called without output/display command, use -o and/or -p flags.");
+            Console.WriteLine("Input cannot be called without output/display or script command.\n" +
+                "Use -o and/or -p flags OR -s <luaScriptFilePath>."
+            );
             return;
         }
 
         // setup
         var dto = SceneLoader.Load(values["input"]);
-        var (scene, camera, settings) = SceneBuilder.Build(dto);
+        var (scene, settings) = SceneBuilder.Build(dto);
 
         int width = settings.Width;
         int height = settings.Height;
@@ -144,7 +171,40 @@ static class CreatePixelRay
             _ => DebugMode.None
         };
 
-        FrameBuffer buffer = renderer.Render(scene, camera, settings.Threading, upScaleFactor, debug);
+        FrameBuffer buffer;
+
+        // Lua script animations
+        if (values["script"] != "")
+        {
+            string frameOutputDir = "frames";
+
+            // flush frame directory
+            Directory.CreateDirectory(frameOutputDir);
+            foreach (var file in Directory.GetFiles(frameOutputDir, "*.png"))
+                File.Delete(file);
+
+            var lua = new LuaEngine();
+
+            lua.AttachScene(scene, scene.Camera);
+            lua.Load(values["script"]);
+
+            // TODO replace hard-coded frame count with custom value
+            for (int frame = 0; frame < 60; frame++)
+            {
+                lua.Update(frame);
+
+                buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug);
+                ImageWriter.WritePNG($"{frameOutputDir}/frame-{frame}.png", buffer); // scripts will only produce png
+            }
+
+            // produce a GIF from frames
+            if (values["produceGif"] == "enabled")
+                GifBuilder.Build(frameOutputDir, "output.gif");
+
+            return;
+        }
+
+        buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug);
 
         string outputFile = values["output"];
         string imageFormat = values["outputFormat"];

@@ -70,7 +70,7 @@ To avoid file path issues, just keep scene (and script) file in the same directo
     ```bash
     PixelRay -i scene.json -s script.lua 30 -g
     ```
-    
+
     produces files frame0.png to frame29.png in `./frames` and 
     then combines these into a gif file as `outputGif.gif`
 
@@ -228,11 +228,3 @@ copy-pasting all the colors)
 3. new materials/mediums
 4. shared materials and meshes
 4. the rest
-
-
-TODO:
-
-- scripting: custom frame count
-- Lua: add light support
-- make a basic animation, add it into scene (along with scene.json)
-- update README: add Scripting section

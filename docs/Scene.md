@@ -1,4 +1,4 @@
-## Right-hand coordinates:
+ ## Right-hand coordinates:
 - standard: 
     - x increases to right, y increases upwards, camera points to negative z-axis
     - `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this system
@@ -31,7 +31,7 @@ Here are all the scene entities and their parameters
 
 #### render
 
-- `threading`: `boolean, default=false` 
+- `threading`: `boolean, default=true` 
     - for parallelized rendering
 - `width`: `integer >= 0` 
     - image width
@@ -73,7 +73,8 @@ Here are all the scene entities and their parameters
 
 ### Objects
 
-#### primitives:
+Each object has optional `name` field. This can be used for accessing specific object in Lua scripts.
+
 - `sphere` unit sphere
 - `disc` unit disc pointing at (0, 1, 0)
 - `plane` plane pointing at (0, 1, 0)
@@ -93,8 +94,9 @@ Here are all the scene entities and their parameters
 Use transforms to change object geometry, and materials to change color & how light is reflected
 
 #### transforms
-- `position`: `[x, y, z]` 
-    - translation/shifting/moving object position
+- `translate`: `[x, y, z]` 
+    - translation/shifting/moving object position alongside vector (x, y, z)
+    - it doesn't move object TO (x, y, z), instead adds this vector to your current position
 - `rotation`: `list of [x, y, z, w]` 
     - 4D vector [x, y, z, w] where (x,y,z) is the rotation axis and w the angle in degrees (not radians!)
     - rotations are always treated as a list of rotations so even for a single rotation, use `[[1, 0, 0, 90]]`. If no 
@@ -216,7 +218,7 @@ For radius types:
         "fov": 90
     },
     "render": { // renderer configurations
-        "threading": true, // default is 'false', but keep this enabled for major rendering speed boost (unless very old cpu)
+        "threading": true, // default is 'true' so this line is unnecessary. Keep enabled for major rendering speed boost
         "width": 250,
         "height": 140,
         "upScaleFactor": 3,
@@ -293,6 +295,7 @@ For radius types:
             }
         },
         {
+            "name": "torus1" // optional name, useful for referring to specific objects when scripting
             "type": "torus",
             "minorRadius": 0.2,
             "majorRadius": 0.1,

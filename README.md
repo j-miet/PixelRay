@@ -1,11 +1,21 @@
-![](docs/Images/Demo/default.png)
+# Simple ray tracer for pixel-themed scenes and animations
 
-> More demo images can be found [here](docs/Images/Demo/)
+| ![](docs/Images/Demo/default.png) |
+|:--:|
+|Static base scene|
+
+
+| ![](docs/Images/defaultGif.gif) |
+|:--:|
+| Animation from base scene|
+
+> More static demo images can be found [here](docs/Images/Demo/)
 
 ## Table of contents
 
 - [<u>How to use</u>](#how-to-use)
 - [<u>Scene</u>](#scene)
+    - [<u>Scripting</u>](#scripting)
 - [<u>Pixel-look</u>](#pixel-look)
 - [<u>Building from source</u>](#building-from-source)
 - [<u>Running tests</u>](#running-tests)
@@ -13,6 +23,9 @@
 
 
 ## How to use
+
+**Executables for Windows** (and probably Linux-x64) will be added soon. Otherwise you need to
+[build from source](#building-from-source).
 
 To produce an output image, paths for scene and output files are required:
 
@@ -27,6 +40,7 @@ call default image opener program via shell execution:
 PixelRay -i scene.json -o output.png -p
 ```
 
+To avoid file path issues, just keep scene (and script) file in the same directory with executable
 
 #### All commands
 
@@ -36,11 +50,30 @@ PixelRay -i scene.json -o output.png -p
 
 - `-o <path>` or `--output <path>` 
 
-    Output file path. Image format is either **png** or **ppm**-
+    Output file path. Image format is either **.png** or **.ppm**.
 - `-p` or `--preview`:
 
     Attempts to open the output image after rendering by executing the image file, thus calling the default viewing 
     tool in process. Only available for png images as basic editors seldom support ppm.
+
+- `-s <luaScript> <frameCount> {gif}` or `--script <luaScript> <frameCount> {gif}`
+
+    Uses the static scene from `-i` command as a baseline then runs Lua script to produce output frames into 
+    `./frames` directory. Output format is always **png**, frame count defaults to 60 if frameCount is not a valid integer value.
+    - script file uses Lua language and must there end in .lua
+    - cannot be used with output or preview flags
+    - automatically flushes `frames` directory to remove old images
+    - can optionally pass `-g` / `--gif` flag to produce a GIF file from saved frames.
+
+    Example:
+    
+    ```bash
+    PixelRay -i scene.json -s script.lua 30 -g
+    ```
+    
+    produces files frame0.png to frame29.png in `./frames` and 
+    then combines these into a gif file as `outputGif.gif`
+
 - `--debug <mode>`
     
     Renders image based on selected debug mode. These are:
@@ -54,10 +87,24 @@ PixelRay -i scene.json -o output.png -p
 
 ## Scene
 
+> Scene file and animation script templates can be found in [here](scene-template).
+
 Scenes use **json** format.
-Default scene file can be found [here](docs/scene.json).
 
 For all scene parameters and their explanations, see [Scene.md](docs/Scene.md)
+
+### Scripting
+
+Scripts use [Lua programming language](https://www.lua.org/start.html) embedded into C# 
+via [MoonSharp](https://github.com/moonsharp-devs/moonsharp).
+
+Scripting can be applied to
+
+- object transforms (translation/positioning, scaling, rotations)
+- camera (position, forward/upward direction, fov, aspect ratio)
+
+For scripting API, see [Lua.md](docs/Lua.md)
+
 
 ## Pixel-look
 
@@ -79,8 +126,11 @@ To enforce pixelated theme:
 
 ## Building from source
 
-`SixLabors.ImageSharp` is the only required third-party package
-and happens to be well-supported on both Linux and macOS. It's used for producing output images in PNG format
+Both third-party packages
+- `SixLabors.ImageSharp` for png and gif generation
+- `MoonSharp` for Lua scripting support
+
+are be well-supported on Windows, Linux and macOS.
 
 ---
 
@@ -93,9 +143,9 @@ Build command for .NET is
 > dotnet publish -c Release -r \<rid\> \<args\>
 
 There are generally two ways to build into an executable:
-1. Self-contained exe. This dll is SILK.NET native dependency and needs be included
-    - larger executable (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation 
-    required for end user
+1. Self-contained executable
+    - larger size (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation 
+    required from end user
 2. minimal exe + DLLs 
     - very small, but end user must have **.NET 10.0 Runtime** installed
 
@@ -161,18 +211,28 @@ copy-pasting all the colors)
 - maybe depth of field/blur in some form
 - materials/mediums: glass, matte, lambertian, fog/gas
     - maybe also simplistic emissive materials
-- objects:
+- geometry:
     - simple meshes for custom shapes. Also some kind of preview tool could be useful
     - maybe some new primitives
     - maybe new transforms like shear
+- shared materials (and meshes): current system adds materials in each object, prevent reusing them
 - performance 
     - at least BHV when meshes get added
     - otherwise some smaller optimizations here and there
-- scripting support via Lua language (complex scenes + animations)
-- more unit tests + maybe a few integration tests
+- scipting: add lights (transforms and camera controls already there)
+- more tests
 
 #### Priority
-1. Lua scripting support
+1. light manipulation in scripts
 2. meshes + BHV
 3. new materials/mediums
+4. shared materials and meshes
 4. the rest
+
+
+TODO:
+
+- scripting: custom frame count
+- Lua: add light support
+- make a basic animation, add it into scene (along with scene.json)
+- update README: add Scripting section

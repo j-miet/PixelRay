@@ -32,11 +32,11 @@ public class LuaEngine
     {
         _lua.Globals["t"] = t;
 
-        _camera?.Rebuild();
-
         var fn = _lua.Globals.Get("update");
 
         if (!fn.IsNil())
             _lua.Call(fn, t);
+
+        _camera?.Rebuild();
     }
 }

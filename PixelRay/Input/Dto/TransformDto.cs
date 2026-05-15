@@ -20,7 +20,7 @@ public class TransformDto
         // direction and last is the angle [0, 360] which gets converted to radians for internal use
         foreach (var r in Rotation)
         {
-            double radianAngle = r[3] * Math.PI / 180;
+            double radianAngle = InputUtils.DegreesToRadians(r[3]);
             rotation *= Matrix4x4.Rotate(new(r[0], r[1], r[2]), radianAngle);
         }
 

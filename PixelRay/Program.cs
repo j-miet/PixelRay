@@ -15,6 +15,7 @@ static class CreatePixelRay
         values.Add("output", "");
         values.Add("outputFormat", "");
         values.Add("script", "");
+        values.Add("frameCount", "");
         values.Add("produceGif", "");
         values.Add("preview", "");
         values.Add("debug", "");
@@ -86,10 +87,22 @@ static class CreatePixelRay
                             i++;
                         }
 
-                        if (args[i + 1] == "-g")
+                        string flag;
+                        if (args[i + 1] is not null)
                         {
-                            values["produceGif"] = "enabled";
+                            flag = args[i + 1];
+                            values["frameCount"] = flag;
                             i++;
+                        }
+
+                        if (args[i + 1] is not null)
+                        {
+                            flag = args[i + 1];
+                            if (flag == "-g" || flag == "-gif")
+                            {
+                                values["produceGif"] = "enabled";
+                                i++;
+                            }
                         }
                     }
                     catch (IndexOutOfRangeException)
@@ -177,6 +190,7 @@ static class CreatePixelRay
         if (values["script"] != "")
         {
             string frameOutputDir = "frames";
+            int totalFrames = 60;
 
             // flush frame directory
             Directory.CreateDirectory(frameOutputDir);
@@ -188,8 +202,14 @@ static class CreatePixelRay
             lua.AttachScene(scene, scene.Camera);
             lua.Load(values["script"]);
 
-            // TODO replace hard-coded frame count with custom value
-            for (int frame = 0; frame < 60; frame++)
+            // custom frame count; invalid output defaults to 60
+            if (values["frameCount"] != "")
+            {
+                if (int.TryParse(values["frameCount"], out int frameVal))
+                    totalFrames = frameVal >= 0 ? frameVal : 60;
+            }
+
+            for (int frame = 0; frame < totalFrames; frame++)
             {
                 lua.Update(frame);
 

@@ -22,7 +22,7 @@ public class LuaObject(Instance instance)
     }
 
     /// <summary>
-    /// Move instance object to new location from its base position
+    /// Move instance object to new direction from its base position
     /// </summary>
     public void Translate(double x, double y, double z)
     {
@@ -49,9 +49,10 @@ public class LuaObject(Instance instance)
     public void Rotate(double x, double y, double z, double w)
     {
         var axis = new Vec3(x, y, z);
-        var r = Matrix4x4.Rotate(axis, w);
+        var angleRadians = InputUtils.DegreesToRadians(w);
+        var r = Matrix4x4.Rotate(axis, angleRadians);
 
-        _instance.Transform = new Transform(r);
+        _instance.Transform = new Transform(r * _instance.Transform.LocalToWorld);
     }
 
     /// <summary>
@@ -72,14 +73,14 @@ public class LuaObject(Instance instance)
                 (double)item.Get(2).Number,
                 (double)item.Get(3).Number
             );
-            var angle = (double)item.Get(4).Number;
+            var angleRadians = InputUtils.DegreesToRadians((double)item.Get(4).Number);
 
-            var r = Matrix4x4.Rotate(axis, angle);
+            var r = Matrix4x4.Rotate(axis, angleRadians);
 
             finalRotation = r * finalRotation;
         }
 
-        _instance.Transform = new Transform(finalRotation);
+        _instance.Transform = new Transform(finalRotation * _instance.Transform.LocalToWorld);
     }
 
     private readonly Instance _instance = instance;

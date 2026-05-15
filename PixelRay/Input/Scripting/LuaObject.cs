@@ -30,7 +30,6 @@ public class LuaObject(Instance instance)
 
         _instance.Transform = new Transform(t * _instance.Transform.LocalToWorld);
     }
-    public void Position(double x, double y, double z) => Translate(x, y, z); // alias for Translate
 
     /// <summary>
     /// Scale instance object size

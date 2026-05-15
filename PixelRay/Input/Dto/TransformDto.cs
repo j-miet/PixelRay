@@ -7,12 +7,12 @@ public class TransformDto
 {
     // axis direction (first three) + angle (final index). Allows multiple rotations.
     public double[][] Rotation { get; set; } = [[0, 0, 0, 0]];
-    public double[] Position { get; set; } = [0, 0, 0];
+    public double[] Translate { get; set; } = [0, 0, 0];
     public double[] Scale { get; set; } = [1, 1, 1];
 
     public Transform Build()
     {
-        Matrix4x4 translate = Matrix4x4.Translate(new(Position[0], Position[1], Position[2]));
+        Matrix4x4 translate = Matrix4x4.Translate(new(Translate[0], Translate[1], Translate[2]));
         Matrix4x4 scale = Matrix4x4.Scale(new Vec3(Scale[0], Scale[1], Scale[2]));
         Matrix4x4 rotation = Matrix4x4.Identity();
 

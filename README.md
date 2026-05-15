@@ -1,13 +1,14 @@
 # Simple ray tracer for pixel-themed scenes and animations
 
-| ![](docs/Images/Demo/default.png) |
-|:--:|
-|Static base scene|
+<figure align="center">
+  <img src="docs/Images/Demo/default.png" alt="Default scene">
+  <figcaption>Static base scene.</figcaption>
+</figure>
 
-
-| ![](docs/Images/defaultGif.gif) |
-|:--:|
-| Animation from base scene|
+<figure align="center">
+  <img src="docs/Images/defaultGif.gif" alt="Default animation">
+  <figcaption>Animation from base scene</figcaption>
+</figure>
 
 > More static demo images can be found [here](docs/Images/Demo/)
 

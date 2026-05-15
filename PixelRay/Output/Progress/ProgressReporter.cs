@@ -3,7 +3,7 @@ namespace PixelRay.Output.Progress;
 /// <summary>
 /// Handles rendering progress updates via a callback function
 /// </summary>
-public class ProgressReporter(int total, Action<RenderProgress> callback)
+public class ProgressReporter(int frame, int total, Action<RenderProgress> callback)
 {
     private int _done;
     private readonly int _total = total;
@@ -17,6 +17,7 @@ public class ProgressReporter(int total, Action<RenderProgress> callback)
         if (done % 500 == 0 || done == _total)
         {
             _callback(new RenderProgress(
+                frame,
                 done,
                 _total,
                 (double)done / _total

@@ -213,13 +213,13 @@ static class CreatePixelRay
             {
                 lua.Update(frame);
 
-                buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug);
+                buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug, frame);
                 ImageWriter.WritePNG($"{frameOutputDir}/frame-{frame}.png", buffer); // scripts will only produce png
             }
 
             // produce a GIF from frames
             if (values["produceGif"] == "enabled")
-                GifBuilder.Build(frameOutputDir, "output.gif");
+                GifBuilder.Build(frameOutputDir, "outputGIF.gif");
 
             return;
         }

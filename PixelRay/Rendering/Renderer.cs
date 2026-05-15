@@ -47,7 +47,8 @@ public class Renderer(
         Camera camera,
         bool threading,
         int upScale = 1,
-        DebugMode mode = DebugMode.None
+        DebugMode mode = DebugMode.None,
+        int frame = -1
     )
     {
         int scaledW = upScale * _width;
@@ -55,7 +56,10 @@ public class Renderer(
         FrameBuffer buffer = new(scaledW, scaledH);
 
         var consoleBar = new ProgressBar(30);
+
+
         var reporter = new ProgressReporter(
+            frame,
             _width * _height,
             consoleBar.Update
         );

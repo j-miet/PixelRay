@@ -17,9 +17,9 @@ public class SpotLight(
     int shadowBands = 0
 ) : PointLight(position, color, intensity, lightRadius, shadowBands)
 {
-    public Vec3 Direction { get; } = direction.Unit();
-    public double Angle { get; } = outerAngle;
-    public double InnerAngle { get; } = innerAngle <= outerAngle ? innerAngle : outerAngle;
+    public Vec3 Direction { get; set; } = direction.Unit();
+    public double OuterAngle { get; set; } = outerAngle;
+    public double InnerAngle { get; set; } = innerAngle <= outerAngle ? innerAngle : outerAngle;
 
     public override LightContribution Shade(Scene scene, in HitRecord hit)
     {
@@ -29,7 +29,7 @@ public class SpotLight(
 
         double cosAngle = Vec3.Dot(-dir, Direction); // invert to make both point into same direction
 
-        double outerCos = Math.Cos(Angle * 0.5 * Math.PI / 180); // halve the input angle
+        double outerCos = Math.Cos(OuterAngle * 0.5 * Math.PI / 180); // halve the input angle
 
         // cosine is decreasing on [0, PI/2]: angle larger than outer = point is outside cone's vision
         if (cosAngle < outerCos)

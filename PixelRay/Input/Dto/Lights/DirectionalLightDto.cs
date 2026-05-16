@@ -17,6 +17,9 @@ public class DirectionalLightDto : ILightDto
             InputUtils.ToVec3(Direction),
             InputUtils.ToColor(Color),
             Intensity
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

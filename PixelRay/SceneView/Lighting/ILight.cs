@@ -10,8 +10,12 @@ namespace PixelRay.SceneView.Lighting;
 /// </summary>
 public interface ILight
 {
-    public ColorRGB Color { get; }
-    public double Intensity { get; }
+    // these are for Lua scripting
+    public int Id { get; set; }
+    public string? Name { get; set; }
+
+    public ColorRGB Color { get; set; }
+    public double Intensity { get; set; }
 
     public LightContribution Shade(
         Scene scene,

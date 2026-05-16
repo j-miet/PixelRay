@@ -14,11 +14,14 @@ public class PointLight(
     int shadowBands = 0
 ) : ILight
 {
-    public Vec3 Position { get; } = position;
-    public ColorRGB Color { get; } = color;
-    public double LightRadius { get; } = lightRadius;
-    public double Intensity { get; } = intensity;
-    public int ShadowBands { get; } = shadowBands;
+    public int Id { get; set; }
+    public string? Name { get; set; }
+
+    public Vec3 Position { get; set; } = position;
+    public ColorRGB Color { get; set; } = color;
+    public double LightRadius { get; set; } = lightRadius;
+    public double Intensity { get; set; } = intensity;
+    public int ShadowBands { get; set; } = shadowBands;
 
     public virtual LightContribution Shade(Scene scene, in HitRecord hit)
     {

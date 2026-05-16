@@ -14,6 +14,9 @@ public class AmbientLightDto : ILightDto
         return new AmbientLight(
             InputUtils.ToColor(Color),
             Intensity
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

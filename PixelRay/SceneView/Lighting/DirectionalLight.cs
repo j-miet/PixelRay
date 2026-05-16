@@ -9,9 +9,12 @@ namespace PixelRay.SceneView.Lighting;
 /// </summary>
 public class DirectionalLight(Vec3 direction, ColorRGB color, double intensity = 1.0) : ILight
 {
-    public Vec3 Direction { get; } = direction.Unit();
-    public ColorRGB Color { get; } = color;
-    public double Intensity { get; } = intensity;
+    public int Id { get; set; }
+    public string? Name { get; set; }
+
+    public Vec3 Direction { get; set; } = direction.Unit();
+    public ColorRGB Color { get; set; } = color;
+    public double Intensity { get; set; } = intensity;
 
     public LightContribution Shade(Scene scene, in HitRecord hit)
     {

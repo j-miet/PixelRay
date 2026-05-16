@@ -1,18 +1,17 @@
 using MoonSharp.Interpreter;
+
 using PixelRay.SceneView;
 
 namespace PixelRay.Input.Scripting;
 
 public class LuaEngine
 {
-    private readonly Script _lua = new();
-    private Camera? _camera;
-
     public LuaEngine()
     {
         UserData.RegisterType<LuaSceneApi>();
-        UserData.RegisterType<LuaObject>();
         UserData.RegisterType<LuaCameraApi>();
+        UserData.RegisterType<LuaObjectApi>();
+        UserData.RegisterType<LuaLightApi>();
     }
 
     public void AttachScene(Scene scene, Camera camera)
@@ -39,4 +38,7 @@ public class LuaEngine
 
         _camera?.Rebuild();
     }
+
+    private readonly Script _lua = new();
+    private Camera? _camera;
 }

@@ -39,14 +39,23 @@ public static class SceneBuilder
                 scene.AddObject(instance);
 
                 if (!string.IsNullOrEmpty(instance.Name))
-                    scene.NameLookup[instance.Name] = instance.Id;
+                    scene.ObjectLookup[instance.Name] = instance;
             }
         }
 
         if (dto.Lights != null)
         {
-            foreach (var light in dto.Lights)
-                scene.AddLight(light.Build());
+            foreach (var l in dto.Lights)
+            {
+                var light = l.Build();
+
+                light.Id = id++;
+
+                scene.AddLight(light);
+
+                if (!string.IsNullOrEmpty(light.Name))
+                    scene.LightLookup[light.Name] = light;
+            }
         }
 
         RendererSettings settings = LoadRendererSettings(dto.Render);

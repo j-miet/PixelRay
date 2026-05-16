@@ -27,6 +27,9 @@ public class SpotLightDto : ILightDto
             Intensity,
             LightRadius,
             ShadowBands
-        );
+        )
+        {
+            Name = Name
+        };
     }
 }

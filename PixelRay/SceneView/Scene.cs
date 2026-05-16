@@ -12,17 +12,13 @@ public class Scene
     public List<Instance> Objects { get; } = [];
     public List<ILight> Lights { get; } = [];
 
-    public Dictionary<string, int> NameLookup = [];
+    public Dictionary<string, Instance> ObjectLookup = [];
+    public Dictionary<string, ILight> LightLookup = [];
 
-    public Instance Get(string name)
-    {
-        return Objects[NameLookup[name]];
-    }
-
-    public void AddObject(Instance obj)
-    {
-        Objects.Add(obj);
-    }
-
+    public void AddObject(Instance obj) => Objects.Add(obj);
     public void AddLight(ILight light) => Lights.Add(light);
+
+    // these are for scripting
+    public Instance GetObject(string name) => ObjectLookup[name];
+    public ILight GetLight(string name) => LightLookup[name];
 }

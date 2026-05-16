@@ -25,26 +25,46 @@ public class LuaObjectApi(Instance instance)
     public void Translate(double x, double y, double z)
     {
         var t = Matrix4x4.Translate(x, y, z);
+        Vec3 newPos = _instance.Transform.Position + new Vec3(x, y, z);
 
-        _instance.Transform = new Transform(t * _instance.Transform.LocalToWorld);
+        _instance.Transform = new Transform(t * _instance.Transform.LocalToWorld)
+        {
+            Position = newPos
+        };
     }
 
     public void Scale(double x, double y, double z)
     {
+        Vec3 pos = _instance.Transform.Position;
+
+        var posT = Matrix4x4.Translate(pos);
+        var invPosT = Matrix4x4.Translate(-pos);
+
         var s = Matrix4x4.Scale(x, y, z);
 
-        _instance.Transform = new Transform(s * _instance.Transform.LocalToWorld);
+        _instance.Transform = new Transform(posT * s * invPosT * _instance.Transform.LocalToWorld)
+        {
+            Position = pos
+        };
     }
 
     public void ScaleUniform(double t) => Scale(t, t, t);
 
     public void Rotate(double x, double y, double z, double w)
     {
+        Vec3 pos = _instance.Transform.Position;
+
+        var posT = Matrix4x4.Translate(pos);
+        var invPosT = Matrix4x4.Translate(-pos);
+
         var axis = new Vec3(x, y, z);
         var angleRadians = InputUtils.DegreesToRadians(w);
         var r = Matrix4x4.Rotate(axis, angleRadians);
 
-        _instance.Transform = new Transform(r * _instance.Transform.LocalToWorld);
+        _instance.Transform = new Transform(posT * r * invPosT * _instance.Transform.LocalToWorld)
+        {
+            Position = pos
+        };
     }
 
     public void RotateMultiple(DynValue rotations)

@@ -12,7 +12,8 @@ public class TransformDto
 
     public Transform Build()
     {
-        Matrix4x4 translate = Matrix4x4.Translate(new(Translate[0], Translate[1], Translate[2]));
+        Vec3 TranslateVector = new(Translate[0], Translate[1], Translate[2]);
+        Matrix4x4 translate = Matrix4x4.Translate(TranslateVector);
         Matrix4x4 scale = Matrix4x4.Scale(new Vec3(Scale[0], Scale[1], Scale[2]));
         Matrix4x4 rotation = Matrix4x4.Identity();
 
@@ -24,6 +25,9 @@ public class TransformDto
             rotation *= Matrix4x4.Rotate(new(r[0], r[1], r[2]), radianAngle);
         }
 
-        return new Transform(translate * rotation * scale);
+        return new Transform(translate * rotation * scale)
+        {
+            Position = TranslateVector
+        };
     }
 }

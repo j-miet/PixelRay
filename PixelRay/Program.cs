@@ -98,7 +98,7 @@ static class CreatePixelRay
                         if (args[i + 1] is not null)
                         {
                             flag = args[i + 1];
-                            if (flag == "-g" || flag == "-gif")
+                            if (flag == "-g" || flag == "--gif")
                             {
                                 values["produceGif"] = "enabled";
                                 i++;

@@ -10,5 +10,5 @@ namespace PixelRay.SceneView.InstanceObject.Geometry;
 public interface IGeometry
 {
     bool Hit(Ray ray, Interval rayT, out HitRecord hit);
-    // AABB BoundingBox(); later for BHV
+    // AABB BoundingBox(); later for BVH
 }

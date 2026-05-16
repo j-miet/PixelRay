@@ -15,6 +15,9 @@ namespace PixelRay.SceneView.InstanceObject;
 /// </summary>
 public struct Transform
 {
+    // for scripting only, no need to add quaternions just for this
+    public Vec3 Position = new();
+
     public Matrix4x4 LocalToWorld;
     public Matrix4x4 WorldToLocal;
     public Matrix4x4 NormalMatrix;

@@ -24,7 +24,10 @@ public class Instance(
 
     public IGeometry Geometry = geometry;
     public IMaterial Material = material;
-    public Transform BaseTransform = new(transform.LocalToWorld);
+    public Transform BaseTransform = new(transform.LocalToWorld)
+    {
+        Position = transform.Position
+    };
     public Transform Transform = transform;
 
     public bool Hit(Ray ray, Interval rayT, out HitRecord hit)

@@ -2,7 +2,8 @@
 
 **You still need a static scene file for initial state. If you don't have one, see [Scene.md](Scene.md)**
 
-**Scene and script file templates used for producing README image + gif can be in [scene-template](../scene-template/) directory**
+**Scene and script file templates used for producing README image + gif can be 
+in [scene-template](../scene-template/) directory**
 
 
 ## How to
@@ -36,39 +37,23 @@
     torus1 = scene:GetObject("torus1")
     ```
 
+- Similarly, to access a light, use `GetLight(name)`:
+
+    ```lua
+    dir = scene:GetLight("directionalLight")
+    ```
+
 Currently only transforms can be manipulated.
 
 ### Transforms
 
-#### Order of operations (IMPORTANT)
-
-For static scenes, PixelRay will always perform translation in this order:  
-    
-    scale -> rotate -> translate
-
-Reason is that all geometry objects primitives are origin-centered so matrix transforms behave as expected.
-
-**What this means for animations:**
-
-- translations work always
-- scaling and rotating: 
-    - requires you to translate object into origin (0, 0, 0)
-    - then perform scaling and/or rotating
-    - then translate back to actual position
-
-    For example: object at (1, 0.5, -2), you want to scale it. You then first move to (0, 0, 0) by applying inverse translation (-1, -0.5, 2) then scale, then apply translation (1, 0.5, -2) again.
-
-**It's important to follow this principle, otherwise your animations will not produce correct frames.**
-
----
-
-#### Transform commands
-
 - `ResetTransform()`  
     Resets object back to base transformation defined in json scene file
 
-    - this is good for parametric equations: instead of using previous state, reset back to initial then let **t** define new state
-    - it also good to use this for stability purposes: long animations require stacking lots of transformations -> lots of matrix multiplication -> possible numerical instability
+    - this is good for parametric equations: instead of using previous state, reset back to initial then let **t** 
+    define new state
+    - it also good to use this for stability purposes: long animations require stacking lots of transformations -> 
+    lots of matrix multiplication -> possible numerical instability
 
     **Example:**
     ```lua
@@ -78,7 +63,8 @@ Reason is that all geometry objects primitives are origin-centered so matrix tra
 - `Translate(x, y, z)`  
     Move object to new position along vector (x, y, z) from current position
 
-    - this doesn't move you TO position (x, y, z), but rather adds the vector so you move along it's direction and magnitude (= summing two vectors)
+    - this doesn't move you TO position (x, y, z), but rather adds the vector so you move along it's direction and 
+    magnitude (= summing two vectors)
     
     **Example:**
     ```lua
@@ -127,8 +113,106 @@ Reason is that all geometry objects primitives are origin-centered so matrix tra
     obj:RotateMultiple({1, 0, 0, 90}, {0, 1, 0, 90}, {0, 0, 1, 90})
     ```
     
-    This would first perform 90 degree x-direction rotation, then same for y-direction and finally for z-direction. In this case, outcome is same as a single (0, 1, 0, 90) rotation.
+    This would first perform 90 degree x-direction rotation, then same for y-direction and finally for z-direction. 
+    In this case, outcome is same as a single (0, 1, 0, 90) rotation.
 
+### Lights
 
+- `Color(r, g, b)`  
+    Color of light source. Each colors is normalized to interval [0, 1], values leaving this boundary get clamped to
+    0 or 1.
 
+    **Example:**
+    ```lua
+    light:Color(1, 1, 1)
+    ```
 
+    translates to (255, 255, 255) or white color.
+
+- `Intensity(value)`
+
+    Light intensity, effectively controls the multiplier `Intensity / (0.01 + distance^2)`.
+
+    **Example:**
+    ```lua
+    light:Intensity(2)
+    ```
+
+- `Direction(x, y, z)`
+    Light direction, applies only to directional and spot light types.
+    
+    Both use opposite direction principle:
+    - DirectionalLight: from ray hit point to source
+    - SpotLight: from source to ray hit point
+
+    **Example:**
+    ```lua
+    directional:Direction(1, 1, 1)
+    ```
+    Here you can think light from origin to (1, 1, 1). Thus global light ray arrives from (-1, -1, -1), or visually
+    from upward right in a 45 degree angle but then angles another 45 degrees to positive z-direction.
+
+    ```lua
+    spot:Direction(1, 1, 1)
+    ```
+    For a spotlight this just simply points from source position to direction (1, 1, 1) as you'd expected
+
+- `Position(x, y, z)`
+
+    Light source position/origin if PointLight or SpotLight.
+
+    **Example:**
+    ```lua
+    point:Direction(0, 0, 0)
+    ```
+
+- `LightRadius(radius)`
+
+    Sampling radius for soft shadows. Works only for area lights e.g. PointLight and SpotLight.
+    
+    - soft shadows are very simple and there also quite rough-looking, especially in animations
+    - use radius=0 for only hard shadows i.e. this light source will not contribute to soft shadows. 
+    - sampling is actually not random, but rather uses fixed offsets. For this reason the shadow can look very blocky
+    or spread out
+    - very low values usually work even in animation. Even moderate radii will start to produce said side effects.
+
+    **Example:**
+    ```lua
+    point:LightRadius(0.5)
+    ```
+
+- `ShadowBands(bands)`
+
+    Soft shadow color quantization steps so an integer value. Works only with LightRadius > 0. 
+    - values 0/1 mean no quantization, 
+    then from 2 and higher will nudge shadow color to closest interval.
+    - therefore higher values add smoothness, low values cause very clear shading bands
+
+    **Example:**
+    ```lua
+    point:ShadowBands(4)
+    ```
+
+- `OuterAngle`
+
+    SpotLight outer cone angle. Points outside this angle are entirely shadowed
+    - uses degrees, NOT radians
+    - uses full angles e.g. 10 degrees means that plane angle is 5 degrees to left and right.
+    - values beyond 90 degree will probably look weird and extends behind the pointing direction
+
+    **Example:**
+    ```lua
+    spot:OuterAngle(60)
+    ```
+
+- `InnerAngle`
+
+    SpotLight inner cone angle. Points inside this angle are fully lighted. Anything between inner and outer angles
+    will gradually become dimmer towards outer edge.
+    - uses degrees
+    - inner angle cannot exceed outer angle
+    - also uses full angles
+
+    ```lua
+    spot:InnerAngle(45)
+    ```

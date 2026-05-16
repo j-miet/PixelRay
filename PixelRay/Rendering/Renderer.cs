@@ -45,7 +45,7 @@ public class Renderer(
     public FrameBuffer Render(
         Scene scene,
         Camera camera,
-        bool threading,
+        bool threading = true,
         int upScale = 1,
         DebugMode mode = DebugMode.None,
         int frame = -1

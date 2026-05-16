@@ -20,5 +20,5 @@ public class RendererSettings
     public int DitherLevels { get; set; } = 16;
     public int DitherDimension { get; set; } = 4;
 
-    public bool Threading { get; set; } = false;
+    public bool Threading { get; set; } = true;
 }

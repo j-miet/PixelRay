@@ -1,0 +1,7 @@
+To produce default and gif from README:
+
+- move scene.json and script.lua into same directory as PixelRay executable, then
+
+PixelRay -i scene.json -o output.png
+
+PixelRay -i scene.json -s script.lua 195 -g

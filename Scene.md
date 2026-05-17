@@ -207,7 +207,7 @@ For radius types:
 
 ## Example
 
-> Comments are **not supported** in actual json format and would have to be removed before use.
+> Comments are **not supported** in actual json format and would have to be removed before use
 
 ```json
 {

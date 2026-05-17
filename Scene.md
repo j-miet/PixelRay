@@ -1,14 +1,23 @@
- ## Right-hand coordinates:
-- standard: 
-    - x increases to right, y increases upwards, camera points to negative z-axis
-    - `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this system
-- in general:
- 
-    `lookAt` and `up` directions define an orthonormal basis where lookAt is the forward axis, up the upward axis. 
-    These produce the right axis. Finally right and forward produce orthogonal upward axis (if `up` isn't a valid one 
-    for this new basis already)
+**This document is about static scenes creation.**
 
-=> `lookAt` is the forward direction, `up` can be used to rotate/flip output image
+**If you'd like to add scripting to your scene, see [Lua.md](Lua.md)**.
+
+## Right-hand coordinates:
+
+**X increases to right, Y increases upwards, camera points to negative Z**
+
+So when you setup camera:
+
+- standard: 
+    - `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this base system
+
+- custom:
+
+    `lookAt` and `up` directions define an orthonormal basis where lookAt is the forward axis, up the upward axis. 
+    These produce the right axis. Finally right and forward produce orthogonal upward axis if `up` isn't a valid one 
+    for this new basis already
+
+    => `lookAt` is the forward direction, `up` can be used for rotating output image
 
 ## Json file
 
@@ -89,7 +98,7 @@ Each object has optional `name` field. This can be used for accessing specific o
     - `minBounds` and `maxBounds` define x,y,z axis bounds so objects don't become infinite. Both use `[x, y, z]` 
     format.
 - `AAbox` axis-aligned box, **cannot be rotated**
-    - `minBounds` and `maxBounds` are used to limit box. These use `[x, y, z]` format.
+    - `minBounds` and `maxBounds` are used for limiting box boundaries. These use `[x, y, z]` format.
 
 Use transforms to change object geometry, and materials to change color & how light is reflected
 
@@ -236,7 +245,7 @@ For radius types:
                 "type": "surface",
                 "color": [0.7, 0.2, 0.2]
             },
-			"transform": { // transforms are used to change object's default geometry (position, size/shape, rotation)
+			"transform": { // transforms are used for changing object's default geometry (position, size/shape, rotation)
                 "scale": [0.05, 0.05, 0.05],
                 "position": [-0.3, -0.2, -0.28]
             }

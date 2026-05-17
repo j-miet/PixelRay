@@ -1,6 +1,6 @@
 **This document is about creating scripts to produce dynamic scenes**.
 
-**You still need a static scene file for initial state. If you don't have one, see [Scene.md](Scene.md)**
+**You still need a static scene file for initial state. If you don't have one, see [Scene.md](Scene.md)**.
 
 ## How to
 
@@ -19,7 +19,7 @@
 - aspect ratio (`camera:AspectRatio`)
     - no internal calculation are performed so this just a raw value
 
-`scene` can be used to access the scene itself
+`scene` can be used for accessing the scene itself
 
 - To access an object instance, use `GetObject(name)` and store reference to a variable:
 

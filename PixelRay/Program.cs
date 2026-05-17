@@ -83,8 +83,19 @@ static class CreatePixelRay
                     {
                         if (args[i + 1] is not null)
                         {
-                            values["script"] = args[i + 1];
-                            i++;
+                            string scriptFile = args[i + 1];
+                            string format = scriptFile.Split(".")[1];
+
+                            if (format == "lua")
+                            {
+                                values["script"] = args[i + 1];
+                                i++;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Script must use lua format");
+                                return;
+                            }
                         }
 
                         string flag;
@@ -103,11 +114,16 @@ static class CreatePixelRay
                                 values["produceGif"] = "enabled";
                                 i++;
                             }
+                            else
+                            {
+                                Console.WriteLine("Use -g or --gif");
+                                return;
+                            }
                         }
                     }
                     catch (IndexOutOfRangeException)
                     {
-                        Console.WriteLine("Usage: -o <outputPath>");
+                        Console.WriteLine("Usage: -s <scriptLua> <frames> {-g}");
                         return;
                     }
                     break;
@@ -144,7 +160,7 @@ static class CreatePixelRay
 
                 default:
                     Console.WriteLine($"Unsupported arg: {val}");
-                    break;
+                    return;
             }
         }
 

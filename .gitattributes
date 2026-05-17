@@ -5,6 +5,6 @@
 # Example => 
 # ".github/**" export-ignore
 # This would ignore .github directory
-"docs/Images/**" export-ignore
+"demo/**" export-ignore
 ".github/**" export-ignore
 "tests/**" export-ignore

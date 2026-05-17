@@ -1,16 +1,16 @@
 # PixelRay: simple ray tracer for pixel/retro-themed scenes and animations
 
 <p align="center">
-  <img src="docs/Images/defaultScene.png" alt="Default scene"><br>
+  <img src="demo/defaultScene.png" alt="Default scene"><br>
   <em>Static base scene</em>
 </p>
 
 <p align="center">
-  <img src="docs/Images/defaultGif.gif" alt="Default animation"><br>
+  <img src="demo/defaultGif.gif" alt="Default animation"><br>
   <em>Animation from base scene</em>
 </p>
 
-> More static demo images can be found [here](docs/Images/Demo/)
+> More static demo images can be found [here](demo/images/)
 
 ## Table of contents
 
@@ -47,7 +47,7 @@ PixelRay supports following tools for achieving pixel-themed look:
 
 ## How to use
 
-- Executables for 64-bit Windows and Linux-x64 can be found in [Releases](https://github.com/j-miet/PixelRay/releases)
+- Executables for 64-bit Windows and Linux-x64 can be found in [GitHub Releases](https://github.com/j-miet/PixelRay/releases) page
 - Otherwise you need to [build from source](#building-from-source)
 
 To produce an output image, paths for scene and output files are required:
@@ -124,11 +124,9 @@ To avoid file path issues, just keep scene and script file in the same directory
 
 ## Scene
 
-> Scene file and animation script templates can be found in [here](scene-template).
-
 Scenes use **json** format.
 
-For all scene parameters and their explanations, see [Scene.md](docs/Scene.md)
+For all scene parameters and their explanations, see [Scene.md](Scene.md)
 
 ### Scripting
 
@@ -140,7 +138,7 @@ Scripting can be applied to
 - object transforms (translation/positioning, scaling, rotations)
 - camera (position, forward/upward direction, fov, aspect ratio)
 
-For scripting API, see [Lua.md](docs/Lua.md)
+For scripting API, see [Lua.md](Lua.md)
 
 ## Building from source
 
@@ -154,7 +152,7 @@ are be well-supported on Windows, Linux and macOS.
 
 To build the executable:
 
-1.  you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). PixelRay uses 
+1. install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
 version 10.0.
 
 2. change working directory to project source i.e. the directory where **Pixelray.csproj** file is located.

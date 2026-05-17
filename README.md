@@ -63,7 +63,7 @@ call default image opener program via shell execution:
 ./PixelRay -i scene.json -o output.png -p
 ```
 
-For scripting e.g. animations you to input static scene and Lua script file for modifying it. This can be do 
+For scripting e.g. animations, input static scene and Lua script files. This can be do 
 with `-s`/`--script` flag:
 
 ```bash

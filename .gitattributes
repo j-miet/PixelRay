@@ -1,10 +1,7 @@
 # Assign file content and end-of-line type
 *.txt text
 
-# Github Release source code zip file contents; use export-ignore to drop files
-# Example => 
-# ".github/**" export-ignore
-# This would ignore .github directory
-"demo/**" export-ignore
+# Github Release source code archive contents; use export-ignore to drop files
+"demo" export-ignore
 ".github/**" export-ignore
-"tests/**" export-ignore
+"tests" export-ignore

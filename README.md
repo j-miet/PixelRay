@@ -1,7 +1,7 @@
-# Simple ray tracer for pixel-themed scenes and animations
+# PixelRay: simple ray tracer for pixel/retro-themed scenes and animations
 
 <p align="center">
-  <img src="docs/Images/Demo/default.png" alt="Default scene"><br>
+  <img src="docs/Images/defaultScene.png" alt="Default scene"><br>
   <em>Static base scene</em>
 </p>
 
@@ -14,34 +14,69 @@
 
 ## Table of contents
 
+- [<u>Pixel-look</u>](#pixel-look)
 - [<u>How to use</u>](#how-to-use)
 - [<u>Scene</u>](#scene)
     - [<u>Scripting</u>](#scripting)
-- [<u>Pixel-look</u>](#pixel-look)
 - [<u>Building from source</u>](#building-from-source)
 - [<u>Running tests</u>](#running-tests)
 - [<u>Future additions</u>](#future-additions)
 
+## Pixel-look
+
+PixelRay supports following tools for achieving pixel-themed look:
+
+- low resolutions + nearest-neighbor upscaling for higher resolutions
+- lighting quantization
+- hard shadows + simple soft shadow logic with fixed disc offsets instead of sampling. Adjustable light radius and
+ shadow quantization bands
+    - soft shadows can look quite rough and out of place if light radius is even slightly larger, especially in 
+    animations
+- ordered dithering
+- keep reflection bounces low
+    - reflections + enough lighting are good for local use
+    - global illumination is not really possible as each ray follows just a single path. So even with high bounces and 
+    lot of reflective surfaces the end outcome is probably not that good. Of course this can still create interesting 
+    visuals
+    - diffused lighting can be used for additional dithering/flickering in animations
+- custom color palettes
+    - not required, but can certainly change the aesthetics a lot
+
+=> no anti-aliasing, resampling or realistic lighting (global illumination). Focus is on aliasing the initial output
+ to achieve a stylistic look
 
 ## How to use
 
-**Executables for Windows** (and probably Linux-x64) will be added soon. Otherwise you need to
-[build from source](#building-from-source).
+- Executables for 64-bit Windows and Linux-x64 can be found in [Releases](https://github.com/j-miet/PixelRay/releases)
+- Otherwise you need to [build from source](#building-from-source)
 
 To produce an output image, paths for scene and output files are required:
 
 ```bash
-PixelRay -i <inputPath> -o <outputPath>
+./PixelRay -i <inputPath> -o <outputPath>
 ```
 
 If you want to automatically open the output after rendering, add the `-p`/`--preview` flag. This will attempt to 
 call default image opener program via shell execution:
 
 ```bash
-PixelRay -i scene.json -o output.png -p
+./PixelRay -i scene.json -o output.png -p
 ```
 
-To avoid file path issues, just keep scene (and script) file in the same directory with executable
+For scripting e.g. animations you to input static scene and Lua script file for modifying it. This can be do 
+with `-s`/`--script` flag:
+
+```bash
+./PixelRay -i <inputPut> -s <scriptFile> <frames> {-g}
+```
+
+Here `frames` is the total amount of frames + optional `-g`/`--gif` to produce a GIF from produced frames. For example
+
+```bash
+./PixelRay -i scene.json -s script.lua 60 -g
+```
+
+To avoid file path issues, just keep scene and script file in the same directory with executable.
 
 #### All commands
 
@@ -60,7 +95,8 @@ To avoid file path issues, just keep scene (and script) file in the same directo
 - `-s <luaScript> <frameCount> {gif}` or `--script <luaScript> <frameCount> {gif}`
 
     Uses the static scene from `-i` command as a baseline then runs Lua script to produce output frames into 
-    `./frames` directory. Output format is always **png**, frame count defaults to 60 if frameCount is not a valid integer value.
+    `./frames` directory. Output format is always **png**, frame count defaults to 60 if frameCount is not a valid 
+    integer value.
     - script file uses Lua language and must there end in .lua
     - cannot be used with output or preview flags
     - automatically flushes `frames` directory to remove old images
@@ -96,8 +132,8 @@ For all scene parameters and their explanations, see [Scene.md](docs/Scene.md)
 
 ### Scripting
 
-Scripts use [Lua programming language](https://www.lua.org/start.html) embedded into C# 
-via [MoonSharp](https://github.com/moonsharp-devs/moonsharp).
+Scripts use Lua programming language embedded into C# 
+via [MoonSharp](https://github.com/moonsharp-devs/moonsharp) interpreter
 
 Scripting can be applied to
 
@@ -106,51 +142,36 @@ Scripting can be applied to
 
 For scripting API, see [Lua.md](docs/Lua.md)
 
-
-## Pixel-look
-
-To enforce pixelated theme:
-
-- low resolutions only, use nearest-neighbor upscaling for higher resolutions
-- lighting quantization
-- hard shadows + simple soft shadow logic with fixed disc offsets instead of sampling. Adjustable light radius and
- shadow quantization bands
-    - soft shadows can look quite rough and out of place without careful planning
-- keep reflection bounces low
-    - can always use ambient/directional lights if scene doesn't allow proper bouncing e.g. lack of reflective 
-    surfaces or open scene where rays bounce to infinity
-- ordered dithering
-- custom color palettes. Works just fine without, but these can certainly change the aesthetics a lot
-
-=> no anti-aliasing, resampling or realistic lighting (global illumination). Focus is on aliasing the initial output
- to achieve a stylistic look
-
 ## Building from source
 
 Both third-party packages
-- `SixLabors.ImageSharp` for png and gif generation
-- `MoonSharp` for Lua scripting support
+- [SixLabors.ImageSharp](https://github.com/SixLabors/ImageSharp) (png and gif generation)
+- [MoonSharp](https://github.com/moonsharp-devs/moonsharp) (Lua scripting)
 
 are be well-supported on Windows, Linux and macOS.
 
 ---
 
-To build the executable, you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). 
-PixelRay uses version 10.0.
+To build the executable:
 
+1.  you need to install [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux). PixelRay uses 
+version 10.0.
 
-Build command for .NET is
+2. change working directory to project source i.e. the directory where **Pixelray.csproj** file is located.
 
-> dotnet publish -c Release -r \<rid\> \<args\>
+3. Build with `dotnet publish -c Release -r <rid> <args>`
 
-There are generally two ways to build into an executable:
+---
+
+There are generally two ways to build project:
+
 1. Self-contained executable
-    - larger size (~37 MB on Windows, ~39 MB on Ubuntu) but runs on its own, no .NET runtime installation 
+    - larger size (almost 40 MB) but runs on its own, no .NET runtime installation 
     required from end user
-2. minimal exe + DLLs 
+2. minimal executable file + DLLs 
     - very small, but end user must have **.NET 10.0 Runtime** installed
 
-Instead of modifying *PixelRay.csproj* for each, both can be done by passing additional args.
+Instead of modifying *PixelRay.csproj* for each, both can be done by passing additional args to build command.
 
 - for args specification check 
 [this](https://learn.microsoft.com/en-us/dotnet/core/deploying/single-file/overview?tabs=cli)
@@ -181,7 +202,7 @@ No differences here, same commands work:
       -p:EnableCompressionInSingleFile=true
     ```
 
-2. minimal, but requires .NET
+2. minimal, but requires .NET runtime
     ```bash
     dotnet publish -c Release -r win-x64 \
       --self-contained false
@@ -198,34 +219,32 @@ used e.g. linux-x64 instead of win-x64
 [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux) version 10.0 is required.
 
 [xUnit](https://xunit.net/docs/getting-started/v3/getting-started) is used for testing. You don't need to download 
-this manually, tests.csproj includes all dependencies.
+this manually, tests.csproj includes all dependencies which will be downloaded when test command is run.
 
 **To run tests:** cd into "PixelRay/tests" then use command `dotnet test`
+
 
 ## Future additions
 
 The goal of this project is not to become become a large, heavily optimized ray/path tracing tool yet it should 
 still have a good amount of customization options. So here's a short list of what most likely gets added:
 
-- build-in color palettes + read palettes from files (so scene.json would only require the file path instead of 
-copy-pasting all the colors)
-- maybe depth of field/blur in some form
-- materials/mediums: glass, matte, lambertian, fog/gas
-    - maybe also simplistic emissive materials
+- build-in color palettes + read palettes from files 
+    - this way scene.json palette field would only require the file path instead of listing all the colors
+- depth of field/blur in some form
+- materials/mediums: glass, matte, fog/gas etc.
+    - maybe simple emissive materials although current lighting is already good enough
 - geometry:
-    - simple meshes for custom shapes. Also some kind of preview tool could be useful
+    - triangle meshes for custom shapes
     - maybe some new primitives
-    - maybe new transforms like shear
-- shared materials (and meshes): current system adds materials in each object, prevent reusing them
+- shared materials (and meshes): current system adds materials inside each object, preventing reusing them
 - performance 
-    - at least BHV when meshes get added
+    - at least BVH when meshes get added
+        - so far only torus primitive uses something similar with a lazy bouncing sphere logic
     - otherwise some smaller optimizations here and there
-- scipting: add lights (transforms and camera controls already there)
 - more tests
 
 #### Priority
-1. light manipulation in scripts
-2. meshes + BHV
-3. new materials/mediums
-4. shared materials and meshes
-4. the rest
+1. meshes + BVH
+2. new materials/mediums
+3. the rest

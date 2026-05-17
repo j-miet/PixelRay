@@ -2,6 +2,6 @@
 *.txt text
 
 # Github Release source code archive contents; use export-ignore to drop files
-"demo" export-ignore
+"demo/**" export-ignore
 ".github/**" export-ignore
-"tests" export-ignore
+"tests/**" export-ignore

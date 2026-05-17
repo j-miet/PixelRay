@@ -6,8 +6,16 @@ name: xUnit - Unit Tests
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - ".github/workflows/**"
+      - "PixelRay/**"
+      - "tests/**"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - ".github/workflows/**"
+      - "PixelRay/**"
+      - "tests/**"
 
 jobs:
   tests:

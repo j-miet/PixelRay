@@ -2,10 +2,6 @@
 
 **You still need a static scene file for initial state. If you don't have one, see [Scene.md](Scene.md)**
 
-**Scene and script file templates used for producing README image + gif can be 
-in [scene-template](../scene-template/) directory**
-
-
 ## How to
 
 - create a scene json file

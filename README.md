@@ -1,4 +1,4 @@
-# PixelRay: simple ray tracer for pixel/retro-themed scenes and animations
+# A simple ray tracer for pixel/retro-themed scenes and animations
 
 <p align="center">
   <img src="demo/defaultScene.png" alt="Default scene"><br>

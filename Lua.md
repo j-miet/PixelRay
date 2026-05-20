@@ -13,7 +13,7 @@
 
 `camera` is for camera access, you can manipulate
 - position (`camera:Position`)
-- look direction (`camera:LookAt`)
+- the point where camera looks at from it's current position (`camera:LookAt`)
 - upward axis (`camera:Up`)
 - field of view (`camera:Fov`)
 - aspect ratio (`camera:AspectRatio`)

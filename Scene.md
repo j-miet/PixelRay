@@ -4,20 +4,25 @@
 
 ## Right-hand coordinates:
 
-**X increases to right, Y increases upwards, camera points to negative Z**
+**X increases to right, Y increases upwards, forward direction is to negative Z**
 
 So when you setup camera:
 
 - standard: 
-    - `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this base system
+    
+    `position = (0, 0, 0)`, `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this base system
 
 - custom:
 
-    `lookAt` and `up` directions define an orthonormal basis where lookAt is the forward axis, up the upward axis. 
-    These produce the right axis. Finally right and forward produce orthogonal upward axis if `up` isn't a valid one 
-    for this new basis already
+    - `lookAt` is the point to which camera looks at from `position`. In other words when camera is at `position`, it points to direction `lookAt - position` which becomes the forward direction 
+    - `up` is upward axis direction
 
-    => `lookAt` is the forward direction, `up` can be used for rotating output image
+    These two directions define the right axis direction via cross product. Finally right and forward are used for producing the orthogonal upward axis if `up` isn't a valid one for this new basis already. This ensures the final camera coordinate basis is orthonormal.
+
+    Therefore
+    - `position` = camera position **point in space**
+    - `lookAt` = the **point in space** where camera looks at from it's current position
+    - `up` is upward **direction vector** which can be used for rotating output image
 
 ## Json file
 
@@ -29,10 +34,10 @@ Here are all the scene entities and their parameters
 ### Rendering
 
 #### camera
-- `origin`: `[x, y, z]`
+- `position`: `[x, y, z]`
     - origin/eye point/center of the camera
 - `lookAt`: `[x, y, z]`
-    - camera direction
+    - the point where camera looks at from it's current position. Internally this defines the actual look/forward direction as a vector `position-lookAt`
 - `up`: `[x, y, z]`
     - upward axis (useful for rotating)
 - `fov`: `decimal >= 0`

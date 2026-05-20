@@ -50,6 +50,8 @@ function update(t)
         x = radius*(sinAngle-center[1])
         z = radius*(cosAngle+center[3])
 
+        -- camera lookAt stays fixed at (0, 0, -1): 
+        -- this way camera points always at circle center while position handles the rotation along the circle path
         camera:Position(x, 0, z)
     end
 

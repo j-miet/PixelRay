@@ -2,22 +2,24 @@
 
 **If you'd like to add scripting to your scene, see [Lua.md](Lua.md)**.
 
-## Right-hand coordinates:
+## Camera
 
+Coordinates are right-handed:  
 **X increases to right, Y increases upwards, forward direction is to negative Z**
 
-So when you setup camera:
-
-- standard: 
+- standard camera: 
     
-    `position = (0, 0, 0)`, `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this base system
+    `position = (0, 0, 0)`, `lookAt = (0, 0, -1)`, `up = (0, 1, 0)` matches to this base system: 
+    - camera at origin
+    - camera looks at negative-z direction
+    - upward is positive y-axis
 
-- custom:
+- general:
 
     - `lookAt` is the point to which camera looks at from `position`. In other words when camera is at `position`, it points to direction `lookAt - position` which becomes the forward direction 
     - `up` is upward axis direction
 
-    These two directions define the right axis direction via cross product. Finally right and forward are used for producing the orthogonal upward axis if `up` isn't a valid one for this new basis already. This ensures the final camera coordinate basis is orthonormal.
+    Then forward and upward directions define the right axis direction via cross product. Finally right and forward are used for producing the orthogonal upward axis if `up` isn't a valid one for this new basis already. This ensures the final camera coordinate basis is orthonormal.
 
     Therefore
     - `position` = camera position **point in space**

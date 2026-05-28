@@ -47,7 +47,8 @@ PixelRay supports following tools for achieving pixel-themed look:
 
 ## How to use
 
-- Executables for 64-bit Windows and Linux-x64 can be found in [GitHub Releases](https://github.com/j-miet/PixelRay/releases) page
+- Executables for 64-bit Windows and Linux-x64 can be found in 
+[GitHub Releases](https://github.com/j-miet/PixelRay/releases/latest) page
 - Otherwise you need to [build from source](#building-from-source)
 
 To produce an output image, paths for scene and output files are required:
@@ -67,7 +68,7 @@ For scripting e.g. animations, input static scene and Lua script files. This can
 with `-s`/`--script` flag:
 
 ```bash
-./PixelRay -i <inputPut> -s <scriptFile> <frames> {-g}
+./PixelRay -i <inputPath> -s <scriptFilePath> <frames> {-g}
 ```
 
 Here `frames` is the total amount of frames + optional `-g`/`--gif` to produce a GIF from produced frames. For example
@@ -76,7 +77,9 @@ Here `frames` is the total amount of frames + optional `-g`/`--gif` to produce a
 ./PixelRay -i scene.json -s script.lua 60 -g
 ```
 
-To avoid file path issues, just keep scene and script file in the same directory with executable.
+would produce 60 frames and combine them into a gif. 
+
+Both the frame directory and output gif are created inside `<scripFilePath>` path.
 
 #### All commands
 
@@ -92,7 +95,7 @@ To avoid file path issues, just keep scene and script file in the same directory
     Attempts to open the output image after rendering by executing the image file, thus calling the default viewing 
     tool in process. Only available for png images as basic editors seldom support ppm.
 
-- `-s <luaScript> <frameCount> {gif}` or `--script <luaScript> <frameCount> {gif}`
+- `-s <luaScriptPath> <frameCount> {gif}` or `--script <luaScriptPath> <frameCount> {gif}`
 
     Uses the static scene from `-i` command as a baseline then runs Lua script to produce output frames into 
     `./frames` directory. Output format is always **png**, frame count defaults to 60 if frameCount is not a valid 
@@ -101,15 +104,8 @@ To avoid file path issues, just keep scene and script file in the same directory
     - cannot be used with output or preview flags
     - automatically flushes `frames` directory to remove old images
     - can optionally pass `-g` / `--gif` flag to produce a GIF file from saved frames.
-
-    Example:
-    
-    ```bash
-    PixelRay -i scene.json -s script.lua 30 -g
-    ```
-
-    produces files frame0.png to frame29.png in `./frames` and 
-    then combines these into a gif file as `outputGif.gif`
+    - both the output frames and produced gif are created inside the script location e.g. 
+    `<luaScriptPath>/frames/` and `<luaScriptPath>/outputGif.gif`
 
 - `--debug <mode>`
     

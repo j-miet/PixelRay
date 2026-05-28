@@ -19,6 +19,7 @@ static class CreatePixelRay
         values.Add("produceGif", "");
         values.Add("preview", "");
         values.Add("debug", "");
+        values.Add("progressUpdateRate", "");
 
         // parse CLI args and update config dictionary values
         try
@@ -160,6 +161,22 @@ static class CreatePixelRay
                     }
                     break;
 
+                case "-u" or "--updaterate":
+                    try
+                    {
+                        if (args[i + 1] is not null)
+                        {
+                            values["progressUpdateRate"] = args[i + 1];
+                            i++;
+                        }
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        Console.WriteLine("Usage: -u <updateRateInPixels>");
+                        return;
+                    }
+                    break;
+
                 default:
                     Console.WriteLine($"Unsupported arg: {val}");
                     return;
@@ -203,6 +220,14 @@ static class CreatePixelRay
         };
 
         FrameBuffer buffer;
+        int progressUpdateRate = 500;
+
+        // update bar progress rate: how many pixels to read between update prints
+        if (values["progressUpdateRate"] != "")
+        {
+            if (int.TryParse(values["progressUpdateRate"], out int updateRate))
+                progressUpdateRate = updateRate;
+        }
 
         // Lua script animations
         if (values["script"] != "")
@@ -250,7 +275,8 @@ static class CreatePixelRay
             {
                 lua.Update(frame);
 
-                buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug, frame);
+                buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug, frame,
+                                         progressUpdateRate);
 
                 ImageWriter.WritePNG($"{frameOutputDir}{Path.DirectorySeparatorChar}frame-{frame}.png", buffer);
             }
@@ -262,7 +288,8 @@ static class CreatePixelRay
             return;
         }
 
-        buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug);
+        buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug,
+                                 updateRate: progressUpdateRate);
 
         string outputPath = values["output"];
         string imageFormat = values["outputFormat"];

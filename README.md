@@ -107,6 +107,13 @@ Both the frame directory and output gif are created inside `<scripFilePath>` pat
     - both the output frames and produced gif are created inside the script location e.g. 
     `<luaScriptPath>/frames/` and `<luaScriptPath>/outputGif.gif`
 
+- `-u <updateRate>` or `--updaterate <updateRate>`
+
+    Changes progress bar update interval: how many pixels to render (from base resolution) before sending update print.
+    - default value is 500
+    - updateRate < 100 defaults to 500 (except 0): terminal can start to flickers with too fast updates. Even values above 100 will likely cause issues so adjust this accordingly.
+    - 0 is a special value: it sets updateRate=base_width*base_height, meaning there will only be a single update from 0% to 100%
+
 - `--debug <mode>`
     
     Renders image based on selected debug mode. These are:

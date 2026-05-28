@@ -38,17 +38,21 @@ public class Renderer(
     /// <summary>
     /// Render a scene through camera and return pixel buffer of rendered image.
     /// </summary>
+    /// <param name="threading">Toggle multithreading</param>
     /// <param name="upScale">Image upscaling factor using nearest-neighbor scaling</param>
     /// <param name="mode">What debug mode is used. Pass value as any DebugMode enum, which are: <br/>
     /// None, Normals, DepthHeat, ObjectId 
     /// </param>
+    /// <param name="frame">Current frame. Should only pass value >= 0 when creating a script animation</param>
+    /// <param name="updateRate">Amount of pixels to render before sending progress updates. Default is 500</param>
     public FrameBuffer Render(
         Scene scene,
         Camera camera,
         bool threading = true,
         int upScale = 1,
         DebugMode mode = DebugMode.None,
-        int frame = -1
+        int frame = -1,
+        int updateRate = 500
     )
     {
         int scaledW = upScale * _width;
@@ -61,7 +65,8 @@ public class Renderer(
         var reporter = new ProgressReporter(
             frame,
             _width * _height,
-            consoleBar.Update
+            consoleBar.Update,
+            updateRate
         );
 
         for (int y = 0; y < _height; y++)

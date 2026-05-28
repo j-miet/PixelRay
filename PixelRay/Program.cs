@@ -29,7 +29,8 @@ static class CreatePixelRay
             if (args[0] != "-i" || args[0] != "--image" || args[1] is not null)
             {
                 string input = args[1];
-                string format = input.Split(".")[1];
+                string format = Path.GetExtension(input).TrimStart('.');
+
                 if (format == "json")
                     values["input"] = input;
                 else
@@ -57,7 +58,8 @@ static class CreatePixelRay
                         if (args[i + 1] is not null)
                         {
                             string output = args[i + 1];
-                            string format = output.Split(".")[1];
+                            string format = Path.GetExtension(output).TrimStart('.');
+
                             if (format == "png" || format == "ppm")
                             {
                                 values["output"] = output;
@@ -84,7 +86,7 @@ static class CreatePixelRay
                         if (args[i + 1] is not null)
                         {
                             string scriptFile = args[i + 1];
-                            string format = scriptFile.Split(".")[1];
+                            string format = Path.GetExtension(scriptFile).TrimStart('.');
 
                             if (format == "lua")
                             {
@@ -106,7 +108,7 @@ static class CreatePixelRay
                             i++;
                         }
 
-                        if (args[i + 1] is not null)
+                        if (i + 1 < args.Length && args[i + 1] is not null)
                         {
                             flag = args[i + 1];
                             if (flag == "-g" || flag == "--gif")
@@ -164,10 +166,10 @@ static class CreatePixelRay
             }
         }
 
-        if (values["output"] == "" && values["preview"] == "" && values["script"] == "")
+        if (values["output"] == "" && values["script"] == "")
         {
-            Console.WriteLine("Input cannot be called without output/display or script command.\n" +
-                "Use -o and/or -p flags OR -s <luaScriptFilePath>."
+            Console.WriteLine("Input cannot be called without output or script command.\n" +
+                "Use -o <outputPath> or -s <luaScriptFilePath>."
             );
             return;
         }
@@ -205,7 +207,26 @@ static class CreatePixelRay
         // Lua script animations
         if (values["script"] != "")
         {
-            string frameOutputDir = "frames";
+            string scriptRoot = Path.GetDirectoryName(values["script"])!;
+
+            string gifOutputName = "outputGIF.gif";
+            string frameOutputDir;
+            string gifOutputPath;
+
+            if (scriptRoot == "")
+            {
+                frameOutputDir = "frames";
+                gifOutputPath = gifOutputName;
+            }
+            else
+            {
+                frameOutputDir = scriptRoot + Path.DirectorySeparatorChar + "frames";
+                gifOutputPath = scriptRoot + Path.DirectorySeparatorChar + gifOutputName;
+            }
+
+            // create output frame dir if it doesn't already exist
+            Directory.CreateDirectory(frameOutputDir);
+
             int totalFrames = 60;
 
             // flush frame directory
@@ -230,31 +251,41 @@ static class CreatePixelRay
                 lua.Update(frame);
 
                 buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug, frame);
-                ImageWriter.WritePNG($"{frameOutputDir}/frame-{frame}.png", buffer); // scripts will only produce png
+
+                ImageWriter.WritePNG($"{frameOutputDir}{Path.DirectorySeparatorChar}frame-{frame}.png", buffer);
             }
 
             // produce a GIF from frames
             if (values["produceGif"] == "enabled")
-                GifBuilder.Build(frameOutputDir, "outputGIF.gif");
+                GifBuilder.Build(frameOutputDir, gifOutputPath);
 
             return;
         }
 
         buffer = renderer.Render(scene, scene.Camera, settings.Threading, upScaleFactor, debug);
 
-        string outputFile = values["output"];
+        string outputPath = values["output"];
         string imageFormat = values["outputFormat"];
 
         if (values["output"] != "")
         {
             if (imageFormat == "ppm")
-                ImageWriter.WritePPM(outputFile, buffer);
+                ImageWriter.WritePPM(outputPath, buffer);
             else if (imageFormat == "png")
             {
-                ImageWriter.WritePNG(outputFile, buffer);
+                ImageWriter.WritePNG(outputPath, buffer);
 
                 if (values["preview"] == "enabled")
                 {
+                    // set directory to path so that shell can just call "<outputFile>.png" below
+                    try
+                    {
+                        Directory.SetCurrentDirectory(Path.GetDirectoryName(outputPath)!);
+                    }
+                    catch (ArgumentException) { } // directory is already "." so continue
+
+                    string outputFile = Path.GetFileName(outputPath);
+
                     // open output png image with default image viewing tool via shell execution
                     try
                     {
